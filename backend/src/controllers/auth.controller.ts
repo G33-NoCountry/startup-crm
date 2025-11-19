@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { UserService } from "../services/user.service";
 import { RegisterUserDto } from "../dto/auth/register-user.dto";
+import { UserResource } from "../resources/user/user-resource.resource";
 
 export class AuthController {
   private userService: UserService;
@@ -20,7 +21,7 @@ export class AuthController {
       return response.status(201).json({
         success: true,
         message: "Registro exitoso!",
-        data: user,
+        data: UserResource.toResponse(user),
       });
     } catch (error: any) {
       return response.status(500).json({
