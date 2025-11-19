@@ -24,11 +24,15 @@ module.exports = {
         allowNull: false,
       },
       role: {
-        type: Sequelize.ENUM('admin', 'agent', 'manager'),
+        type: Sequelize.ENUM('Admin', 'Agente', 'Manager'),
         allowNull: false,
       },
       status: {
         type: Sequelize.BOOLEAN,
+        allowNull: false,
+      },
+      avatar_color: {
+        type: Sequelize.STRING(6),
         allowNull: false,
       },
       created_at: {

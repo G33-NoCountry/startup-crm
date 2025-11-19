@@ -6,8 +6,9 @@ class User extends Model {
     public full_name!: string;
     public email!: string;
     public password!: string;
-    public role!: 'admin' | 'agent' | 'manager';
+    public role!: 'Admin' | 'Agente' | 'Manager';
     public status!: boolean;
+    public avatar_color!: string;
     public readonly created_at!: Date;
     public readonly updated_at!: Date;
 }
@@ -28,11 +29,15 @@ User.init(
             allowNull: false,
         },
         role: {
-            type: DataTypes.ENUM('admin', 'agent', 'manager'),
+            type: DataTypes.ENUM('Admin', 'Agente', 'Manager'),
             allowNull: false,
         },
         status: {
             type: DataTypes.BOOLEAN,
+            allowNull: false,
+        },
+        avatar_color: {
+            type: DataTypes.STRING(50),
             allowNull: false,
         },
     },
