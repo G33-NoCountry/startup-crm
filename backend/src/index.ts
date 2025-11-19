@@ -1,9 +1,11 @@
 import "dotenv/config";
 import express from "express";
-import { appConfig } from "./config/app.config";
-import router from "./routes/index";
 import cors from "cors";
+import { sequelize } from "./config/database.config";
+import { appConfig } from "./config/app.config";
 import { corsConfig } from "./config/cors.config";
+import { setupAssociations } from "./models";
+import router from "./routes/index";
 
 const app = express();
 
@@ -13,7 +15,20 @@ app.use(cors(corsConfig));
 
 app.use("/api", router);
 
+async function initializeDatabase() {
+  try {
+
+    await sequelize.authenticate();
+    console.log("✅ Database connection established successfully.");
+    setupAssociations();
+  } catch (error) {
+    console.error("❌ Unable to connect to the database: ", error);
+  }
+};
+
 const startServer = async () => {
+  await initializeDatabase();
+
   app.listen(appConfig.port, () => {
     console.log(`🚀 Server listening on port: ${appConfig.port}`);
     console.log(`🌍 Environment: ${appConfig.nodeEnv}`);
@@ -22,9 +37,9 @@ const startServer = async () => {
   });
 };
 
-startServer().catch((error) => {
-  console.error("❌ Failed to start server:", error);
-  process.exit(1);
-});
+startServer()
+  .catch((error) => {
+    console.error("❌ Failed to start server:", error);
+  });
 
 export default app;
