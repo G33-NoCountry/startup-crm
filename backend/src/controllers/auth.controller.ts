@@ -4,6 +4,7 @@ import { RegisterUserDto } from "../dto/auth/register-user.dto";
 import { UserResource } from "../resources/user/user-resource.resource";
 import { createToken } from "../utils/token-generator";
 import { jwtConfig } from "../config/jwt.config";
+import { User } from "../models";
 
 /**
  * @swagger
@@ -25,8 +26,6 @@ export class AuthController {
    *     summary: Registrar un nuevo usuario
    *     description: Crea una nueva cuenta de usuario
    *     tags: [Authentication]
-   *     security:
-   *       - bearerAuth: []
    *     requestBody:
    *       required: true
    *       content:
@@ -100,8 +99,151 @@ export class AuthController {
         data: {
           user: UserResource.toResponse(user),
           access_token: jwt,
-          refres_token: refreshToken,
+          refresh_token: refreshToken,
         }
+      });
+    } catch (error: any) {
+      return response.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  };
+
+
+  /**
+   * @swagger
+   * /api/auth/login:
+   *   post:
+   *     summary: Inicio de sesión de un usuario
+   *     description: Permite el inicio de sesión
+   *     tags: [Authentication]
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             $ref: '#/components/schemas/LoginRequest'
+   *     responses:
+   *        200:
+   *         description: Usuario logueado exitosamente
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: true
+   *                 message:
+   *                   type: string
+   *                   example: "Login exitoso!"
+   *                 data:
+   *                   type: object
+   *                   properties:
+   *                     user: 
+   *                       $ref: '#/components/schemas/FullUser'
+   *                     access_token: 
+   *                       type: string
+   *                       example: eyJhbGciOiJ ...
+   *                     refresh_token: 
+   *                       type: string
+   *                       example: eyJhbGciOiJ ...
+   * 
+   *        400:
+   *         description: Solicitud inválida
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/BadRequest'
+   *        401:
+   *         description: No autorizado
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Unauthorized'
+   *        500:
+   *         description: Error interno del servidor
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/InternalServerError'
+  */
+  public login = async (request: Request, response: Response) => {
+    try {
+      const user = request.user as User;
+
+      const jwt = createToken({
+        sub: user.id, role: user.role, email: user.email
+      }, jwtConfig.access_secret, jwtConfig.access_expire);
+
+      const refreshToken = createToken({
+        sub: user.id, role: user.role, email: user.email
+      }, jwtConfig.refresh_secret, jwtConfig.refresh_expire);
+
+      return response.status(200).json({
+        success: true,
+        message: "Login exitoso!",
+        data: {
+          user: user,
+          access_token: jwt,
+          refresh_token: refreshToken,
+        }
+      });
+    } catch (error: any) {
+      return response.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  };
+
+  /**
+   * @swagger
+   * /api/auth/profile:
+   *   get:
+   *     summary: Mostrar el usuario logueado
+   *     description: Permite obtener el usuario logueado
+   *     tags: [Authentication]
+   *     security:
+   *       - bearerAuth: []
+   *     responses:
+   *        200:
+   *         description: Se obtiene el usuario logueado
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: true
+   *                 message:
+   *                   type: string
+   *                   example: "Usuario encontrado!"
+   *                 data:
+   *                   $ref: '#/components/schemas/FullUser'                    
+   * 
+   *        401:
+   *         description: No autorizado
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Unauthorized'
+   *        500:
+   *         description: Error interno del servidor
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/InternalServerError'
+  */
+  public profile = async (request: Request, response: Response) => {
+    try {
+      const user = request.user as User;
+      return response.status(200).json({
+        success: true,
+        message: "Usuario encontrado!",
+        data: UserResource.toResponse(user)
       });
     } catch (error: any) {
       return response.status(500).json({

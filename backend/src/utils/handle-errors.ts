@@ -1,4 +1,6 @@
 import { validationResult } from "express-validator";
+import { passportConfig } from "../config/passport.config";
+import { NextFunction, Request, Response } from "express";
 
 export const handleValidationErrors = (req: any, res: any, next: any) => {
     const errors = validationResult(req);
@@ -11,3 +13,35 @@ export const handleValidationErrors = (req: any, res: any, next: any) => {
     }
     next();
 };
+
+export const handlePassportLocalError = ((req: Request, res: Response, next: NextFunction) => {
+    passportConfig.authenticate("local", (err: any, user: any, info: any) => {
+        if (err) return next(err);
+
+        if (!user)
+            return res.status(401).json({
+                success: false,
+                message: info?.message || "Unauthorized"
+            });
+        req.user = user;
+        
+        next();
+    })(req, res, next);
+});
+
+export const handlePassportJWTError = ((req: Request, res: Response, next: NextFunction) => {
+    passportConfig.authenticate("jwt", { session: false }, (err: any, user: any, info: any) => {
+        if (err)
+            return next(err);
+
+        if (!user) {
+            return res.status(401).json({
+                success: false,
+                message: info?.message || "Unauthorized"
+            });
+        }
+
+        req.user = user;
+        next();
+    })(req, res, next);
+});
