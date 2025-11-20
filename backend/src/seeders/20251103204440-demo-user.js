@@ -5,7 +5,7 @@ const { hashSync } = require('bcrypt');
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    const hashedPassword = hashSync("12345678", 10);
+    const hashedPassword = hashSync("password1Ab_", 10);
     await queryInterface.bulkInsert('users', [
       {
         full_name: "user1",
@@ -23,7 +23,7 @@ module.exports = {
         password: hashedPassword,
         role: 'Agente',
         status: true,
-        avatar_color: "4e9480",
+        avatar_color: "4E9480",
         created_at: new Date,
         updated_at: new Date
       },
@@ -33,7 +33,7 @@ module.exports = {
         password: hashedPassword,
         role: 'Manager',
         status: false,
-        avatar_color: "a24bbd",
+        avatar_color: "A24BBD",
         created_at: new Date,
         updated_at: new Date
       },

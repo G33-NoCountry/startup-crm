@@ -1,0 +1,56 @@
+import JWTStrategy from "passport-jwt";
+import LocalStrategy from "passport-local";
+import passport from "passport";
+import { compareSync } from "bcrypt";
+import { User } from "../models";
+import { jwtConfig } from "./jwt.config";
+
+export const passportConfig = passport;
+
+const jwtOptions = {
+  jwtFromRequest: JWTStrategy.ExtractJwt.fromAuthHeaderAsBearerToken(),
+  secretOrKey: jwtConfig.access_secret
+};
+
+passportConfig.use(
+  new LocalStrategy.Strategy(
+    {
+      usernameField: "email",
+      passwordField: "password",
+      session: false
+    },
+    async (email: string, password: string, done) => {
+      try {
+        const user = await User.findOne({ where: { email: email } });
+        if (!user)
+          return done(null, false, { message: "Credenciales inválidas" });
+
+        const isValid = compareSync(password, user.toJSON().password);
+        if (!isValid)
+          return done(null, false, { message: "Credenciales inválidas" });
+
+        return done(null, user);
+      } catch (err) {
+        return done(err);
+      }
+    }
+  )
+);
+
+passportConfig.use(
+  new JWTStrategy.Strategy(
+    jwtOptions,
+    async (jwt_payload, done: JWTStrategy.VerifiedCallback) => {
+      try {
+        const { data } = jwt_payload;
+        const user = await User.findByPk(data.sub);
+        if (!user)
+          return done(null, false, { message: "Usuario no encontrado" });
+
+        return done(null, user);
+      } catch (err) {
+        return done(err);
+      }
+    }
+  )
+);
