@@ -15,4 +15,6 @@ router.post('/login',
     authController.login
 );
 
+router.get('/profile', handlePassportJWTError, authController.profile);
+
 export default router;

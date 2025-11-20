@@ -26,8 +26,6 @@ export class AuthController {
    *     summary: Registrar un nuevo usuario
    *     description: Crea una nueva cuenta de usuario
    *     tags: [Authentication]
-   *     security:
-   *       - bearerAuth: []
    *     requestBody:
    *       required: true
    *       content:
@@ -174,7 +172,7 @@ export class AuthController {
   public login = async (request: Request, response: Response) => {
     try {
       const user = request.user as User;
-            
+
       const jwt = createToken({
         sub: user.id, role: user.role, email: user.email
       }, jwtConfig.access_secret, jwtConfig.access_expire);
@@ -191,6 +189,61 @@ export class AuthController {
           access_token: jwt,
           refresh_token: refreshToken,
         }
+      });
+    } catch (error: any) {
+      return response.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  };
+
+  /**
+   * @swagger
+   * /api/auth/profile:
+   *   get:
+   *     summary: Mostrar el usuario logueado
+   *     description: Permite obtener el usuario logueado
+   *     tags: [Authentication]
+   *     security:
+   *       - bearerAuth: []
+   *     responses:
+   *        200:
+   *         description: Se obtiene el usuario logueado
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: true
+   *                 message:
+   *                   type: string
+   *                   example: "Usuario encontrado!"
+   *                 data:
+   *                   $ref: '#/components/schemas/FullUser'                    
+   * 
+   *        401:
+   *         description: No autorizado
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Unauthorized'
+   *        500:
+   *         description: Error interno del servidor
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/InternalServerError'
+  */
+  public profile = async (request: Request, response: Response) => {
+    try {
+      const user = request.user as User;
+      return response.status(200).json({
+        success: true,
+        message: "Usuario encontrado!",
+        data: UserResource.toResponse(user)
       });
     } catch (error: any) {
       return response.status(500).json({
