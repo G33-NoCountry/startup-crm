@@ -11,8 +11,9 @@ module.exports = {
         full_name: "user1",
         email: 'user@mail.com',
         password: hashedPassword,
-        role: 'admin',
+        role: 'Admin',
         status: false,
+        avatar_color: "FF0033",
         created_at: new Date,
         updated_at: new Date
       },
@@ -20,8 +21,9 @@ module.exports = {
         full_name: "user2",
         email: 'user2@mail.com',
         password: hashedPassword,
-        role: 'agent',
+        role: 'Agente',
         status: true,
+        avatar_color: "4e9480",
         created_at: new Date,
         updated_at: new Date
       },
@@ -29,8 +31,9 @@ module.exports = {
         full_name: "user3",
         email: 'user3@mail.com',
         password: hashedPassword,
-        role: 'manager',
+        role: 'Manager',
         status: false,
+        avatar_color: "a24bbd",
         created_at: new Date,
         updated_at: new Date
       },
