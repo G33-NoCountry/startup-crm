@@ -6,6 +6,8 @@ import { appConfig } from "./config/app.config";
 import { corsConfig } from "./config/cors.config";
 import { setupAssociations } from "./models";
 import router from "./routes/index";
+import swagger from "swagger-ui-express";
+import swaggerConfig from "./docs/swagger";
 
 const app = express();
 
@@ -14,6 +16,14 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors(corsConfig));
 
 app.use("/api", router);
+
+app.use("/api/docs", swagger.serve,
+    swagger.setup(swaggerConfig, {
+        explorer: true,
+        // customCss: ".swagger-ui .topbar { display: none }",
+        customSiteTitle: "Startup CRM API Documentation",
+    })
+);
 
 async function initializeDatabase() {
   try {
