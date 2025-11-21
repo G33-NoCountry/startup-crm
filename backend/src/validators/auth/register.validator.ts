@@ -1,12 +1,6 @@
 import { body } from "express-validator";
 import { buildValidationMessage } from "../../utils/validation-messages";
-import User from "../../models/user.model";
-
-const validateEmail = async (email: string) => {
-  const existingUser = await User.findOne({ where: { email } });
-  if (existingUser)
-    throw new Error;
-};
+import { validateEmail } from "../../utils/validators";
 
 const validatePassword = async (password: string) => {
   if (! /[A-Z]/.test(password) ||
