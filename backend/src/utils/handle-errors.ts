@@ -21,7 +21,7 @@ export const handlePassportLocalError = ((req: Request, res: Response, next: Nex
         if (!user)
             return res.status(401).json({
                 success: false,
-                message: info?.message || "Unauthorized"
+                message: "No está autenticado"
             });
         req.user = user;
         

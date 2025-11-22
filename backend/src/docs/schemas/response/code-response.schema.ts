@@ -3,7 +3,7 @@ export default {
         type: "object",
         properties: {
             success: { type: "boolean", example: false },
-            message: { type: "string", example: "Unauthorized" },
+            message: { type: "string", example: "No está autenticado" },
         },
     },
     Authenticated: {
@@ -17,7 +17,7 @@ export default {
         type: "object",
         properties: {
             success: { type: "boolean", example: false },
-            message: { type: "string", example: "Forbidden" },
+            message: { type: "string", example: "No tiene permiso para acceder" },
         },
     },
     BadRequest: {
@@ -68,7 +68,7 @@ export default {
         type: "object",
         properties: {
             success: { type: "boolean", example: false },
-            message: { type: "string", example: "Not found" },
+            message: { type: "string", example: "No se encontró" },
         },
     },
 
