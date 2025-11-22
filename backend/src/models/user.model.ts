@@ -1,5 +1,6 @@
 import { DataTypes, Model } from "sequelize";
 import { sequelize } from "../config/database.config";
+import { LazyPaginationConnection, makePaginate, makePaginateLazy, PaginateOptions, PaginationConnection } from "sequelize-cursor-pagination";
 
 class User extends Model {
     public id!: number;
@@ -11,7 +12,16 @@ class User extends Model {
     public avatar_color!: string;
     public readonly created_at!: Date;
     public readonly updated_at!: Date;
+    public static readonly publicAttributes: string[] = [
+        "id", "full_name", "email", "role", "status", "avatar_color", "created_at", "updated_at"
+    ];
+
+    declare static paginate: (options: PaginateOptions<User>) => Promise<PaginationConnection<User>>;
+    declare static paginateLazy: (options: PaginateOptions<User>) => LazyPaginationConnection<User>;
 }
+
+User.paginate = makePaginate(User);
+User.paginateLazy = makePaginateLazy(User);
 
 User.init(
     {

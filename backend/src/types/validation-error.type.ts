@@ -3,6 +3,7 @@ export type ValidationErrorType =
     | "invalid_format"
     | "min_length"
     | "max_length"
+    | "min_numeric"
     | "already_exists"
     | "not_match"
     | "weak_password"

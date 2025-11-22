@@ -12,6 +12,7 @@ export const buildValidationMessage = (
         invalid_format: `El campo ${fieldLabel} no tiene un formato válido.`,
         min_length: `El campo ${fieldLabel} debe tener al menos ${options?.min} caracteres.`,
         max_length: `El campo ${fieldLabel} debe tener como máximo ${options?.max} caracteres.`,
+        min_numeric: `El campo ${fieldLabel} debe tener un valor mínimo de ${options?.min}.`,
         already_exists: `El valor ingresado en ${fieldLabel} ya está registrado.`,
         not_match: `El campo ${fieldLabel} no coincide con el valor requerido.`,
         weak_password: `El campo ${fieldLabel} debe incluir mayúsculas, minúsculas, números y símbolos.`,

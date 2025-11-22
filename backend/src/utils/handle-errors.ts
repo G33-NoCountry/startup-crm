@@ -2,7 +2,7 @@ import { validationResult } from "express-validator";
 import { passportConfig } from "../config/passport.config";
 import { NextFunction, Request, Response } from "express";
 
-export const handleValidationErrors = (req: any, res: any, next: any) => {
+export const handleValidationErrors = (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(400).json({

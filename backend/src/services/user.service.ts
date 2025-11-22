@@ -3,6 +3,7 @@ import { RegisterUserDto } from "../dto/auth/register-user.dto";
 import { User } from "../models";
 import { randomHexColor } from "../utils/hex-color";
 import { UpdateUserDto } from "../dto/user/update-user.dto";
+import { Op } from "sequelize";
 
 export class UserService {
 
@@ -38,6 +39,32 @@ export class UserService {
 
   public async getByPk(id: number) {
     return await User.findByPk(id);
+  }
+
+  public async getUsersPaginate(limit: number | undefined, after?: string, before?: string, where?: any) {
+    const result = await User.paginate({
+      limit,
+      after,
+      before,
+      attributes: User.publicAttributes,
+      where
+    });
+    const items = result.edges.map(edge => edge.node);
+    const cursors = {
+      has_next: result.pageInfo.hasNextPage,
+      has_previous: result.pageInfo.hasPreviousPage,
+    };
+
+    return {
+      items: items,
+      total_count: result.totalCount,
+      paginate_info: {
+        has_next: cursors.has_next,
+        has_previous: cursors.has_previous,
+        next_cursor: cursors.has_next ? result.pageInfo.endCursor : null,
+        prev_cursor: cursors.has_previous ? result.pageInfo.startCursor : null,
+      },
+    };
   }
 
 }
