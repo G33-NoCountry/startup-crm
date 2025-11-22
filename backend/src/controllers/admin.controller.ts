@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import { UserService } from "../services/user.service";
 import { Op } from "sequelize";
 import { User } from "../models";
+import { RegisterUserDto } from "../dto/auth/register-user.dto";
+import { UserResource } from "../resources/user/user-resource.resource";
 
 /**
  * @swagger
@@ -117,4 +119,88 @@ export class AdminController {
       });
     }
   };
+
+
+  /**
+   * @swagger
+   * /api/admin/users:
+   *   post:
+   *     summary: Registra un nuevo usuario
+   *     description: Crea una nueva cuenta de usuario (solo para admins)
+   *     tags: [Admin]
+   *     security:
+   *       - bearerAuth: []
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             $ref: '#/components/schemas/AdminRegisterUserRequest'
+   *     responses:
+   *        201:
+   *         description: Usuario creado exitosamente
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: true
+   *                 message:
+   *                   type: string
+   *                   example: "Usuario creado!"
+   *                 data:
+   *                   type: object
+   *                   properties:
+   *                     user: 
+   *                       $ref: '#/components/schemas/FullUser'
+   * 
+   *        400:
+   *         description: Solicitud inválida
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/BadRequest'
+   *        401:
+   *         description: No autorizado
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Unauthorized'
+   *        403:
+   *         description: No tiene permisos
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Forbidden'
+   *        500:
+   *         description: Error interno del servidor
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/InternalServerError'
+  */
+  public createUser = async (request: Request, response: Response) => {
+    try {
+      const body = request.body as RegisterUserDto;
+      const user = await this.userService.registerUser(body);
+
+      if (!user)
+        throw new Error("No se registro el usuario");
+
+      return response.status(201).json({
+        success: true,
+        message: "Usuario creado!",
+        data: UserResource.toResponse(user)
+      });
+    } catch (error: any) {
+      return response.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  };
+
+
 }

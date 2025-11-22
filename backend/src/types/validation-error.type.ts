@@ -2,6 +2,8 @@ export type ValidationErrorType =
     | "required"
     | "invalid_format"
     | "min_length"
+    | "enum"
+    | "invalid"
     | "max_length"
     | "min_numeric"
     | "already_exists"

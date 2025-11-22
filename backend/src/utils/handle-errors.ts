@@ -21,7 +21,7 @@ export const handlePassportLocalError = ((req: Request, res: Response, next: Nex
         if (!user)
             return res.status(401).json({
                 success: false,
-                message: "No está autenticado"
+                message: info?.message || "No está autenticado"
             });
         req.user = user;
         
@@ -33,11 +33,11 @@ export const handlePassportJWTError = ((req: Request, res: Response, next: NextF
     passportConfig.authenticate("jwt", { session: false }, (err: any, user: any, info: any) => {
         if (err)
             return next(err);
-
+        
         if (!user) {
             return res.status(401).json({
                 success: false,
-                message: info?.message || "Unauthorized"
+                message: info?.message || "No está autenticado"
             });
         }
 

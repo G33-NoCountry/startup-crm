@@ -3,7 +3,6 @@ import { RegisterUserDto } from "../dto/auth/register-user.dto";
 import { User } from "../models";
 import { randomHexColor } from "../utils/hex-color";
 import { UpdateUserDto } from "../dto/user/update-user.dto";
-import { Op } from "sequelize";
 
 export class UserService {
 
@@ -19,7 +18,7 @@ export class UserService {
       full_name: dto.full_name,
       email: dto.email,
       password: dto.password,
-      role: 'Agente',
+      role: dto.role ?? 'Agente',
       status: 1,
       avatar_color: color
     });

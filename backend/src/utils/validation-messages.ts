@@ -3,13 +3,15 @@ import { ValidationErrorType } from "../types/validation-error.type";
 export const buildValidationMessage = (
     field: string,
     type: ValidationErrorType,
-    options?: { min?: number; max?: number }
+    options?: { min?: number; max?: number, enumValues?: string[] }
 ): string => {
     const fieldLabel = `'${field}'`;
 
     const messages = {
         required: `El campo ${fieldLabel} es obligatorio.`,
         invalid_format: `El campo ${fieldLabel} no tiene un formato válido.`,
+        enum: `El campo ${fieldLabel} debe ser uno de los siguientes valores: ${options?.enumValues?.join(", ")}.`,
+        invalid: `El campo ${fieldLabel} no tiene un valor válido`,
         min_length: `El campo ${fieldLabel} debe tener al menos ${options?.min} caracteres.`,
         max_length: `El campo ${fieldLabel} debe tener como máximo ${options?.max} caracteres.`,
         min_numeric: `El campo ${fieldLabel} debe tener un valor mínimo de ${options?.min}.`,
