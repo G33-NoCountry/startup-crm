@@ -5,6 +5,5 @@ export class UpdateUserAdminDto {
     public email?: string,
     public role?: 'Admin' | 'Agente' | 'Manager',
     public status?: boolean,
-  ) {
-  }
+  ) { }
 }
