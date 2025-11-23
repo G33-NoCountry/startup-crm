@@ -21,7 +21,7 @@ export class ContactRepository implements IContactRepository {
         return paginate;
     }
 
-    async create() {
-        return
+    async createContact(data: any): Promise<Contact | null> {
+        return Contact.create(data);
     }
 }

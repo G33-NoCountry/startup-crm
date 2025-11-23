@@ -9,7 +9,7 @@ class Contact extends Model {
     public phone!: string;
     public readonly created_at!: Date;
     public readonly updated_at!: Date;
-    
+
     public static readonly publicAttributes: string[] = [
         "id", "full_name", "email", "phone", "created_at", "updated_at"
     ];
