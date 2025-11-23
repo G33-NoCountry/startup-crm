@@ -2,7 +2,7 @@ import { Router } from "express";
 import { handlePassportJWTError, handleValidationErrors } from "../utils/handle-errors";
 import { AdminController } from "../controllers/admin.controller";
 import { isAdmin } from "../middlewares/is-admin.middleware";
-import { queryParamPaginateValidator } from "../validators/query-param.validator";
+import { queryParamPaginateValidator } from "../validators/param/query-param.validator";
 import { registerUserAdminValidator } from "../validators/admin/register-user-admin.validator";
 import { validateParam } from "../validators/param/param.validator";
 import { updateUserAdminValidator } from "../validators/admin/update-user-admin.validator";
