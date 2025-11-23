@@ -81,6 +81,12 @@ export class UserController {
    *     tags: [Users]
    *     security:
    *       - bearerAuth: []
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             $ref: '#/components/schemas/UpdateUserRequest'
    *     responses:
    *        200:
    *         description: Se actualiza el usuario
