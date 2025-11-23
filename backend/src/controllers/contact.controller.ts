@@ -56,7 +56,7 @@ export class ContactController {
    *                   type: string
    *                   example: "Contactos obtenidos!"
    *                 data:
-   *                   $ref: '#/components/schemas/Paginate'
+   *                   $ref: '#/components/schemas/PaginateContact'
    *        400:
    *         description: Solicitud inválida
    *         content:

@@ -65,7 +65,7 @@ export class AdminController {
    *                   type: string
    *                   example: "Usuarios obtenidos!"
    *                 data:
-   *                   $ref: '#/components/schemas/Paginate'                    
+   *                   $ref: '#/components/schemas/PaginateUser'                    
    * 
    *        400:
    *         description: Solicitud inválida
