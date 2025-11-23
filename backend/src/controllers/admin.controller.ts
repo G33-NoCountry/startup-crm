@@ -32,7 +32,7 @@ export class AdminController {
    *         schema:
    *           type: integer
    *           minimum: 1
-   *         required: false
+   *         required: true
    *         description: Cantidad de resultados a devolver por página.
    *
    *       - in: query

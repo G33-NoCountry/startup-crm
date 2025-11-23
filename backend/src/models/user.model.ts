@@ -18,6 +18,10 @@ class User extends Model {
 
     declare static paginate: (options: PaginateOptions<User>) => Promise<PaginationConnection<User>>;
     declare static paginateLazy: (options: PaginateOptions<User>) => LazyPaginationConnection<User>;
+
+    public checkRole(role: 'Admin' | 'Agente' | 'Manager') {
+        return this.role == role;
+    }
 }
 
 User.paginate = makePaginate(User);
