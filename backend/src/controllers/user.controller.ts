@@ -122,7 +122,7 @@ export class UserController {
       const body = request.body as UpdateUserDto;
       body.id = user.id;
       
-      const isUpdated = await this.userService.updateUser(body);
+      const isUpdated = await this.userService.updateUser(body, body.id);
       const userUpdated = await this.userService.getByPk(user.id);
       if (!isUpdated || !userUpdated)
         throw new Error("No se pudo actualizar el usuario");

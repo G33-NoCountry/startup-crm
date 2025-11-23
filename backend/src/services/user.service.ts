@@ -2,7 +2,6 @@ import { hashSync } from "bcrypt";
 import { RegisterUserDto } from "../dto/auth/register-user.dto";
 import { User } from "../models";
 import { randomHexColor } from "../utils/hex-color";
-import { UpdateUserDto } from "../dto/user/update-user.dto";
 
 export class UserService {
 
@@ -25,14 +24,8 @@ export class UserService {
     return user;
   }
 
-  public async updateUser(dto: UpdateUserDto) {
-    const rows = await User.update(
-      {
-        full_name: dto.full_name,
-        email: dto.email,
-      },
-      { where: { id: dto.id } }
-    );
+  public async updateUser(data: any, id: number) {
+    const rows = await User.update(data, { where: { id: id } });
     return rows.length > 0;
   }
 

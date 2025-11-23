@@ -2,8 +2,9 @@ import { Request, Response } from "express";
 import { UserService } from "../services/user.service";
 import { Op } from "sequelize";
 import { User } from "../models";
-import { RegisterUserDto } from "../dto/auth/register-user.dto";
 import { UserResource } from "../resources/user/user-resource.resource";
+import { UpdateUserAdminDto } from "../dto/admin/update-user-admin.dto";
+import { RegisterUserAdminDto } from "../dto/admin/register-user-admin.dto";
 
 /**
  * @swagger
@@ -183,7 +184,7 @@ export class AdminController {
   */
   public createUser = async (request: Request, response: Response) => {
     try {
-      const body = request.body as RegisterUserDto;
+      const body = request.body as RegisterUserAdminDto;
       const user = await this.userService.registerUser(body);
 
       if (!user)
@@ -193,6 +194,93 @@ export class AdminController {
         success: true,
         message: "Usuario creado!",
         data: UserResource.toResponse(user)
+      });
+    } catch (error: any) {
+      return response.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  };
+
+  /**
+   * @swagger
+   * /api/admin/users/{id}:
+   *   patch:
+   *     summary: Actualiza datos personales de un usuario
+   *     description: Actualiza el usuario segun id (solo para admin)
+   *     tags: [Admin]
+   *     security:
+   *       - bearerAuth: []
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: integer
+   *           minimum: 1
+   *         description: id del usuario
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             $ref: '#/components/schemas/AdminUpdateUserRequest'
+   *     responses:
+   *        200:
+   *         description: Se actualiza el usuario
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: true
+   *                 message:
+   *                   type: string
+   *                   example: "Usuario actualizado!"
+   *                 data:
+   *                   $ref: '#/components/schemas/FullUser'
+   *        400:
+   *         description: Solicitud inválida
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/BadRequest'
+   *        401:
+   *         description: No autorizado
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Unauthorized'
+   *        403:
+   *         description: No tiene permisos
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Forbidden'
+   *        500:
+   *         description: Error interno del servidor
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/InternalServerError'
+  */
+  public updateUser = async (request: Request, response: Response) => {
+    try {
+      const userId = parseInt(request.params.id);
+      const body = request.body as UpdateUserAdminDto;
+      body.id = userId;
+      const isUpdated = await this.userService.updateUser(body, body.id);
+      const userUpdated = await this.userService.getByPk(userId);
+      if (!isUpdated || !userUpdated)
+        throw new Error("No se pudo actualizar el usuario");
+
+      return response.status(200).json({
+        success: true,
+        message: "Usuario actualizado!",
+        data: UserResource.toResponse(userUpdated)
       });
     } catch (error: any) {
       return response.status(500).json({
