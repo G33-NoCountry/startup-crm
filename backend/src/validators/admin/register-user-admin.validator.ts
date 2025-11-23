@@ -2,12 +2,7 @@ import { body } from "express-validator";
 import { buildValidationMessage } from "../../utils/validation-messages";
 import { validateEmail, validatePassword } from "../../utils/validators";
 
-const validatePasswordConfirmation = async (passwordConfirmation: string, { req }: any) => {
-  if (passwordConfirmation != req.body.password)
-    throw new Error("Las contraseñas no coinciden.");
-};
-
-export const registerUserValidator = [
+export const registerUserAdminValidator = [
   body("full_name")
     .notEmpty().withMessage(buildValidationMessage("full_name", "required"))
     .bail()
@@ -32,15 +27,12 @@ export const registerUserValidator = [
     .bail()
     .custom(validatePassword).withMessage(buildValidationMessage("password", "weak_password"))
   ,
-  body("password_confirmation")
-    .notEmpty().withMessage(buildValidationMessage("password_confirmation", "required"))
+  body("role")
+    .notEmpty().withMessage(buildValidationMessage("role", "required"))
     .bail()
-    .isString()
-    .isLength({ min: 8 }).withMessage(buildValidationMessage("password_confirmation", "min_length", { min: 8 }))
-    .bail()
-    .isLength({ max: 60 }).withMessage(buildValidationMessage("password_confirmation", "max_length", { max: 60 }))
-    .bail()
-    .custom(validatePasswordConfirmation)
+    .isIn([
+      'Admin', 'Agente', 'Manager'
+    ]).withMessage(buildValidationMessage("role", "invalid"))
   ,
 
 ];

@@ -1,4 +1,4 @@
-export class RegisterUserDto {
+export class RegisterUserAdminDto {
   constructor(
     public full_name: string,
     public email: string,

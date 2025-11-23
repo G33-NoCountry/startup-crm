@@ -81,6 +81,12 @@ export class UserController {
    *     tags: [Users]
    *     security:
    *       - bearerAuth: []
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             $ref: '#/components/schemas/UpdateUserRequest'
    *     responses:
    *        200:
    *         description: Se actualiza el usuario
@@ -122,7 +128,7 @@ export class UserController {
       const body = request.body as UpdateUserDto;
       body.id = user.id;
       
-      const isUpdated = await this.userService.updateUser(body);
+      const isUpdated = await this.userService.updateUser(body, body.id);
       const userUpdated = await this.userService.getByPk(user.id);
       if (!isUpdated || !userUpdated)
         throw new Error("No se pudo actualizar el usuario");
