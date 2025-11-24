@@ -185,6 +185,64 @@ export class ContactController {
     }
   };
 
+  /**
+   * @swagger
+   * /api/contacts/{id}:
+   *   get:
+   *     summary: Obtener contacto
+   *     description: Obtener datos de un contacto (solo para usuarios "Agente")
+   *     tags: [Contacts]
+   *     security:
+   *       - bearerAuth: []
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: integer
+   *           minimum: 1
+   *         description: id del contacto
+   *     responses:
+   *        200:
+   *         description: Contacto obtenido
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: true
+   *                 message:
+   *                   type: string
+   *                   example: "Contacto obtenido!"
+   *                 data:
+   *                   $ref: '#/components/schemas/FullContact'
+   *        400:
+   *         description: Solicitud inválida
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/BadRequest'
+   *        401:
+   *         description: No autorizado
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Unauthorized'
+   *        403:
+   *         description: No tiene permisos
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Forbidden'
+   *        500:
+   *         description: Error interno del servidor
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/InternalServerError'
+  */
   public getContact = async (request: Request, response: Response) => {
     try {
       const contactId = parseInt(request.params.id);
