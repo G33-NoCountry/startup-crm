@@ -4,6 +4,8 @@ import paginateSchemas  from "./response/paginate.schema";
 import authRequestSchemas  from "./request/auth.schema";
 import adminRequestSchemas  from "./request/admin.schema";
 import userRequestSchemas  from "./request/user.schema";
+import contactSchemas  from "./models/contact/contact.schema";
+import contactRequestSchemas  from "./request/contact.schema";
 
 export default {
     ...authRequestSchemas,
@@ -11,5 +13,7 @@ export default {
     ...userSchemas,
     ...paginateSchemas,
     ...adminRequestSchemas,
-    ...userRequestSchemas
+    ...userRequestSchemas,
+    ...contactSchemas,
+    ...contactRequestSchemas
 };

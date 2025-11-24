@@ -1,31 +1,26 @@
 import { Request, Response } from "express";
-import { UserService } from "../services/user.service";
-import { Op } from "sequelize";
-import { User } from "../models";
-import { UserResource } from "../resources/user/user-resource.resource";
-import { UpdateUserAdminDto } from "../dto/admin/update-user-admin.dto";
-import { RegisterUserAdminDto } from "../dto/admin/register-user-admin.dto";
+import { ContactService } from "../services/contact.service";
+import { Contact } from "../models";
+import { RegisterContactDto } from "../dto/contact/register-contact.dto";
+import { ContactResource } from "../resources/contact/contact-resource.resource";
+import { UpdateContactDto } from "../dto/contact/update-contact.dto";
 
 /**
  * @swagger
  * tags:
- *   name: Admin
- *   description: Endpoints para gestión de usuarios (solo admins)
+ *   name: Contacts
+ *   description: Endpoints para gestión de contactos
  */
-export class AdminController {
-  private userService: UserService;
-
-  constructor() {
-    this.userService = new UserService();
-  }
+export class ContactController {
+  constructor(private contactService: ContactService) { }
 
   /**
    * @swagger
-   * /api/admin/users:
+   * /api/contacts:
    *   get:
-   *     summary: Obtener usuarios
-   *     description: Obtener datos de usuarios paginados (solo para admins)
-   *     tags: [Admin]
+   *     summary: Obtener contactos
+   *     description: Obtener datos de contactos paginados (solo para usuarios "Agente")
+   *     tags: [Contacts]
    *     parameters:
    *       - in: query
    *         name: limit
@@ -52,7 +47,7 @@ export class AdminController {
    *       - bearerAuth: []
    *     responses:
    *        200:
-   *         description: Usuarios obtenidos
+   *         description: Contactos obtenidos
    *         content:
    *           application/json:
    *             schema:
@@ -63,10 +58,9 @@ export class AdminController {
    *                   example: true
    *                 message:
    *                   type: string
-   *                   example: "Usuarios obtenidos!"
+   *                   example: "Contactos obtenidos!"
    *                 data:
-   *                   $ref: '#/components/schemas/PaginateUser'                    
-   * 
+   *                   $ref: '#/components/schemas/PaginateContact'
    *        400:
    *         description: Solicitud inválida
    *         content:
@@ -92,26 +86,20 @@ export class AdminController {
    *             schema:
    *               $ref: '#/components/schemas/InternalServerError'
   */
-  public getUserList = async (request: Request, response: Response) => {
+  public getContacts = async (request: Request, response: Response) => {
     try {
-      const userId = request.user as User;
       const { after, limit, before } = request.query;
       const parsedLimit = limit ? parseInt(limit as string, 10) : undefined;
-      const users = await this.userService.getUsersPaginate(
+      const contacts = await this.contactService.getUsers(
         parsedLimit,
         after as string ?? undefined,
         before as string ?? undefined,
-        {
-          id: {
-            [Op.ne]: userId.id
-          }
-        }
       );
 
       return response.status(200).json({
         success: true,
-        message: "Usuarios obtenidos!",
-        data: users
+        message: "Contactos obtenidos!",
+        data: contacts
       });
     } catch (error: any) {
       return response.status(500).json({
@@ -121,14 +109,13 @@ export class AdminController {
     }
   };
 
-
   /**
    * @swagger
-   * /api/admin/users:
+   * /api/contacts:
    *   post:
-   *     summary: Registra un nuevo usuario
-   *     description: Crea una nueva cuenta de usuario (solo para admins)
-   *     tags: [Admin]
+   *     summary: Registra un nuevo contacto
+   *     description: Crea un registro de contacto (solo para usuarios "Agente")
+   *     tags: [Contacts]
    *     security:
    *       - bearerAuth: []
    *     requestBody:
@@ -136,10 +123,10 @@ export class AdminController {
    *       content:
    *         application/json:
    *           schema:
-   *             $ref: '#/components/schemas/AdminRegisterUserRequest'
+   *             $ref: '#/components/schemas/RegisterContactRequest'
    *     responses:
    *        201:
-   *         description: Usuario creado exitosamente
+   *         description: Contacto creado exitosamente
    *         content:
    *           application/json:
    *             schema:
@@ -150,13 +137,9 @@ export class AdminController {
    *                   example: true
    *                 message:
    *                   type: string
-   *                   example: "Usuario creado!"
+   *                   example: "Contacto creado!"
    *                 data:
-   *                   type: object
-   *                   properties:
-   *                     user: 
-   *                       $ref: '#/components/schemas/FullUser'
-   * 
+   *                   $ref: '#/components/schemas/FullContact'
    *        400:
    *         description: Solicitud inválida
    *         content:
@@ -182,18 +165,18 @@ export class AdminController {
    *             schema:
    *               $ref: '#/components/schemas/InternalServerError'
   */
-  public createUser = async (request: Request, response: Response) => {
+  public registerContact = async (request: Request, response: Response) => {
     try {
-      const body = request.body as RegisterUserAdminDto;
-      const user = await this.userService.registerUser(body);
+      const body = request.body as RegisterContactDto;
+      const contact = await this.contactService.create(body);
 
-      if (!user)
-        throw new Error("No se registro el usuario");
+      if (!contact)
+        throw new Error("No se registro el contacto");
 
       return response.status(201).json({
         success: true,
-        message: "Usuario creado!",
-        data: UserResource.toResponse(user)
+        message: "Contacto creado!",
+        data: ContactResource.toResponse(contact)
       });
     } catch (error: any) {
       return response.status(500).json({
@@ -205,11 +188,11 @@ export class AdminController {
 
   /**
    * @swagger
-   * /api/admin/users/{id}:
-   *   patch:
-   *     summary: Actualiza datos personales de un usuario
-   *     description: Actualiza el usuario segun id (solo para admin)
-   *     tags: [Admin]
+   * /api/contacts/{id}:
+   *   get:
+   *     summary: Obtener contacto
+   *     description: Obtener datos de un contacto (solo para usuarios "Agente")
+   *     tags: [Contacts]
    *     security:
    *       - bearerAuth: []
    *     parameters:
@@ -219,16 +202,10 @@ export class AdminController {
    *         schema:
    *           type: integer
    *           minimum: 1
-   *         description: id del usuario
-   *     requestBody:
-   *       required: true
-   *       content:
-   *         application/json:
-   *           schema:
-   *             $ref: '#/components/schemas/AdminUpdateUserRequest'
+   *         description: id del contacto
    *     responses:
    *        200:
-   *         description: Se actualiza el usuario
+   *         description: Contacto obtenido
    *         content:
    *           application/json:
    *             schema:
@@ -239,9 +216,9 @@ export class AdminController {
    *                   example: true
    *                 message:
    *                   type: string
-   *                   example: "Usuario actualizado!"
+   *                   example: "Contacto obtenido!"
    *                 data:
-   *                   $ref: '#/components/schemas/FullUser'
+   *                   $ref: '#/components/schemas/FullContact'
    *        400:
    *         description: Solicitud inválida
    *         content:
@@ -267,20 +244,18 @@ export class AdminController {
    *             schema:
    *               $ref: '#/components/schemas/InternalServerError'
   */
-  public updateUser = async (request: Request, response: Response) => {
+  public getContact = async (request: Request, response: Response) => {
     try {
-      const userId = parseInt(request.params.id);
-      const body = request.body as UpdateUserAdminDto;
-      body.id = userId;
-      const isUpdated = await this.userService.updateUser(body, body.id);
-      const userUpdated = await this.userService.getByPk(userId);
-      if (!isUpdated || !userUpdated)
-        throw new Error("No se pudo actualizar el usuario");
+      const contactId = parseInt(request.params.id);
+      const contact = await this.contactService.getByPk(contactId);
+
+      if (!contact)
+        throw new Error;
 
       return response.status(200).json({
         success: true,
-        message: "Usuario actualizado!",
-        data: UserResource.toResponse(userUpdated)
+        message: "Contacto obtenido!",
+        data: ContactResource.toResponse(contact)
       });
     } catch (error: any) {
       return response.status(500).json({
@@ -290,5 +265,90 @@ export class AdminController {
     }
   };
 
+  /**
+   * @swagger
+   * /api/contacts/{id}:
+   *   patch:
+   *     summary: Actualizar contacto
+   *     description: Actualizar datos de un contacto (solo para usuarios "Agente")
+   *     tags: [Contacts]
+   *     security:
+   *       - bearerAuth: []
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: integer
+   *           minimum: 1
+   *         description: id del contacto
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             $ref: '#/components/schemas/UpdateContactRequest'
+   *     responses:
+   *        200:
+   *         description: Contacto actualizado
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: true
+   *                 message:
+   *                   type: string
+   *                   example: "Contacto actualizado!"
+   *                 data:
+   *                   $ref: '#/components/schemas/FullContact'
+   *        400:
+   *         description: Solicitud inválida
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/BadRequest'
+   *        401:
+   *         description: No autorizado
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Unauthorized'
+   *        403:
+   *         description: No tiene permisos
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Forbidden'
+   *        500:
+   *         description: Error interno del servidor
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/InternalServerError'
+  */
+  public updateContact = async (request: Request, response: Response) => {
+    try {
+      const contactId = parseInt(request.params.id);
+      const body = request.body as UpdateContactDto;
+      body.id = contactId;
+      const contactUpdated = await this.contactService.update(body);
+      if (!contactUpdated)
+        throw new Error("No se pudo actualizar el contacto");
+
+      return response.status(200).json({
+        success: true,
+        message: "Contacto actualizado!",
+        data: ContactResource.toResponse(contactUpdated)
+      });
+    } catch (error: any) {
+      return response.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  };
 
 }
