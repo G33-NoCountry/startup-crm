@@ -185,4 +185,25 @@ export class ContactController {
     }
   };
 
+  public getContact = async (request: Request, response: Response) => {
+    try {
+      const contactId = parseInt(request.params.id);
+      const contact = await this.contactService.getByPk(contactId);
+
+      if (!contact)
+        throw new Error;
+
+      return response.status(200).json({
+        success: true,
+        message: "Contacto obtenido!",
+        data: ContactResource.toResponse(contact)
+      });
+    } catch (error: any) {
+      return response.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  };
+
 }
