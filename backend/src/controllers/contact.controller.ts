@@ -238,6 +238,12 @@ export class ContactController {
    *           application/json:
    *             schema:
    *              $ref: '#/components/schemas/Forbidden'
+   *        404:
+   *         description: No encontrado
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/NotFound'
    *        500:
    *         description: Error interno del servidor
    *         content:
@@ -323,6 +329,12 @@ export class ContactController {
    *           application/json:
    *             schema:
    *              $ref: '#/components/schemas/Forbidden'
+   *        404:
+   *         description: No encontrado
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/NotFound'
    *        500:
    *         description: Error interno del servidor
    *         content:
