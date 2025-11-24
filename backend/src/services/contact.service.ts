@@ -21,5 +21,9 @@ export class ContactService {
     return this.contactRepository.updateContact(data);
   }
 
+  public async delete(contact: Contact): Promise<void> {
+    return this.contactRepository.deleteContact(contact);
+  }
+
 
 }

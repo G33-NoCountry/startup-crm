@@ -18,16 +18,22 @@ Deal.init(
             type: DataTypes.INTEGER,
             allowNull: false,
             references: { model: "users" },
+            onUpdate: "CASCADE",
+            onDelete: "RESTRICT",
         },
         contact_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: { model: "contacts" },
+            onUpdate: "CASCADE",
+            onDelete: "RESTRICT",
         },
         funnel_stage_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: { model: "funnel_stages" },
+            onUpdate: "CASCADE",
+            onDelete: "RESTRICT",
         },
         title: {
             type: DataTypes.STRING(255),

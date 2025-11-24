@@ -1,6 +1,12 @@
 import { DataTypes, Model } from "sequelize";
 import { sequelize } from "../config/database.config";
-import { LazyPaginationConnection, makePaginate, makePaginateLazy, PaginateOptions, PaginationConnection } from "sequelize-cursor-pagination";
+import {
+    LazyPaginationConnection,
+    makePaginate,
+    makePaginateLazy,
+    PaginateOptions,
+    PaginationConnection
+} from "sequelize-cursor-pagination";
 
 class Contact extends Model {
     public id!: number;
@@ -41,6 +47,7 @@ Contact.init(
     {
         sequelize,
         tableName: "contacts",
+        paranoid: true,
     }
 );
 
