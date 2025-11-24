@@ -4,6 +4,7 @@ import { Contact } from "../models";
 import { RegisterContactDto } from "../dto/contact/register-contact.dto";
 import { ContactResource } from "../resources/contact/contact-resource.resource";
 import { UpdateContactDto } from "../dto/contact/update-contact.dto";
+import { ContactRequest } from "../request/contact.request";
 
 /**
  * @swagger
@@ -343,6 +344,71 @@ export class ContactController {
         message: "Contacto actualizado!",
         data: ContactResource.toResponse(contactUpdated)
       });
+    } catch (error: any) {
+      return response.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  };
+
+  /**
+   * @swagger
+   * /api/contacts/{id}:
+   *   delete:
+   *     summary: Eliminar contacto
+   *     description: Elimina el registro de un contacto
+   *     tags: [Contacts]
+   *     security:
+   *       - bearerAuth: []
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: integer
+   *           minimum: 1
+   *         description: id del contacto
+   *     responses:
+   *        204:
+   *         description: Contacto eliminado (sin respuesta)
+   *        400:
+   *         description: Solicitud inválida
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/BadRequest'
+   *        401:
+   *         description: No autorizado
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Unauthorized'
+   *        403:
+   *         description: No tiene permisos
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Forbidden'
+   *        404:
+   *         description: No encontrado
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/NotFound'
+   *        500:
+   *         description: Error interno del servidor
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/InternalServerError'
+  */
+  public deleteContact = async (request: Request, response: Response) => {
+    try {
+      const contact = (request as ContactRequest).contact;
+      await this.contactService.delete(contact);
+
+      return response.status(204).send();
     } catch (error: any) {
       return response.status(500).json({
         success: false,

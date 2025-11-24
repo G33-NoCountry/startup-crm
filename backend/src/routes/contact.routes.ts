@@ -32,5 +32,7 @@ router.patch(
     sanitizeBody,
     contactController.updateContact
 );
+router.delete('/:id', validateParam("id"), validateRequestMiddleware, contactExists, contactController.deleteContact);
+
 
 export default router;

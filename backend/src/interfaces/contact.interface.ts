@@ -6,4 +6,5 @@ export interface IContactRepository {
     findAll(limit: number | undefined, after?: string, before?: string, where?: any): Promise<IPaginate<Contact>>;
     createContact(data: any): Promise<Contact | null>;
     updateContact(data: any): Promise<Contact | null>;
+    deleteContact(contact: Contact): Promise<void>;
 }

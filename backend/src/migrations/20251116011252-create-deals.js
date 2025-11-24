@@ -14,16 +14,22 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: { model: "users" },
+        onUpdate: "CASCADE",
+        onDelete: "RESTRICT",
       },
       contact_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: { model: "contacts" },
+        onUpdate: "CASCADE",
+        onDelete: "RESTRICT",
       },
       funnel_stage_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: { model: "funnel_stages" },
+        onUpdate: "CASCADE",
+        onDelete: "RESTRICT",
       },
       title: {
         type: Sequelize.STRING(255),

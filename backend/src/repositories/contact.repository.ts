@@ -35,4 +35,8 @@ export class ContactRepository implements IContactRepository {
         const contactUpdated = await this.findById(data.id);
         return contactUpdated;
     }
+
+    async deleteContact(contact: Contact): Promise<void> {
+        return contact.destroy();
+    }
 }
