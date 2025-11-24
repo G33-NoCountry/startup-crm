@@ -3,6 +3,7 @@ import { ContactService } from "../services/contact.service";
 import { Contact } from "../models";
 import { RegisterContactDto } from "../dto/contact/register-contact.dto";
 import { ContactResource } from "../resources/contact/contact-resource.resource";
+import { UpdateContactDto } from "../dto/contact/update-contact.dto";
 
 /**
  * @swagger
@@ -255,6 +256,92 @@ export class ContactController {
         success: true,
         message: "Contacto obtenido!",
         data: ContactResource.toResponse(contact)
+      });
+    } catch (error: any) {
+      return response.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  };
+
+  /**
+   * @swagger
+   * /api/contacts/{id}:
+   *   patch:
+   *     summary: Actualizar contacto
+   *     description: Actualizar datos de un contacto (solo para usuarios "Agente")
+   *     tags: [Contacts]
+   *     security:
+   *       - bearerAuth: []
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: integer
+   *           minimum: 1
+   *         description: id del contacto
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             $ref: '#/components/schemas/UpdateContactRequest'
+   *     responses:
+   *        200:
+   *         description: Contacto actualizado
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: true
+   *                 message:
+   *                   type: string
+   *                   example: "Contacto actualizado!"
+   *                 data:
+   *                   $ref: '#/components/schemas/FullContact'
+   *        400:
+   *         description: Solicitud inválida
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/BadRequest'
+   *        401:
+   *         description: No autorizado
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Unauthorized'
+   *        403:
+   *         description: No tiene permisos
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Forbidden'
+   *        500:
+   *         description: Error interno del servidor
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/InternalServerError'
+  */
+  public updateContact = async (request: Request, response: Response) => {
+    try {
+      const contactId = parseInt(request.params.id);
+      const body = request.body as UpdateContactDto;
+      body.id = contactId;
+      const contactUpdated = await this.contactService.update(body);
+      if (!contactUpdated)
+        throw new Error("No se pudo actualizar el contacto");
+
+      return response.status(200).json({
+        success: true,
+        message: "Contacto actualizado!",
+        data: ContactResource.toResponse(contactUpdated)
       });
     } catch (error: any) {
       return response.status(500).json({

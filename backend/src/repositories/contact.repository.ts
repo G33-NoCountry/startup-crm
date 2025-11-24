@@ -24,4 +24,15 @@ export class ContactRepository implements IContactRepository {
     async createContact(data: any): Promise<Contact | null> {
         return Contact.create(data);
     }
+
+    async updateContact(data: any): Promise<Contact | null> {
+        const result = await Contact.update(data, {
+            where: { id: data.id }
+        });
+
+        if (!(result.length > 0))
+            return null;
+        const contactUpdated = await this.findById(data.id);
+        return contactUpdated;
+    }
 }

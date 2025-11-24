@@ -10,6 +10,7 @@ import { registerContactValidator } from "../validators/contact/register-contact
 import { sanitizeBody } from "../middlewares/sanitize.middlewares";
 import { validateParam } from "../validators/param/param.validator";
 import { contactExists } from "../middlewares/contact-exist.middleware";
+import { updateContactValidator } from "../validators/contact/update-contact.validator";
 
 const router = Router();
 const contactRepository = new ContactRepository;
@@ -21,5 +22,15 @@ router.use(checkJwtMiddleware, acceptRoleMiddleware('Agente'));
 router.get('/', queryParamPaginateValidator, validateRequestMiddleware, contactController.getContacts);
 router.post('/', registerContactValidator, validateRequestMiddleware, sanitizeBody, contactController.registerContact);
 router.get('/:id', validateParam("id"), validateRequestMiddleware, contactExists, contactController.getContact);
+router.patch(
+    '/:id',
+    validateParam("id"),
+    validateRequestMiddleware,
+    contactExists,
+    updateContactValidator,
+    validateRequestMiddleware,
+    sanitizeBody,
+    contactController.updateContact
+);
 
 export default router;

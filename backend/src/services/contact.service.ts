@@ -17,5 +17,9 @@ export class ContactService {
     return this.contactRepository.createContact(data);
   }
 
+  public async update(data: any): Promise<Contact | null> {
+    return this.contactRepository.updateContact(data);
+  }
+
 
 }
