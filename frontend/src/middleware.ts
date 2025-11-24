@@ -15,6 +15,11 @@ const protectedRoutes = [
 ];
 
 export function middleware(request: NextRequest) {
+  // TODO: Descomentar cuando el backend esté listo y se usen cookies
+  // Actualmente deshabilitado para trabajar con mock + localStorage
+  return NextResponse.next();
+
+  /* 
   const { pathname } = request.nextUrl;
   
   const token = request.cookies.get("auth_token")?.value;
@@ -38,6 +43,7 @@ export function middleware(request: NextRequest) {
   }
 
   return NextResponse.next();
+  */
 }
 
 export const config = {

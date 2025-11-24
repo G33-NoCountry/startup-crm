@@ -16,7 +16,7 @@ export default function LoginPage() {
                             className="pb-4"
                             priority // imagen principal visible al cargar (LCP)
                         />
-                        <hr className="h-2 w-24 my-1 bg-orange-400 rounded-lg border-none"></hr>
+                        <hr className="h-2 w-24 my-1 bg-accent rounded-lg border-none"></hr>
                     </div>
 
                     <h2 className="text-3xl font-semibold mb-4 leading-tight">
