@@ -1,7 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import { sequelize } from "./config/database.config";
+import { sequelize } from "./models";
 import { appConfig } from "./config/app.config";
 import { corsConfig } from "./config/cors.config";
 import { setupAssociations } from "./models";

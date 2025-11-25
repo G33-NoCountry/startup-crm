@@ -64,12 +64,6 @@ export class AuthController {
    *           application/json:
    *             schema:
    *              $ref: '#/components/schemas/BadRequest'
-   *        409:
-   *         description: Existe una sesión iniciada
-   *         content:
-   *           application/json:
-   *             schema:
-   *               $ref: '#/components/schemas/Authenticated'
    *        500:
    *         description: Error interno del servidor
    *         content:
