@@ -29,6 +29,46 @@ module.exports = {
         created_at: new Date,
         updated_at: new Date
       },
+      {
+        user_id: 1,
+        contact_id: 3,
+        funnel_stage_id: 2,
+        title: "Otro servicio 2",
+        created_at: new Date,
+        updated_at: new Date
+      },
+      {
+        user_id: 3,
+        contact_id: 2,
+        funnel_stage_id: 2,
+        title: "Otro servicio 3",
+        created_at: new Date,
+        updated_at: new Date
+      },
+      {
+        user_id: 3,
+        contact_id: 2,
+        funnel_stage_id: 1,
+        title: "Otro servicio 4",
+        created_at: new Date,
+        updated_at: new Date
+      },
+      {
+        user_id: 1,
+        contact_id: 2,
+        funnel_stage_id: 3,
+        title: "Otro servicio 5",
+        created_at: new Date,
+        updated_at: new Date
+      },
+      {
+        user_id: 1,
+        contact_id: 3,
+        funnel_stage_id: 3,
+        title: "Otro servicio 6",
+        created_at: new Date,
+        updated_at: new Date
+      },
     ]);
   },
 

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { ContactService } from "../services/contact.service";
-import { Contact } from "../models";
+import { Contact, Deal, FunnelStage } from "../models";
 import { RegisterContactDto } from "../dto/contact/register-contact.dto";
 import { ContactResource } from "../resources/contact/contact-resource.resource";
 import { UpdateContactDto } from "../dto/contact/update-contact.dto";
@@ -44,6 +44,14 @@ export class ContactController {
    *           type: string
    *         required: false
    *         description: Cursor para obtener la página anterior.
+   * 
+   *       - in: query
+   *         name: funnel_stage_id
+   *         schema:
+   *           type: integer
+   *           minimum: 1
+   *         required: false
+   *         description: Id del funnel stage para filtrar contactos
    *     security:
    *       - bearerAuth: []
    *     responses:
@@ -89,12 +97,15 @@ export class ContactController {
   */
   public getContacts = async (request: Request, response: Response) => {
     try {
-      const { after, limit, before } = request.query;
+      const { after, limit, before, funnel_stage_id } = request.query;
       const parsedLimit = limit ? parseInt(limit as string, 10) : undefined;
-      const contacts = await this.contactService.getUsers(
+      const contactsId = await this.contactService.filterContactsId(parseInt(funnel_stage_id as string));
+
+      const contacts = await this.contactService.getContacts(
         parsedLimit,
         after as string ?? undefined,
         before as string ?? undefined,
+        [], { id: contactsId.map(i => i.id) }
       );
 
       return response.status(200).json({

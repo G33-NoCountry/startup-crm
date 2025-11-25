@@ -8,14 +8,25 @@ export class ContactRepository implements IContactRepository {
         return Contact.findByPk(id);
     }
 
-    async findAll(limit: number | undefined, after?: string, before?: string, where?: any): Promise<IPaginate<Contact>> {
+    async findAll(
+        limit: number | undefined,
+        after?: string,
+        before?: string,
+        include?: any,
+        where?: any
+    ): Promise<IPaginate<Contact> | null> {
         const result = await Contact.paginate({
             limit,
             after,
             before,
+            order: [['id', 'ASC']],
+            include: include,
             attributes: Contact.publicAttributes,
-            where
+            where,
         });
+
+        if (!(result.edges.length > 0))
+            return null;
 
         const paginate = toPaginate<Contact>(result);
         return paginate;
