@@ -13,7 +13,7 @@ import {
 
 import { DataTable } from "@/components/features/contacts/data-table";
 import { columns } from "@/components/features/contacts/columns"
-import { contactSchema } from "@/lib/validations/contact.schema"
+import { contactDbSchema } from "@/lib/validations/contact.schema"
 import { NewContactDialog } from "@/components/features/contacts/NewContactDialog";
 
 import { UserPlus } from "lucide-react";
@@ -22,11 +22,11 @@ import dataContacts from "@/lib/data/contacts.json";
 
 export default function ContactPage() {
 
-  const contacts = z.array(contactSchema).parse(dataContacts);
+  const contacts = z.array(contactDbSchema).parse(dataContacts);
   const [isNewDialogOpen, setIsNewDialogOpen] = useState(false);
 
     return (       
-        <div className="flex flex-1 flex-col gap-4 p-4">          
+        <div className="flex flex-1 flex-col gap-4 py-4">          
             <Card>
               <CardHeader className="flex flex-col gap-4 px-6 py-4 md:flex-row md:items-start md:justify-between">
                 <div className="flex flex-col gap-1">
