@@ -1,6 +1,6 @@
 "use client";
 
-import { Ellipsis } from "lucide-react";
+import { Ellipsis, Pencil, Trash2 } from "lucide-react";
 import { Row } from "@tanstack/react-table";
 
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { contactSchema } from "@/lib/validations/contact.schema";
+import { EditContactDialog } from "./EditContactDialog";
+import { DeleteContactDialog } from "./DeleteContactDialog";
+import type { Contact } from "@/lib/validations/contact.schema";
+import { toast } from "sonner";
+
+import { useState } from "react";
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>;
@@ -20,9 +25,12 @@ interface DataTableRowActionsProps<TData> {
 export function DataTableRowActions<TData>({
   row,
 }: DataTableRowActionsProps<TData>) {
-  const contact = contactSchema.parse(row.original);
+  const contact = row.original as Contact;
+  const [editOpen, setEditOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
 
   return (
+    <>
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
@@ -30,14 +38,42 @@ export function DataTableRowActions<TData>({
           className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
         >
           <Ellipsis className="h-4 w-4" />
-          <span className="sr-only">Open menu</span>
+          <span className="sr-only">Abrir menú</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[160px]">
-        <DropdownMenuItem onClick={() => { contact.id }} className="cursor-pointer hover:bg-accent" >Ver</DropdownMenuItem>
-        <DropdownMenuItem onClick={() => { contact.id }} className="cursor-pointer hover:bg-accent" >Editar</DropdownMenuItem>
-        <DropdownMenuItem onClick={() => { contact.id }} className="cursor-pointer hover:bg-accent" >Eliminar</DropdownMenuItem>
+        <DropdownMenuItem onSelect={() => setEditOpen(true)} className="cursor-pointer hover:bg-accent" >
+          <Pencil className="mr-2 h-4 w-4" />
+          Editar
+        </DropdownMenuItem>
+        <DropdownMenuItem onSelect={() => setDeleteOpen(true)} className="cursor-pointer text-red-600 focus:text-red-600" >
+          <Trash2 className="mr-2 h-4 w-4" />
+          Eliminar
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
+
+    {/* Edit Dialog */}
+    <EditContactDialog
+        contact={contact}
+        open={editOpen}
+        onOpenChange={setEditOpen}
+        onSuccess={
+          // Aquí puedes refrescar la tabla si usas TanStack Query, etc.
+          () => toast.success("Contacto actualizado")
+        }
+      />
+
+      {/* Delete Dialog */}
+      <DeleteContactDialog
+        contact={contact}
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+        onSuccess={
+          // Refrescar tabla o mutar datos
+          () => toast.success("Contacto eliminado")
+        }
+      />
+    </>
   );
 }
