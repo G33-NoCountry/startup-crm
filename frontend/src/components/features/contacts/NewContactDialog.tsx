@@ -1,29 +1,34 @@
 "use client";
 
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Save } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ContactForm } from "./ContactForm";
+import { type ContactFormData } from "@/lib/validations/contact.schema";
+import { toast } from "sonner"
 
 interface NewContactDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSuccess?: () => void;
 }
 
-export function NewContactDialog({ open, onOpenChange }: NewContactDialogProps) {
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Aquí iría tu lógica: mutate, API, tanstack query, etc.
-    console.log("Creando contacto...");
-    onOpenChange(false); // cerrar al enviar
+export function NewContactDialog({ open, onOpenChange, onSuccess }: NewContactDialogProps) {
+
+  const handleSubmit = async (data: ContactFormData) => {
+    try {
+      const res = await fetch("/api/contacts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (!res.ok) throw new Error("Error al crear");
+
+      toast.success("Contacto creado correctamente");
+      onSuccess?.();
+      onOpenChange(false);
+    } catch (err) {
+      toast.error("Error al crear el contacto");
+    }
   };
 
   return (
@@ -31,37 +36,8 @@ export function NewContactDialog({ open, onOpenChange }: NewContactDialogProps) 
       <DialogContent className="sm:max-w-[525px]">
         <DialogHeader>
           <DialogTitle>Nuevo contacto</DialogTitle>
-          <DialogDescription>
-            Agrega los datos del nuevo contacto. Puedes editarlo más tarde.
-          </DialogDescription>
         </DialogHeader>
-
-        <form onSubmit={handleSubmit}>
-          <div className="grid gap-4 pt-4 pb-8">
-            <div className="grid gap-3">
-              <Label htmlFor="full_name">Nombre Completo</Label>
-              <Input id="full_name" name="full_name" />
-            </div>
-            <div className="grid gap-3">
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" name="email" />
-            </div>
-            <div className="grid gap-3">
-              <Label htmlFor="phone">Teléfono</Label>
-              <Input id="phone" name="phone"/>
-            </div>
-          </div>
-
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancelar
-            </Button>
-            <Button type="submit">
-              <Save className="mr-2 h-4 w-4" />
-              Guardar
-            </Button>
-          </DialogFooter>
-        </form>
+        <ContactForm mode="create" onSubmit={handleSubmit} />
       </DialogContent>
     </Dialog>
   );
