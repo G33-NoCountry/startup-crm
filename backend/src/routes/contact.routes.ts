@@ -11,7 +11,7 @@ import { sanitizeBody } from "../middlewares/sanitize.middlewares";
 import { validateParam } from "../validators/param/param.validator";
 import { contactExists } from "../middlewares/contact-exist.middleware";
 import { updateContactValidator } from "../validators/contact/update-contact.validator";
-import { funnelStageExists, queryParamFunnelStageIdValidator } from "../validators/param/query-funnel-stage.validator";
+import { queryFunnelStageExists, queryParamFunnelStageIdValidator } from "../validators/param/query-funnel-stage.validator";
 
 const router = Router();
 const contactRepository = new ContactRepository;
@@ -24,7 +24,7 @@ router.get('/',
     queryParamPaginateValidator,
     queryParamFunnelStageIdValidator,
     validateRequestMiddleware,
-    funnelStageExists,
+    queryFunnelStageExists,
     contactController.getContacts
 );
 router.post('/', registerContactValidator, validateRequestMiddleware, sanitizeBody, contactController.registerContact);

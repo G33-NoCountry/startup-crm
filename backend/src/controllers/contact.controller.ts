@@ -99,13 +99,16 @@ export class ContactController {
     try {
       const { after, limit, before, funnel_stage_id } = request.query;
       const parsedLimit = limit ? parseInt(limit as string, 10) : undefined;
-      const contactsId = await this.contactService.filterContactsId(parseInt(funnel_stage_id as string));
+      let contactsId =
+        funnel_stage_id ?
+          await this.contactService.filterContactsId(parseInt(funnel_stage_id as string)) :
+          [];
 
       const contacts = await this.contactService.getContacts(
         parsedLimit,
         after as string ?? undefined,
         before as string ?? undefined,
-        [], { id: contactsId.map(i => i.id) }
+        [], contactsId.length > 0 ? { id: contactsId.map(i => i.id) } : {}
       );
 
       return response.status(200).json({

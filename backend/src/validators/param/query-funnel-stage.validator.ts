@@ -5,6 +5,7 @@ import { FunnelStage } from "../../models";
 
 export const queryParamFunnelStageIdValidator = [
     query("funnel_stage_id")
+        .optional()
         .notEmpty().withMessage(buildValidationMessage("funnel_stage_id", "required"))
         .bail()
         .isNumeric().withMessage(buildValidationMessage("funnel_stage_id", "numeric"))
@@ -13,10 +14,11 @@ export const queryParamFunnelStageIdValidator = [
     ,
 ];
 
-export const funnelStageExists = (async (req: Request, res: Response, next: NextFunction) => {
+export const queryFunnelStageExists = (async (req: Request, res: Response, next: NextFunction) => {
     const { funnel_stage_id } = req.query;
     if (!funnel_stage_id)
-        throw new Error;
+        next();
+
     const funnelStageId = parseInt(funnel_stage_id as string);
 
     if (!await FunnelStage.findByPk(funnelStageId)) {
