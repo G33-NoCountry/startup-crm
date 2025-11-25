@@ -45,18 +45,14 @@ export default function LoginForm() {
     }, [error, clearError, form]);
 
     async function onSubmit(data: any) {
-        try {
-            await login({
-                email: data.email,
-                password: data.password,
-                rememberMe: data.rememberMe ?? false,
-            });
+        const success = await login({
+            email: data.email,
+            password: data.password,
+            rememberMe: data.rememberMe ?? false,
+        });
 
-            if (!error && !isBlocked) {
-                router.push("/dashboard");
-            }
-        } catch (err) {
-            console.error("Error en submit:", err);
+        if (success) {
+            router.push("/dashboard");
         }
     }
 

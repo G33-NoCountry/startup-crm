@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import type { User, LoginCredentials, AuthError } from "@/types/auth.types";
-import { authService } from "@/lib/api/authService";
+// TODO: Cambiar a authService cuando el backend implemente el endpoint
+// import { authService } from "@/lib/api/authService";
+import { authServiceMock as authService } from "@/lib/api/authService.mock";
 import {
   saveToken,
   getToken,
@@ -19,7 +21,7 @@ interface AuthStore {
   loginAttempts: number;
   isBlocked: boolean;
 
-  login: (credentials: LoginCredentials) => Promise<void>;
+  login: (credentials: LoginCredentials) => Promise<boolean>;
   logout: () => Promise<void>;
   checkAuth: () => void;
   clearError: () => void;
@@ -45,7 +47,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       set({
         error: "Demasiados intentos fallidos. Intenta nuevamente más tarde.",
       });
-      return;
+      return false;
     }
 
     set({ isLoading: true, error: null });
@@ -65,6 +67,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         loginAttempts: 0,
         isBlocked: false,
       });
+      
+      return true;
     } catch (error) {
       const authError = error as AuthError;
       const newAttempts = state.loginAttempts + 1;
@@ -101,6 +105,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       }
 
       console.error("Error en login:", authError);
+      return false;
     }
   },
 
