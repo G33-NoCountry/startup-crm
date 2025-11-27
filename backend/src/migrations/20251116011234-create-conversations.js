@@ -16,7 +16,7 @@ module.exports = {
         references: { model: "contacts" },
       },
       status: {
-        type: Sequelize.STRING(255),
+        type: Sequelize.BOOLEAN,
         allowNull: false,
       },
       channel: {

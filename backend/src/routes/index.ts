@@ -4,6 +4,7 @@ import userRoutes from "./user.routes";
 import adminRoutes from "./admin.routes";
 import contactRoutes from "./contact.routes";
 import dealRoutes from "./deal.routes";
+import conversationRoutes from "./conversations.routes";
 
 const router = Router();
 
@@ -12,5 +13,6 @@ router.use("/users", userRoutes);
 router.use("/admin", adminRoutes);
 router.use("/contacts", contactRoutes);
 router.use("/deals", dealRoutes);
+router.use("/conversations", conversationRoutes);
 
 export default router;

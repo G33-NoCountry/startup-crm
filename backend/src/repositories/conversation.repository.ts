@@ -1,0 +1,52 @@
+import { IConversationRepository } from "../interfaces/conversation.interface";
+import { IPaginate } from "../interfaces/paginate.interface";
+import { Conversation } from "../models";
+import { toPaginate } from "../utils/paginate";
+
+export class ConversationRepository implements IConversationRepository {
+    async findById(id: number) {
+        return Conversation.findByPk(id);
+    }
+
+    async findAll(
+        limit: number | undefined,
+        after?: string,
+        before?: string,
+        include?: any,
+        where?: any
+    ): Promise<IPaginate<Conversation> | null> {
+        const result = await Conversation.paginate({
+            limit,
+            after,
+            before,
+            include: include,
+            attributes: Conversation.publicAttributes,
+            where,
+        });
+
+        if (!(result.edges.length > 0))
+            return null;
+
+        const paginate = toPaginate<Conversation>(result);
+        return paginate;
+    }
+
+    async create(data: any): Promise<Conversation | null> {
+        return Conversation.create(data);
+    }
+
+    async update(data: any): Promise<Conversation | null> {
+        const result = await Conversation.update(data, {
+            where: { id: data.id }
+        });
+
+        if (!(result.length > 0))
+            return null;
+        const ConversationUpdated = await this.findById(data.id);
+        return ConversationUpdated;
+    }
+
+    async delete(Conversation: Conversation): Promise<void> {
+        return Conversation.destroy();
+    }
+}

@@ -12,11 +12,15 @@ import { validateParam } from "../validators/param/param.validator";
 import { contactExists } from "../middlewares/contact-exist.middleware";
 import { updateContactValidator } from "../validators/contact/update-contact.validator";
 import { queryFunnelStageExists, queryParamFunnelStageIdValidator } from "../validators/param/query-funnel-stage.validator";
+import { ConversationRepository } from "../repositories/conversation.repository";
+import { ConversationService } from "../services/conversation.service";
 
 const router = Router();
 const contactRepository = new ContactRepository;
+const conversationRepository = new ConversationRepository;
 const contactService = new ContactService(contactRepository);
-const contactController = new ContactController(contactService);
+const conversationService = new ConversationService(conversationRepository);
+const contactController = new ContactController(contactService, conversationService);
 
 // Solo acceden los usuarios con rol "Agente"
 router.use(checkJwtMiddleware, acceptRoleMiddleware('Agente'));
@@ -28,6 +32,14 @@ router.get('/',
     contactController.getContacts
 );
 router.post('/', registerContactValidator, validateRequestMiddleware, sanitizeBody, contactController.registerContact);
+router.get('/:id/conversations',
+    validateParam("id"),
+    validateRequestMiddleware,
+    contactExists,
+    queryParamPaginateValidator,
+    validateRequestMiddleware,
+    contactController.getCoversationsByContactId
+);
 router.get('/:id', validateParam("id"), validateRequestMiddleware, contactExists, contactController.getContact);
 router.patch('/:id',
     validateParam("id"),

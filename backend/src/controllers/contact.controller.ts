@@ -5,6 +5,7 @@ import { RegisterContactDto } from "../dto/contact/register-contact.dto";
 import { ContactResource } from "../resources/contact/contact-resource.resource";
 import { UpdateContactDto } from "../dto/contact/update-contact.dto";
 import { ContactRequest } from "../request/contact.request";
+import { ConversationService } from "../services/conversation.service";
 
 /**
  * @swagger
@@ -13,7 +14,10 @@ import { ContactRequest } from "../request/contact.request";
  *   description: Endpoints para gestión de contactos
  */
 export class ContactController {
-  constructor(private contactService: ContactService) { }
+  constructor(
+    private contactService: ContactService,
+    private conversationService: ConversationService,
+  ) { }
 
   /**
    * @swagger
@@ -99,9 +103,9 @@ export class ContactController {
     try {
       const { after, limit, before, funnel_stage_id } = request.query;
       const parsedLimit = limit ? parseInt(limit as string, 10) : undefined;
-      let contactsId =
+      const contactsId =
         funnel_stage_id ?
-          await this.contactService.filterContactsId(parseInt(funnel_stage_id as string)) :
+          await this.contactService.filterContactsByFunnelStageId(parseInt(funnel_stage_id as string)) :
           [];
 
       const contacts = await this.contactService.getContacts(
@@ -435,6 +439,111 @@ export class ContactController {
       await this.contactService.delete(contact);
 
       return response.status(204).send();
+    } catch (error: any) {
+      return response.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  };
+
+  /**
+   * @swagger
+   * /api/contacts/{id}/conversations:
+   *   get:
+   *     summary: Obtener conversaciones según el `id` de un contacto 
+   *     description: Obtener datos de conversaciones paginados (solo para usuarios "Agente")
+   *     tags: [Contacts]
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: integer
+   *           minimum: 1
+   *         description: id del contacto
+   * 
+   *       - in: query
+   *         name: limit
+   *         schema:
+   *           type: integer
+   *           minimum: 1
+   *         required: true
+   *         description: Cantidad de resultados a devolver por página.
+   *
+   *       - in: query
+   *         name: after
+   *         schema:
+   *           type: string
+   *         required: false
+   *         description: Cursor para obtener la siguiente página.
+   *
+   *       - in: query
+   *         name: before
+   *         schema:
+   *           type: string
+   *         required: false
+   *         description: Cursor para obtener la página anterior.
+   *     security:
+   *       - bearerAuth: []
+   *     responses:
+   *        200:
+   *         description: Conversaciones obtenidos
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: true
+   *                 message:
+   *                   type: string
+   *                   example: "Conversaciones obtenidas!"
+   *                 data:
+   *                   $ref: '#/components/schemas/PaginateConversation'
+   *        400:
+   *         description: Solicitud inválida
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/BadRequest'
+   *        401:
+   *         description: No autorizado
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Unauthorized'
+   *        403:
+   *         description: No tiene permisos
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Forbidden'
+   *        500:
+   *         description: Error interno del servidor
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/InternalServerError'
+  */
+  public getCoversationsByContactId = async (request: Request, response: Response) => {
+    try {
+      const { after, limit, before } = request.query;
+      const parsedLimit = limit ? parseInt(limit as string, 10) : undefined;
+      const contactId = parseInt(request.params.id);
+      const conversations = await this.conversationService.getConversations(
+        parsedLimit,
+        after as string ?? undefined,
+        before as string ?? undefined,
+        [], { contact_id: contactId }
+      );
+
+      return response.status(200).json({
+        success: true,
+        message: "Conversaciones obtenidas!",
+        data: conversations
+      });
     } catch (error: any) {
       return response.status(500).json({
         success: false,
