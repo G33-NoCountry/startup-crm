@@ -179,7 +179,7 @@ export class AuthController {
         success: true,
         message: "Login exitoso!",
         data: {
-          user: user,
+          user: UserResource.toResponse(user),
           access_token: jwt,
           refresh_token: refreshToken,
         }
