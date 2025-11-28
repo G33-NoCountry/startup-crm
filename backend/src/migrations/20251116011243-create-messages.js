@@ -10,11 +10,6 @@ module.exports = {
         autoIncrement: true,
         primaryKey: true,
       },
-      contact_id: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        references: { model: "contacts" },
-      },
       conversation_id: {
         type: Sequelize.INTEGER,
         allowNull: false,

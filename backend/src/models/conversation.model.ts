@@ -32,7 +32,7 @@ Conversation.init(
             allowNull: false,
         },
         channel: {
-            type: DataTypes.STRING(55),
+            type: DataTypes.ENUM('whatsapp', 'email'),
             allowNull: false,
         },
         last_interaction: {

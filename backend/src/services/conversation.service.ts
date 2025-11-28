@@ -1,5 +1,5 @@
 import { IConversationRepository } from "../interfaces/conversation.interface";
-import { Conversation} from "../models";
+import { Conversation } from "../models";
 
 export class ConversationService {
 

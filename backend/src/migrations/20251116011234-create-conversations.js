@@ -20,7 +20,7 @@ module.exports = {
         allowNull: false,
       },
       channel: {
-        type: Sequelize.STRING(55),
+        type: Sequelize.ENUM('whatsapp', 'email'),
         allowNull: false,
       },
       last_interaction: {
