@@ -9,9 +9,10 @@ export const sequelize: Sequelize = new Sequelize({
     database: env.DB_NAME ?? "db",
     dialect: 'mysql',
     logging: false,
-    define:{
+    define: {
         underscored: true,
         createdAt: 'created_at',
         updatedAt: 'updated_at',
+        deletedAt: 'deleted_at'
     }
 });

@@ -30,3 +30,10 @@ export const companyNameSchema = z
     .max(100, "El nombre no puede exceder 100 caracteres")
     .trim()
     .optional()
+
+export const phoneSchema = z
+  .string()
+  .trim()
+  .regex(/^[\d\s+()-]*$/, "Teléfono inválido (solo números, espacios, +, -, (), etc.)")
+  .optional()
+  .or(z.literal(""))

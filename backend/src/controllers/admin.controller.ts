@@ -1,0 +1,300 @@
+import { Request, Response } from "express";
+import { UserService } from "../services/user.service";
+import { Op } from "sequelize";
+import { User } from "../models";
+import { UserResource } from "../resources/user/user-resource.resource";
+import { UpdateUserAdminDto } from "../dto/admin/update-user-admin.dto";
+import { RegisterUserAdminDto } from "../dto/admin/register-user-admin.dto";
+
+/**
+ * @swagger
+ * tags:
+ *   name: Admin
+ *   description: Endpoints para gestión de usuarios (solo acceden usuarios "Admin")
+ */
+export class AdminController {
+  private userService: UserService;
+
+  constructor() {
+    this.userService = new UserService();
+  }
+
+  /**
+   * @swagger
+   * /api/admin/users:
+   *   get:
+   *     summary: Obtener usuarios
+   *     description: Obtener datos de usuarios paginados
+   *     tags: [Admin]
+   *     parameters:
+   *       - in: query
+   *         name: limit
+   *         schema:
+   *           type: integer
+   *           minimum: 1
+   *         required: true
+   *         description: Cantidad de resultados a devolver por página.
+   *
+   *       - in: query
+   *         name: after
+   *         schema:
+   *           type: string
+   *         required: false
+   *         description: Cursor para obtener la siguiente página.
+   *
+   *       - in: query
+   *         name: before
+   *         schema:
+   *           type: string
+   *         required: false
+   *         description: Cursor para obtener la página anterior.
+   *     security:
+   *       - bearerAuth: []
+   *     responses:
+   *        200:
+   *         description: Usuarios obtenidos
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: true
+   *                 message:
+   *                   type: string
+   *                   example: "Usuarios obtenidos!"
+   *                 data:
+   *                   $ref: '#/components/schemas/PaginateUser'                    
+   * 
+   *        400:
+   *         description: Solicitud inválida
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/BadRequest'
+   *        401:
+   *         description: No autorizado
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Unauthorized'
+   *        403:
+   *         description: No tiene permisos
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Forbidden'
+   *        500:
+   *         description: Error interno del servidor
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/InternalServerError'
+  */
+  public getUserList = async (request: Request, response: Response) => {
+    try {
+      const userId = request.user as User;
+      const { after, limit, before } = request.query;
+      const parsedLimit = limit ? parseInt(limit as string, 10) : undefined;
+      const users = await this.userService.getUsersPaginate(
+        parsedLimit,
+        after as string ?? undefined,
+        before as string ?? undefined,
+        {
+          id: {
+            [Op.ne]: userId.id
+          }
+        }
+      );
+
+      return response.status(200).json({
+        success: true,
+        message: "Usuarios obtenidos!",
+        data: users
+      });
+    } catch (error: any) {
+      return response.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  };
+
+
+  /**
+   * @swagger
+   * /api/admin/users:
+   *   post:
+   *     summary: Registra un nuevo usuario
+   *     description: Crea una nueva cuenta de usuario
+   *     tags: [Admin]
+   *     security:
+   *       - bearerAuth: []
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             $ref: '#/components/schemas/AdminRegisterUserRequest'
+   *     responses:
+   *        201:
+   *         description: Usuario creado exitosamente
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: true
+   *                 message:
+   *                   type: string
+   *                   example: "Usuario creado!"
+   *                 data:
+   *                   type: object
+   *                   properties:
+   *                     user: 
+   *                       $ref: '#/components/schemas/FullUser'
+   * 
+   *        400:
+   *         description: Solicitud inválida
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/BadRequest'
+   *        401:
+   *         description: No autorizado
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Unauthorized'
+   *        403:
+   *         description: No tiene permisos
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Forbidden'
+   *        500:
+   *         description: Error interno del servidor
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/InternalServerError'
+  */
+  public createUser = async (request: Request, response: Response) => {
+    try {
+      const body = request.body as RegisterUserAdminDto;
+      const user = await this.userService.registerUser(body);
+
+      if (!user)
+        throw new Error("No se registro el usuario");
+
+      return response.status(201).json({
+        success: true,
+        message: "Usuario creado!",
+        data: UserResource.toResponse(user)
+      });
+    } catch (error: any) {
+      return response.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  };
+
+  /**
+   * @swagger
+   * /api/admin/users/{id}:
+   *   patch:
+   *     summary: Actualiza datos personales de un usuario
+   *     description: Actualiza el usuario segun id
+   *     tags: [Admin]
+   *     security:
+   *       - bearerAuth: []
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: integer
+   *           minimum: 1
+   *         description: id del usuario
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             $ref: '#/components/schemas/AdminUpdateUserRequest'
+   *     responses:
+   *        200:
+   *         description: Se actualiza el usuario
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: true
+   *                 message:
+   *                   type: string
+   *                   example: "Usuario actualizado!"
+   *                 data:
+   *                   $ref: '#/components/schemas/FullUser'
+   *        400:
+   *         description: Solicitud inválida
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/BadRequest'
+   *        401:
+   *         description: No autorizado
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Unauthorized'
+   *        403:
+   *         description: No tiene permisos
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Forbidden'
+   *        404:
+   *         description: No encontrado
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/NotFound'
+   *        500:
+   *         description: Error interno del servidor
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/InternalServerError'
+  */
+  public updateUser = async (request: Request, response: Response) => {
+    try {
+      const userId = parseInt(request.params.id);
+      const body = request.body as UpdateUserAdminDto;
+      body.id = userId;
+      const isUpdated = await this.userService.updateUser(body, body.id);
+      const userUpdated = await this.userService.getByPk(userId);
+      if (!isUpdated || !userUpdated)
+        throw new Error("No se pudo actualizar el usuario");
+
+      return response.status(200).json({
+        success: true,
+        message: "Usuario actualizado!",
+        data: UserResource.toResponse(userUpdated)
+      });
+    } catch (error: any) {
+      return response.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  };
+
+
+}

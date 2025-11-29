@@ -5,21 +5,21 @@ const { hashSync } = require('bcrypt');
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    const hashedPassword = hashSync("12345678", 10);
+    const hashedPassword = hashSync("password1Ab_", 10);
     await queryInterface.bulkInsert('users', [
       {
-        full_name: "user1",
-        email: 'user@mail.com',
+        full_name: "Juan Perez",
+        email: 'admin@admin.com',
         password: hashedPassword,
         role: 'Admin',
-        status: false,
-        avatar_color: "FF0033",
+        status: true,
+        avatar_color: "ff0033",
         created_at: new Date,
         updated_at: new Date
       },
       {
-        full_name: "user2",
-        email: 'user2@mail.com',
+        full_name: "Jose Mendez",
+        email: 'agente@agente.com',
         password: hashedPassword,
         role: 'Agente',
         status: true,
@@ -28,11 +28,31 @@ module.exports = {
         updated_at: new Date
       },
       {
-        full_name: "user3",
-        email: 'user3@mail.com',
+        full_name: "Jimena Lopez",
+        email: 'manager@manager.com',
         password: hashedPassword,
         role: 'Manager',
-        status: false,
+        status: true,
+        avatar_color: "a24bbd",
+        created_at: new Date,
+        updated_at: new Date
+      },
+      {
+        full_name: "Hernan Gomez",
+        email: 'hernan@admin.com',
+        password: hashedPassword,
+        role: 'Agente',
+        status: true,
+        avatar_color: "a24bbd",
+        created_at: new Date,
+        updated_at: new Date
+      },
+      {
+        full_name: "Valeria Gomez",
+        email: 'valeria@agente.com',
+        password: hashedPassword,
+        role: 'Admin',
+        status: true,
         avatar_color: "a24bbd",
         created_at: new Date,
         updated_at: new Date

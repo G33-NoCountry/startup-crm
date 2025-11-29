@@ -1,13 +1,14 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import { sequelize } from "./config/database.config";
+import { sequelize } from "./models";
 import { appConfig } from "./config/app.config";
 import { corsConfig } from "./config/cors.config";
 import { setupAssociations } from "./models";
 import router from "./routes/index";
 import swagger from "swagger-ui-express";
 import swaggerConfig from "./docs/swagger";
+import { passportConfig } from "./config/passport.config";
 
 const app = express();
 
@@ -20,10 +21,11 @@ app.use("/api", router);
 app.use("/api/docs", swagger.serve,
     swagger.setup(swaggerConfig, {
         explorer: true,
-        // customCss: ".swagger-ui .topbar { display: none }",
         customSiteTitle: "Startup CRM API Documentation",
     })
 );
+
+app.use(passportConfig.initialize());
 
 async function initializeDatabase() {
   try {
