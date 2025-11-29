@@ -38,4 +38,19 @@ export class DealRepository {
             ]
         });
     }
+
+    public async findById(id: number) {
+        return await Deal.findByPk(id);
+    }
+
+    public async updateFunnelStage(dealId: number, newStageId: number) {
+        const [affectedCount] = await Deal.update(
+            { funnel_stage_id: newStageId },
+            { where: { id: dealId } }
+        );
+
+        if (affectedCount === 0) return null;
+
+        return await this.findById(dealId);
+    }
 }
