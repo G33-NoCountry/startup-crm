@@ -11,7 +11,7 @@ import { ConversationService } from "../services/conversation.service";
  * @swagger
  * tags:
  *   name: Contacts
- *   description: Endpoints para gestión de contactos (solo acceden usuarios "Admin" y "Agente")
+ *   description: Endpoints para gestión de contactos
  */
 export class ContactController {
   constructor(
@@ -24,7 +24,7 @@ export class ContactController {
    * /api/contacts:
    *   get:
    *     summary: Obtener contactos
-   *     description: Obtener datos de contactos paginados
+   *     description: Obtener datos de contactos paginados (solo para usuarios "Agente")
    *     tags: [Contacts]
    *     parameters:
    *       - in: query
@@ -133,7 +133,7 @@ export class ContactController {
    * /api/contacts:
    *   post:
    *     summary: Registra un nuevo contacto
-   *     description: Crea un registro de contacto
+   *     description: Crea un registro de contacto (solo para usuarios "Agente")
    *     tags: [Contacts]
    *     security:
    *       - bearerAuth: []
@@ -210,7 +210,7 @@ export class ContactController {
    * /api/contacts/{id}:
    *   get:
    *     summary: Obtener contacto
-   *     description: Obtener datos de un contacto
+   *     description: Obtener datos de un contacto (solo para usuarios "Agente")
    *     tags: [Contacts]
    *     security:
    *       - bearerAuth: []
@@ -295,7 +295,7 @@ export class ContactController {
    * /api/contacts/{id}:
    *   patch:
    *     summary: Actualizar contacto
-   *     description: Actualizar datos de un contacto
+   *     description: Actualizar datos de un contacto (solo para usuarios "Agente")
    *     tags: [Contacts]
    *     security:
    *       - bearerAuth: []
