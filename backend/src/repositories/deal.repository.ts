@@ -53,4 +53,18 @@ export class DealRepository {
 
         return await this.findById(dealId);
     }
+
+    async findFirstFunnelStageId(): Promise<number | null> {
+        const firstStage = await FunnelStage.findOne({
+            where: { sort_order: 1 },
+            attributes: ['id'],
+            order: [['id', 'ASC']]
+        });
+        return firstStage ? firstStage.id : null;
+    }
+
+    async create(data: { title: string, value?: number, contact_id: number, user_id: number, funnel_stage_id: number }): Promise<Deal> {
+        const newDeal = await Deal.create(data);
+        return newDeal;
+    }
 }

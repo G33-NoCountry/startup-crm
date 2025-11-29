@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import { DealService } from "../services/deal.service";
 
 export class DealController {
@@ -118,4 +118,55 @@ export class DealController {
             });
         }
     };
+
+    /**
+     * @swagger
+     * /api/deals:
+     *   post:
+     *     summary: Crear un nuevo deal (oportunidad de venta)
+     *     description: Crea un nuevo deal, lo asocia a un contacto y lo asigna a la primera etapa del funnel. El user_id se asigna automáticamente al usuario autenticado.
+     *     tags: [Deals]
+     *     security:
+     *       - bearerAuth: []
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             $ref: '#/components/schemas/DealCreateRequest'
+     *     responses:
+     *       201:
+     *         description: Deal creado exitosamente
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/DealCreateResponse'
+     *       400:
+     *         description: Error de validación (ej. falta título, contact_id no existe)
+     *       401:
+     *         description: No autorizado
+     */
+    public createDeal = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const userPayload = req.user as { id: number, role: string };
+            const userId = userPayload.id;
+            const { title, contact_id, value } = req.body;
+
+            const newDeal = await this.dealService.createDeal(
+                title,
+                contact_id,
+                userId,
+                value
+            );
+
+            return res.status(201).json({
+                success: true,
+                message: "Deal creado exitosamente y asociado a la primera etapa.",
+                data: newDeal.toJSON()
+            });
+
+        } catch (error) {
+            next(error);
+        }
+    }
 }

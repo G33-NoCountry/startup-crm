@@ -69,5 +69,38 @@ export default {
                 }
             }
         }
+    },
+
+    DealCreateRequest: {
+        type: "object",
+        required: ["title", "contact_id"],
+        properties: {
+            title: {
+                type: "string",
+                example: "Implementación de App Móvil",
+                description: "Título de la oportunidad de negocio."
+            },
+            contact_id: {
+                type: "integer",
+                example: 5,
+                description: "ID del contacto existente al que se asocia este deal."
+            },
+            value: {
+                type: "number",
+                format: "float",
+                example: 25000.00,
+                description: "Valor monetario estimado del deal (opcional)."
+            }
+        }
+    },
+    DealCreateResponse: {
+        type: "object",
+        properties: {
+            success: { type: "boolean", example: true },
+            message: { type: "string", example: "Deal creado exitosamente y asociado a la primera etapa." },
+            data: {
+                $ref: "#/components/schemas/DealKanbanItem"
+            }
+        }
     }
 };

@@ -1,4 +1,5 @@
 import { DealRepository } from "../repositories/deal.repository";
+import Deal from '../models/deal.model';
 
 export class DealService {
     // Definimos la propiedad
@@ -35,5 +36,31 @@ export class DealService {
         }
 
         return updatedDeal;
+    }
+
+    async createDeal(title: string, contactId: number, userId: number, value?: number): Promise<Deal> {
+        //Encontrar la primera etapa del funnel 
+
+        const firstStageId = await this.dealRepository.findFirstFunnelStageId();
+
+        if (!firstStageId) {
+            throw new Error("Configuración incompleta: No se encontró la primera etapa del funnel (sort_order = 1).");
+        }
+
+        // 2. Preparar datos y crear el deal
+        const dealData = {
+            title: title,
+            value: value,
+            contact_id: contactId,
+            user_id: userId, // ID del usuario autenticado
+            funnel_stage_id: firstStageId // Primera etapa del funnel
+        };
+
+        const newDeal = await this.dealRepository.create(dealData);
+
+        // Opcional: Recarga el deal con sus relaciones para la respuesta
+        // const dealWithRelations = await this.dealRepository.findById(newDeal.id);
+
+        return newDeal; // O dealWithRelations si recargas.
     }
 }
