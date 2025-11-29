@@ -6,7 +6,7 @@ class Conversation extends Model {
     public id!: number;
     public contact_id!: number;
     public status!: boolean;
-    public channel!: string;
+    public channel!: 'whatsapp' | 'email';
     public last_interaction!: Date;
     public readonly created_at!: Date;
     public readonly updated_at!: Date;
