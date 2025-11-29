@@ -1,26 +1,39 @@
 "use client"
-import Link from "next/link";
-import Image from "next/image";
-import { useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
-import { Bell, LogOut, User } from "lucide-react";
-import { useAuthStore } from "@/store/authStore";
+
+import Link from "next/link"
+import Image from "next/image"
+import { usePathname, useRouter } from "next/navigation"
+import { Bell, LogOut, User, LayoutDashboard, Users, MessageSquare, Calendar, Kanban as KanbanIcon, Settings, UsersRound } from "lucide-react"
+import { useAuthStore } from "@/store/authStore"
+import {
+    Sidebar,
+    SidebarContent,
+    SidebarGroup,
+    SidebarGroupContent,
+    SidebarGroupLabel,
+    SidebarHeader,
+    SidebarMenu,
+    SidebarMenuButton,
+    SidebarMenuItem,
+    SidebarProvider,
+    SidebarTrigger,
+    SidebarInset,
+} from "@/components/ui/sidebar"
+import { Separator } from "@/components/ui/separator"
 
 export default function DashboardLayout({
     children,
 }: {
-    children: React.ReactNode;
+    children: React.ReactNode
 }) {
-    const pathname = usePathname();
-    const router = useRouter();
-    const [activeLink, setActiveLink] = useState(pathname);
-    const [hoveredLink, setHoveredLink] = useState<string | null>(null);
-    const { user, logout } = useAuthStore();
+    const pathname = usePathname()
+    const router = useRouter()
+    const { user, logout } = useAuthStore()
 
     const handleLogout = async () => {
-        await logout();
-        router.push("/login");
-    };
+        await logout()
+        router.push("/login")
+    }
 
     const getPageTitle = () => {
         const titles: { [key: string]: string } = {
@@ -30,155 +43,110 @@ export default function DashboardLayout({
             "/calendar": "Calendario",
             "/kanban": "Kanban",
             "/settings": "Ajustes",
-            "/team-management": "Administrar equipo",
-        };
-        return titles[pathname] || "Dashboard";
-    };
+            "/equipos": "Administrar equipo",
+        }
+        return titles[pathname] || "Dashboard"
+    }
+
+    const mainMenuItems = [
+        { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+        { href: "/contacts", label: "Contactos", icon: Users },
+        { href: "/conversations", label: "Conversaciones", icon: MessageSquare },
+        { href: "/calendar", label: "Calendario", icon: Calendar },
+        { href: "/kanban", label: "Kanban", icon: KanbanIcon },
+        { href: "/settings", label: "Ajustes", icon: Settings },
+    ]
+
+    const teamMenuItems = [
+        { href: "/teams", label: "Administrar equipo", icon: UsersRound },
+    ]
 
     return (
-        <div className="flex min-h-screen bg-slate-50">
-            <aside className="w-64 bg-foreground text-white p-4 hidden md:block">
-                <div className="text-xl font-bold pt-4 px-4 mb-8 gap-2">
-                    <Image
-                        src="images/logo-start.svg"
-                        alt="Logo"
-                        width={90}
-                        height={50}
-                        priority
-                    />
-                    <hr className="h-1 w-16 my-3 bg-accent rounded-lg border-none"></hr>
-                </div>
-                <nav className="space-y-2 px-1 gap-6">
-                    <Link
-                        href="/dashboard"
-                        onClick={() => setActiveLink("/dashboard")}
-                        onMouseEnter={() => setHoveredLink("/dashboard")}
-                        onMouseLeave={() => setHoveredLink(null)}
-                        className="gap-2 flex items-center px-4 py-2 hover:bg-[#393941] rounded"
-                    >
+        <SidebarProvider defaultOpen={true}>
+            <Sidebar collapsible="offcanvas" className="bg-foreground border-none">
+                <SidebarHeader className="border-b border-sidebar-border/20 px-4 py-6">
+                    <div className="flex items-center gap-2">
                         <Image
-                            src={hoveredLink === "/dashboard" ? "images/dashboard-orange.svg" : "images/dashboard.svg"}
-                            alt="Dashboard"
-                            width={16}
-                            height={16}
+                            src="/images/logo-start.svg"
+                            alt="Logo"
+                            width={90}
+                            height={50}
                             priority
                         />
-                        Dashboard
-                    </Link>
-                    <Link
-                        href="/contacts"
-                        onClick={() => setActiveLink("/contacts")}
-                        onMouseEnter={() => setHoveredLink("/contacts")}
-                        onMouseLeave={() => setHoveredLink(null)}
-                        className="gap-2 flex items-center px-4 py-2 hover:bg-[#393941] rounded"
-                    >
-                        <Image
-                            src={hoveredLink === "/contacts" ? "images/contacto-orange.svg" : "images/contacto.svg"}
-                            alt="Contactos"
-                            width={16}
-                            height={16}
-                            priority
-                        />
-                        Contactos
-                    </Link>
-                    <Link
-                        href="/conversations"
-                        onClick={() => setActiveLink("/conversations")}
-                        onMouseEnter={() => setHoveredLink("/conversations")}
-                        onMouseLeave={() => setHoveredLink(null)}
-                        className="gap-2 flex items-center px-4 py-2 hover:bg-[#393941] rounded"
-                    >
-                        <Image
-                            src={hoveredLink === "/conversations" ? "images/conversaciones-orange.svg" : "images/conversaciones.svg"}
-                            alt="Conversaciones"
-                            width={16}
-                            height={16}
-                            priority
-                        />
-                        Conversaciones
-                    </Link>
-                    <Link
-                        href="/calendar"
-                        onClick={() => setActiveLink("/calendar")}
-                        onMouseEnter={() => setHoveredLink("/calendar")}
-                        onMouseLeave={() => setHoveredLink(null)}
-                        className="gap-2 flex items-center px-4 py-2 hover:bg-[#393941] rounded"
-                    >
-                        <Image
-                            src={hoveredLink === "/calendar" ? "images/calendario-orange.svg" : "images/calendario.svg"}
-                            alt="Calendario"
-                            width={16}
-                            height={16}
-                            priority
-                        />
-                        Calendario
-                    </Link>
-                    <Link
-                        href="/kanban"
-                        onClick={() => setActiveLink("/kanban")}
-                        onMouseEnter={() => setHoveredLink("/kanban")}
-                        onMouseLeave={() => setHoveredLink(null)}
-                        className="gap-2 flex items-center px-4 py-2 hover:bg-[#393941] rounded"
-                    >
-                        <Image
-                            src={hoveredLink === "/kanban" ? "images/kanban-orange.svg" : "images/kanban.svg"}
-                            alt="Kanban"
-                            width={16}
-                            height={16}
-                            priority
-                        />
-                        Kanban
-                    </Link>
-                    <Link
-                        href="/settings"
-                        onClick={() => setActiveLink("/settings")}
-                        onMouseEnter={() => setHoveredLink("/settings")}
-                        onMouseLeave={() => setHoveredLink(null)}
-                        className="gap-2 flex items-center px-4 py-2 hover:bg-[#393941] rounded"
-                    >
-                        <Image
-                            src={hoveredLink === "/settings" ? "images/ajustes-orange.svg" : "images/ajustes.svg"}
-                            alt="Ajustes"
-                            width={16}
-                            height={16}
-                            priority
-                        />
-                        Ajustes
-                    </Link>
-                    <p className="text-white text-xs px-2 mt-4">Mi equipo</p>
-                    <Link
-                        href="/team-management"
-                        onClick={() => setActiveLink("/team-management")}
-                        onMouseEnter={() => setHoveredLink("/team-management")}
-                        onMouseLeave={() => setHoveredLink(null)}
-                        className="gap-2 flex items-center px-4 py-2 hover:bg-[#393941] rounded"
-                    >
-                        <Image
-                            src={hoveredLink === "/team-management" ? "images/dashboard-orange.svg" : "images/dashboard.svg"}
-                            alt="Administrar equipo"
-                            width={16}
-                            height={16}
-                            priority
-                        />
-                        Administrar equipo
-                    </Link>
-                </nav>
-            </aside>
+                    </div>
+                    <hr className="h-1 w-16 mt-3 bg-accent rounded-lg border-none" />
+                </SidebarHeader>
 
-            <main className="flex-1 flex flex-col">
-                <header className="bg-white border-b border-gray-200 px-8 py-4">
-                    <div className="flex items-center justify-between">
-                        <h1 className="text-2xl font-semibold text-gray-800">{getPageTitle()}</h1>
+                <SidebarContent className="px-2">
+                    <SidebarGroup>
+                        <SidebarGroupContent>
+                            <SidebarMenu>
+                                {mainMenuItems.map((item) => (
+                                    <SidebarMenuItem key={item.href}>
+                                        <SidebarMenuButton
+                                            asChild
+                                            isActive={pathname === item.href}
+                                            className="hover:bg-[#393941] data-[active=true]:bg-[#393941] data-[active=true]:text-white"
+                                        >
+                                            <Link href={item.href}>
+                                                <item.icon className="size-4" />
+                                                <span>{item.label}</span>
+                                            </Link>
+                                        </SidebarMenuButton>
+                                    </SidebarMenuItem>
+                                ))}
+                            </SidebarMenu>
+                        </SidebarGroupContent>
+                    </SidebarGroup>
 
-                        <div className="flex items-center gap-6">
+                    <Separator className="my-2 bg-sidebar-border/20" />
+
+                    <SidebarGroup>
+                        <SidebarGroupLabel className="text-white/70 text-xs px-2">
+                            Mi equipo
+                        </SidebarGroupLabel>
+                        <SidebarGroupContent>
+                            <SidebarMenu>
+                                {teamMenuItems.map((item) => (
+                                    <SidebarMenuItem key={item.href}>
+                                        <SidebarMenuButton
+                                            asChild
+                                            isActive={pathname === item.href}
+                                            className="hover:bg-[#393941] data-[active=true]:bg-accent data-[active=true]:text-white"
+                                        >
+                                            <Link href={item.href}>
+                                                <item.icon className="size-4" />
+                                                <span>{item.label}</span>
+                                            </Link>
+                                        </SidebarMenuButton>
+                                    </SidebarMenuItem>
+                                ))}
+                            </SidebarMenu>
+                        </SidebarGroupContent>
+                    </SidebarGroup>
+                </SidebarContent>
+            </Sidebar>
+
+            <SidebarInset>
+                <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center gap-2 border-b bg-white px-4 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+                    <div className="flex w-full items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                            <SidebarTrigger className="-ml-1" />
+                            <Separator orientation="vertical" className="mr-2 h-4" />
+                            <h1 className="text-xl font-semibold text-gray-800 md:text-2xl">
+                                {getPageTitle()}
+                            </h1>
+                        </div>
+
+                        <div className="flex items-center gap-2 md:gap-4">
                             <button className="relative p-2 hover:bg-gray-100 rounded-full transition-colors">
-                                <Bell className="w-5 h-5 text-gray-600" />
-                                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                                <Bell className="size-5 text-gray-600" />
+                                <span className="absolute top-1 right-1 size-2 bg-red-500 rounded-full" />
                             </button>
 
-                            <div className="flex items-center gap-3">
-                                <div className="w-9 h-9 bg-accent rounded-full flex items-center justify-center">
-                                    <User className="w-5 h-5 text-white" />
+                            <div className="hidden md:flex items-center gap-3">
+                                <div className="size-9 bg-accent rounded-full flex items-center justify-center">
+                                    <User className="size-5 text-white" />
                                 </div>
                                 <span className="text-sm text-gray-700">
                                     Hola, <span className="font-semibold">{user?.name || "Usuario"}</span>
@@ -190,13 +158,16 @@ export default function DashboardLayout({
                                 className="p-2 hover:bg-red-50 rounded-full transition-colors group"
                                 title="Cerrar sesión"
                             >
-                                <LogOut className="w-5 h-5 text-gray-600 group-hover:text-red-600" />
+                                <LogOut className="size-5 text-gray-600 group-hover:text-red-600" />
                             </button>
                         </div>
                     </div>
                 </header>
-                <div className="flex flex-1 flex-col gap-4 p-4 pt-0">{children}</div>
-            </main>
-        </div>
-    );
+
+                <div className="flex flex-1 flex-col gap-4 p-4 md:p-6">
+                    {children}
+                </div>
+            </SidebarInset>
+        </SidebarProvider>
+    )
 }
