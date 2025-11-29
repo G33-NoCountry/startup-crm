@@ -11,12 +11,9 @@ export class MessageService {
 
   public async getMessagesByConversations(
     limit: number | undefined,
-    after?: string,
-    before?: string,
-    include?: any,
-    where?: any
+    where?: any,
   ) {
-    return this.messageRepository.findAll(limit, after, before, include, where);
+    return this.messageRepository.findAll(limit, undefined, undefined, undefined, where);
   }
 
   public async create(data: any): Promise<Message | null> {

@@ -18,6 +18,7 @@ export const queryParamConversationValidator = [
         .isInt({ min: 1 }).withMessage(buildValidationMessage("limit", "min_numeric", { min: 1 }))
     ,
     query("before")
+        .optional()
         .notEmpty().withMessage(buildValidationMessage("before", "required"))
         .bail()
         .isISO8601().withMessage(buildValidationMessage("before", "date"))

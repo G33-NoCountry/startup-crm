@@ -15,10 +15,13 @@ module.exports = {
         allowNull: false,
         references: { model: "conversations" },
       },
-      user_id: {
+      sender_type: {
+        type: Sequelize.ENUM("User", "Contact"),
+        allowNull: false,
+      },
+      sender_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        references: { model: "users" },
       },
       content: {
         type: Sequelize.TEXT,

@@ -23,7 +23,7 @@ export const setupAssociations = () => {
   User.hasMany(Template, { foreignKey: "user_id", as: "templates" });
   Template.belongsTo(User, { foreignKey: "user_id", as: "user" });
 
-  // User - Message relationship (COMPLETAR)
+  // User - Message relationship: Relación manual porque no hay FK
 
   // Contact - Conversation relationship
   Contact.hasMany(Conversation, { foreignKey: "contact_id", as: "conversations" });
@@ -37,7 +37,7 @@ export const setupAssociations = () => {
   Contact.hasMany(Task, { foreignKey: "contact_id", as: "tasks" });
   Task.belongsTo(Contact, { foreignKey: "contact_id", as: "contact" });
 
-  // Contact - Message relationship (COMPLETAR)
+  // Contact - Message relationship: Relación manual porque no hay FK
 
   // Deal - Task relationship
   Deal.hasMany(Task, { foreignKey: "deal_id", as: "tasks" });

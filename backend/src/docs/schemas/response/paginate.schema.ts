@@ -175,5 +175,71 @@ export default {
                 }
             }
         }
+    },
+    PaginateMessages: {
+        type: "object",
+        properties: {
+            items: {
+                type: "array",
+                example: [
+                    {
+                        id: 15,
+                        conversation_id: 6,
+                        sender_type: "User",
+                        sender_id: 3,
+                        content: "Sí, confirmado. ¿La reunión es por videollamada?.",
+                        created_at: "2025-11-03T19:30:14.000Z",
+                        updated_at: "2025-11-03T19:30:14.000Z",
+                        sender: {
+                            id: 3,
+                            full_name: "Jimena Lopez",
+                            email: "manager@manager.com"
+                        }
+                    },
+                    {
+                        id: 14,
+                        conversation_id: 6,
+                        sender_type: "Contact",
+                        sender_id: 1,
+                        content: "Dale, te reservo un espacio a las 15:00. ¿Te queda bien?.",
+                        created_at: "2025-11-03T19:00:14.000Z",
+                        updated_at: "2025-11-03T19:00:14.000Z",
+                        sender: {
+                            id: 1,
+                            full_name: "Sofía Rodríguez",
+                            email: "sofia.rodriguez.dev@gmail.com",
+                            phone: "+541189215288"
+                        }
+                    },
+                    {
+                        id: 13,
+                        conversation_id: 6,
+                        sender_type: "Contact",
+                        sender_id: 1,
+                        content: "Sí, podría mañana por la tarde.",
+                        created_at: "2025-11-03T18:00:14.000Z",
+                        updated_at: "2025-11-03T18:00:14.000Z",
+                        sender: {
+                            id: 1,
+                            full_name: "Sofía Rodríguez",
+                            email: "sofia.rodriguez.dev@gmail.com",
+                            phone: "+541189215288"
+                        }
+                    },
+                ]
+            },
+            paginate_info: {
+                type: "object",
+                example: {
+                    "has_next": false,
+                },
+                properties: {
+                    has_next: {
+                        type: "boolean",
+                        example: false,
+                    },
+                }
+            }
+        }
     }
 };
