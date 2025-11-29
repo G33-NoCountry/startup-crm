@@ -1,0 +1,15 @@
+export const tagColorClasses: Record<string, string> = {
+  red: "bg-red-100 text-red-800 hover:bg-red-100",
+  blue: "bg-blue-100 text-blue-800 hover:bg-blue-100",
+  sky: "bg-sky-100 text-sky-800 hover:bg-sky-100",
+  green: "bg-green-100 text-green-800 hover:bg-green-100",
+  lime: "bg-lime-100 text-lime-800 hover:bg-lime-100",
+  yellow: "bg-yellow-100 text-yellow-800 hover:bg-yellow-100",
+  purple: "bg-purple-100 text-purple-800 hover:bg-purple-100",
+  pink: "bg-pink-100 text-pink-800 hover:bg-pink-100",
+  indigo: "bg-indigo-100 text-indigo-800 hover:bg-indigo-100",
+  gray: "bg-gray-100 text-gray-800 hover:bg-gray-100",
+  emerald: "bg-emerald-100 text-emerald-800 hover:bg-emerald-100",
+  cyan: "bg-cyan-100 text-cyan-800 hover:bg-cyan-100",
+  orange: "bg-orange-100 text-orange-800 hover:bg-orange-100",
+};
