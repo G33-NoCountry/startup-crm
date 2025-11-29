@@ -6,6 +6,7 @@ import adminRequestSchemas  from "./request/admin.schema";
 import userRequestSchemas  from "./request/user.schema";
 import contactSchemas  from "./models/contact/contact.schema";
 import contactRequestSchemas  from "./request/contact.schema";
+import dealSchema from "./models/deal/deal.schema";
 
 export default {
     ...authRequestSchemas,
@@ -15,5 +16,6 @@ export default {
     ...adminRequestSchemas,
     ...userRequestSchemas,
     ...contactSchemas,
-    ...contactRequestSchemas
+    ...contactRequestSchemas,
+    ...dealSchema,
 };

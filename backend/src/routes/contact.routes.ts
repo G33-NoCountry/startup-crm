@@ -18,8 +18,8 @@ const contactRepository = new ContactRepository;
 const contactService = new ContactService(contactRepository);
 const contactController = new ContactController(contactService);
 
-// Solo acceden los usuarios con rol "Agente"
-router.use(checkJwtMiddleware, acceptRoleMiddleware('Agente'));
+// Solo acceden los usuarios con rol "Admin" y "Agente"
+router.use(checkJwtMiddleware, acceptRoleMiddleware('Admin', 'Agente'));
 router.get('/',
     queryParamPaginateValidator,
     queryParamFunnelStageIdValidator,

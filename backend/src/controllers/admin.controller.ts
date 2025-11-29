@@ -10,7 +10,7 @@ import { RegisterUserAdminDto } from "../dto/admin/register-user-admin.dto";
  * @swagger
  * tags:
  *   name: Admin
- *   description: Endpoints para gestión de usuarios (solo admins)
+ *   description: Endpoints para gestión de usuarios (solo acceden usuarios "Admin")
  */
 export class AdminController {
   private userService: UserService;
@@ -24,7 +24,7 @@ export class AdminController {
    * /api/admin/users:
    *   get:
    *     summary: Obtener usuarios
-   *     description: Obtener datos de usuarios paginados (solo para admins)
+   *     description: Obtener datos de usuarios paginados
    *     tags: [Admin]
    *     parameters:
    *       - in: query
@@ -127,7 +127,7 @@ export class AdminController {
    * /api/admin/users:
    *   post:
    *     summary: Registra un nuevo usuario
-   *     description: Crea una nueva cuenta de usuario (solo para admins)
+   *     description: Crea una nueva cuenta de usuario
    *     tags: [Admin]
    *     security:
    *       - bearerAuth: []
@@ -208,7 +208,7 @@ export class AdminController {
    * /api/admin/users/{id}:
    *   patch:
    *     summary: Actualiza datos personales de un usuario
-   *     description: Actualiza el usuario segun id (solo para admin)
+   *     description: Actualiza el usuario segun id
    *     tags: [Admin]
    *     security:
    *       - bearerAuth: []
