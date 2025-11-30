@@ -1,7 +1,9 @@
 import { Request, Response } from "express";
 import { MessageService } from "../services/message.service";
 import { Op } from "sequelize";
-import { User } from "../models";
+import { ConversationService } from "../services/conversation.service";
+import { UpdateStatusDto } from "../dto/conversation/update-status.dto";
+import { ConversationResource } from "../resources/conversation/conversation.resource";
 
 /**
  * @swagger
@@ -11,6 +13,7 @@ import { User } from "../models";
  */
 export class ConversationController {
   constructor(
+    private conversationService: ConversationService,
     private messageService: MessageService,
   ) { }
 
@@ -84,6 +87,12 @@ export class ConversationController {
    *           application/json:
    *             schema:
    *              $ref: '#/components/schemas/Forbidden'
+   *        404:
+   *         description: No encontrado
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/NotFound'
    *        500:
    *         description: Error interno del servidor
    *         content:
@@ -108,6 +117,99 @@ export class ConversationController {
         success: true,
         message: "Mensajes obtenidos!",
         data: messages
+      });
+    } catch (error: any) {
+      return response.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  };
+
+  /**
+   * @swagger
+   * /api/conversations/{id}/status:
+   *   patch:
+   *     summary: Actualizar el estado de una conversación
+   *     description: Actualiza la propiedad `status` en `true` = `activo` o `false` = `inactivo`
+   *     tags: [Conversations]
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: integer
+   *           minimum: 1
+   *         description: id de la conversación
+   *         example: 6
+   * 
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             $ref: '#/components/schemas/UpdateStatusConversationRequest'
+   * 
+   *     responses:
+   *        200:
+   *         description: Conversación actualizada
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: true
+   *                 message:
+   *                   type: string
+   *                   example: "Conversación actualizada!"
+   *                 data:
+   *                   $ref: '#/components/schemas/FullConversation'
+   *        400:
+   *         description: Solicitud inválida
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/BadRequest'
+   *        401:
+   *         description: No autorizado
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Unauthorized'
+   *        403:
+   *         description: No tiene permisos
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Forbidden'
+   *        404:
+   *         description: No encontrado
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/NotFound'
+   *        500:
+   *         description: Error interno del servidor
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/InternalServerError'
+  */
+  public updateStatus = async (request: Request, response: Response) => {
+    try {
+      const body = request.body as UpdateStatusDto;
+      const conversationId = parseInt(request.params.id);
+      body.id = conversationId;
+      const conversationUpdated = await this.conversationService.update(body);
+      if (!conversationUpdated)
+        throw new Error("No se pudo actualizar la conversación");
+
+      return response.status(200).json({
+        success: true,
+        message: "Conversación actualizada!",
+        data: ConversationResource.toResponse(conversationUpdated)
       });
     } catch (error: any) {
       return response.status(500).json({

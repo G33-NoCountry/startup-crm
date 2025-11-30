@@ -7,6 +7,8 @@ import userRequestSchemas  from "./request/user.schema";
 import contactSchemas  from "./models/contact/contact.schema";
 import contactRequestSchemas  from "./request/contact.schema";
 import dealSchema from "./models/deal/deal.schema";
+import conversationSchema from "./models/conversation/conversation.schema";
+import conversationRequestSchema from "./request/conversation.schema";
 
 export default {
     ...authRequestSchemas,
@@ -18,4 +20,6 @@ export default {
     ...contactSchemas,
     ...contactRequestSchemas,
     ...dealSchema,
+    ...conversationSchema,
+    ...conversationRequestSchema
 };

@@ -42,8 +42,8 @@ export class ConversationRepository implements IConversationRepository {
 
         if (!(result.length > 0))
             return null;
-        const ConversationUpdated = await this.findById(data.id);
-        return ConversationUpdated;
+        const conversationUpdated = await this.findById(data.id);
+        return conversationUpdated;
     }
 
     async delete(Conversation: Conversation): Promise<void> {

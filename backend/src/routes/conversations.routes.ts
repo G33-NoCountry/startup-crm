@@ -9,12 +9,17 @@ import { MessageService } from "../services/message.service";
 import { queryParamConversationValidator } from "../validators/param/query-conversation.validator";
 import { checkJwtMiddleware } from "../middlewares/authenticate.middleware";
 import { acceptRoleMiddleware } from "../middlewares/check-role.middleware";
+import updateStatusConversationValidator from "../validators/conversation/update-status-conversation.validator";
+import { ConversationRepository } from "../repositories/conversation.repository";
+import { ConversationService } from "../services/conversation.service";
 
 const router = Router();
 
 const messageRepository = new MessageRepository;
+const conversationRepository = new ConversationRepository;
 const messageService = new MessageService(messageRepository);
-const conversationController = new ConversationController(messageService);
+const conversationService = new ConversationService(conversationRepository);
+const conversationController = new ConversationController(conversationService, messageService);
 
 router.use(checkJwtMiddleware, acceptRoleMiddleware('Admin', 'Agente'));
 
@@ -25,6 +30,13 @@ router.get('/:id/messages',
     queryParamConversationValidator,
     validateRequestMiddleware,
     conversationController.getMessagesByConversation
+);
+
+router.patch('/:id/status',
+    updateStatusConversationValidator,
+    validateRequestMiddleware,
+    recordExists(Conversation),
+    conversationController.updateStatus
 );
 
 export default router;
