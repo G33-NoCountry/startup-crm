@@ -1,4 +1,4 @@
-import { Contact } from "../models";
+import { Contact, Conversation } from "../models";
 import { IPaginate } from "./paginate.interface";
 
 export interface IContactRepository {
@@ -13,4 +13,5 @@ export interface IContactRepository {
     createContact(data: any): Promise<Contact | null>;
     updateContact(data: any): Promise<Contact | null>;
     deleteContact(contact: Contact): Promise<void>;
+    findConversationsByContactId(contactId: number): Promise<Conversation[] | null>;
 }

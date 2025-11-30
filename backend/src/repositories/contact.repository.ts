@@ -1,6 +1,6 @@
 import { IContactRepository } from "../interfaces/contact.interface";
 import { IPaginate } from "../interfaces/paginate.interface";
-import { Contact } from "../models";
+import { Contact, Conversation } from "../models";
 import { toPaginate } from "../utils/paginate";
 
 export class ContactRepository implements IContactRepository {
@@ -49,5 +49,15 @@ export class ContactRepository implements IContactRepository {
 
     async deleteContact(contact: Contact): Promise<void> {
         return contact.destroy();
+    }
+
+    async findConversationsByContactId(contactId: number): Promise<Conversation[] | null> {
+        const conversations = await Conversation.findAll({
+            where: {
+                contact_id: contactId
+            }
+        });
+
+        return conversations ?? null;
     }
 }
