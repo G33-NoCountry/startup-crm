@@ -22,12 +22,12 @@ Task.init(
         },
         deal_id: {
             type: DataTypes.INTEGER,
-            allowNull: false,
+            allowNull: true,
             references: { model: "deals" },
         },
         contact_id: {
             type: DataTypes.INTEGER,
-            allowNull: false,
+            allowNull: true,
             references: { model: "contacts" },
         },
         title: {

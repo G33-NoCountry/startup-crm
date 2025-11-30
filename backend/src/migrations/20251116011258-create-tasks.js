@@ -17,12 +17,12 @@ module.exports = {
       },
       deal_id: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        allowNull: true,
         references: { model: "deals" },
       },
       contact_id: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        allowNull: true,
         references: { model: "contacts" },
       },
       title: {
