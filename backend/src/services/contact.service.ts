@@ -1,5 +1,5 @@
 import { IContactRepository } from "../interfaces/contact.interface";
-import { Contact, Deal, FunnelStage } from "../models";
+import { Contact, Conversation, Deal, FunnelStage } from "../models";
 
 export class ContactService {
 
@@ -9,7 +9,7 @@ export class ContactService {
     return this.contactRepository.findById(id);
   }
 
-  public async filterContactsId(funnelStageId: number) {
+  public async filterContactsByFunnelStageId(funnelStageId: number) {
     return await Contact.findAll({
       attributes: ["id"],
       include: [
@@ -58,5 +58,8 @@ export class ContactService {
     return this.contactRepository.deleteContact(contact);
   }
 
+  public async getConversationsByContactId(contactId: number): Promise<Conversation[] | null> {
+    return this.contactRepository.findConversationsByContactId(contactId);
+  }
 
 }
