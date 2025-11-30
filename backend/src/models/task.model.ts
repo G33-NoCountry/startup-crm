@@ -1,5 +1,6 @@
 import { DataTypes, Model } from "sequelize";
 import { sequelize } from "../config/database.config";
+import { makePaginate, PaginateOptions, PaginationConnection } from "sequelize-cursor-pagination";
 
 class Task extends Model {
     public id!: number;
@@ -11,7 +12,15 @@ class Task extends Model {
     public status!: boolean;
     public readonly created_at!: Date;
     public readonly updated_at!: Date;
+
+    public static readonly publicAttributes: string[] = [
+        "id", "user_id", "deal_id", "contact_id", "title", "due_date", "status", "created_at", "updated_at"
+    ];
+
+    declare static paginate: (options: PaginateOptions<Task>) => Promise<PaginationConnection<Task>>;
 }
+
+Task.paginate = makePaginate(Task);
 
 Task.init(
     {
