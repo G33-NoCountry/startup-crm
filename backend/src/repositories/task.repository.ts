@@ -36,14 +36,12 @@ export class TaskRepository implements ITaskRepository {
     }
 
     async update(data: any): Promise<Task | null> {
-        const result = await Task.update(data, {
-            where: { id: data.id }
-        });
-
-        if (!(result.length > 0))
+        const task = await Task.findByPk(data.id);
+        if (!task)
             return null;
-        const contactUpdated = await this.findById(data.id);
-        return contactUpdated;
+
+        task.set(data);
+        return await task.save();
     }
 
     async delete(task: Task): Promise<void> {

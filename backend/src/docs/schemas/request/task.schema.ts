@@ -13,4 +13,11 @@ export default {
         },
         required: ["title", "due_date"],
     },
+    UpdateTaskRequest: {
+        type: "object",
+        properties: {
+            status: { type: "boolean", example: false, description: "Estado de la Task" },
+        },
+        required: ["status"],
+    },
 };

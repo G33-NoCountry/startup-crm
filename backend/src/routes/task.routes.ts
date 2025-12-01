@@ -8,6 +8,10 @@ import { TaskRepository } from "../repositories/task.repository";
 import { TaskService } from "../services/task.service";
 import { queryParamPaginateValidator } from "../validators/param/query-param.validator";
 import createTaskValidator from "../validators/task/create-task.validator";
+import updateTaskValidator from "../validators/task/update-task.validator";
+import { recordExists } from "../middlewares/model-exist.middleware";
+import { Task } from "../models";
+import { validateParam } from "../validators/param/param.validator";
 
 const router = Router();
 
@@ -25,10 +29,7 @@ router.get('/',
     taskController.getTasks
 );
 
-router.post('/',
-    createTaskValidator,
-    validateRequestMiddleware,
-    taskController.createTask
-);
+router.post('/', createTaskValidator, validateRequestMiddleware, taskController.createTask);
+router.patch('/:id', validateParam("id"), updateTaskValidator, validateRequestMiddleware, recordExists(Task), taskController.updateTask);
 
 export default router;

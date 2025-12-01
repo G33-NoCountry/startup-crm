@@ -4,6 +4,7 @@ import { TaskService } from "../services/task.service";
 import { User } from "../models";
 import { CreateTaskDto } from "../dto/task/create-task.dto";
 import { TaskResource } from "../resources/task/task.resource";
+import { UpdateTaskDto } from "../dto/task/update-task.dto";
 
 /**
  * @swagger
@@ -21,7 +22,7 @@ export class TaskController {
    * /api/tasks:
    *   get:
    *     summary: Obtener tasks
-   *     description: Obtener datos de tasks paginados (solo para usuarios "Admin" y "Agente")
+   *     description: Obtener datos de tasks paginados
    *     tags: [Tasks]
    *     parameters:
    *       - in: query
@@ -128,7 +129,7 @@ export class TaskController {
    * /api/tasks:
    *   post:
    *     summary: Registrar una Task
-   *     description: Crea un nuevo registro de Task (solo para usuarios "Admin" y "Agente")
+   *     description: Crea un nuevo registro de Task
    *     tags: [Tasks]
    *     requestBody:
    *       required: true
@@ -191,6 +192,96 @@ export class TaskController {
         success: true,
         message: "Task creada!",
         data: TaskResource.toResponse(task)
+      });
+    } catch (error: any) {
+      return response.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  };
+
+  /**
+   * @swagger
+   * /api/tasks/{id}:
+   *   patch:
+   *     summary: Actualizar una Task
+   *     description: Actualiza un registro de Task
+   *     tags: [Tasks]
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: integer
+   *           minimum: 1
+   *         description: id de la Task
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             $ref: '#/components/schemas/UpdateTaskRequest'
+   *     responses:
+   *        201:
+   *         description: Task creada exitosamente
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: true
+   *                 message:
+   *                   type: string
+   *                   example: "Task actualizada!"
+   *                 data:
+   *                   $ref: '#/components/schemas/FullTask'
+   *        400:
+   *         description: Solicitud inválida
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/BadRequest'
+   *        401:
+   *         description: No autorizado
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Unauthorized'
+   *        403:
+   *         description: No tiene permisos
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Forbidden'
+   *        404:
+   *         description: No encontrado
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/NotFound'
+   *        500:
+   *         description: Error interno del servidor
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/InternalServerError'
+  */
+  public updateTask = async (request: Request, response: Response) => {
+    try {
+      const { id } = request.params;
+      const body = request.body as UpdateTaskDto;
+      body.id = parseInt(id);
+      const taskUpdated = await this.taskService.updateTask(body);
+      if (!taskUpdated)
+        throw new Error("No se pudo actualizar el registro");
+
+      return response.status(200).json({
+        success: true,
+        message: "Task actualizada!",
+        data: TaskResource.toResponse(taskUpdated)
       });
     } catch (error: any) {
       return response.status(500).json({
