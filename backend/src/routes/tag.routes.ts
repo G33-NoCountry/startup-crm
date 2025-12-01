@@ -7,6 +7,10 @@ import { TagController } from "../controllers/tag.controller";
 import { sanitizeBody } from "../middlewares/sanitize.middlewares";
 import validateRequestMiddleware from "../middlewares/validate-request.middleware";
 import createTagValidator from "../validators/tag/create-tag.validator";
+import updateTagValidator from "../validators/tag/update-tag.validator";
+import { validateParam } from "../validators/param/param.validator";
+import { recordExists } from "../middlewares/model-exist.middleware";
+import { Tag } from "../models";
 
 const router = Router();
 
@@ -19,5 +23,14 @@ router.use(checkJwtMiddleware, acceptRoleMiddleware('Admin'));
 
 router.get('/', tagController.getTags);
 router.post('/', createTagValidator, validateRequestMiddleware, sanitizeBody, tagController.createTag);
+router.put(
+    '/:id',
+    validateParam("id"),
+    recordExists(Tag),
+    updateTagValidator,
+    validateRequestMiddleware,
+    sanitizeBody,
+    tagController.updateTag
+);
 
 export default router;

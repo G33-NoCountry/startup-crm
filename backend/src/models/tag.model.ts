@@ -9,7 +9,7 @@ class Tag extends Model {
     public readonly updated_at!: Date;
 
     public static readonly publicAttributes: string[] = [
-        "id", "title", "color"
+        "id", "title", "color", "created_at", "updated_at"
     ];
 
 }
