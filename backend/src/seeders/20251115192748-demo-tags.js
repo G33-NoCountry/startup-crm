@@ -6,26 +6,26 @@ module.exports = {
     await queryInterface.bulkInsert('tags', [
       {
         title: 'Bloqueado para WA',
-        color: "002884",
+        color: "indigo",
         created_at: new Date,
         updated_at: new Date
       },
       {
         title: 'Baja Interacción',
-        color: "457ce8",
+        color: "pink",
         created_at: new Date,
         updated_at: new Date
       },
       {
         title: 'Cliente Referido',
-        color: "732ce1",
+        color: "gray",
         created_at: new Date,
         updated_at: new Date
 
       },
       {
         title: 'Riesgo de Abandono',
-        color: "157cg8",
+        color: "yellow",
         created_at: new Date,
         updated_at: new Date
       },

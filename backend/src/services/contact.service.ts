@@ -42,10 +42,6 @@ export class ContactService {
     return this.contactRepository.findAllPaginate(limit, after, before, include, where);
   }
 
-  // public async getContactsFilter(limit: number | undefined, after?: string, before?: string, where?: any) {
-  //   return this.contactRepository.findAll(limit, after, before, where);
-  // }
-
   public async create(data: any): Promise<Contact | null> {
     return this.contactRepository.create(data);
   }
