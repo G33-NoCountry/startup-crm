@@ -22,6 +22,7 @@ export const buildValidationMessage = (
         numeric: `El campo ${fieldLabel} solo puede contener números`,
         boolean: `El campo ${fieldLabel} debe ser verdadero o falso`,
         date: `El campo ${fieldLabel} debe ser una fecha válida.`,
+        string: `El campo ${fieldLabel} debe ser una cadena de texto válida.`,
     };
 
     return messages[type];

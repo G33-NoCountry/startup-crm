@@ -7,6 +7,7 @@ import { TaskController } from "../controllers/task.controller";
 import { TaskRepository } from "../repositories/task.repository";
 import { TaskService } from "../services/task.service";
 import { queryParamPaginateValidator } from "../validators/param/query-param.validator";
+import createTaskValidator from "../validators/task/create-task.validator";
 
 const router = Router();
 
@@ -22,6 +23,12 @@ router.get('/',
     queryParamTaskValidator,
     validateRequestMiddleware,
     taskController.getTasks
+);
+
+router.post('/',
+    createTaskValidator,
+    validateRequestMiddleware,
+    taskController.createTask
 );
 
 export default router;

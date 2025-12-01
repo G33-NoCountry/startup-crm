@@ -13,4 +13,5 @@ export type ValidationErrorType =
     | "numeric"
     | "boolean"
     | "date"
+    | "string"
 ;

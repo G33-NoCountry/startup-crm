@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import { Op } from "sequelize";
 import { TaskService } from "../services/task.service";
 import { User } from "../models";
+import { CreateTaskDto } from "../dto/task/create-task.dto";
+import { TaskResource } from "../resources/task/task.resource";
 
 /**
  * @swagger
@@ -14,6 +16,86 @@ export class TaskController {
     private taskService: TaskService
   ) { }
 
+  /**
+   * @swagger
+   * /api/tasks:
+   *   get:
+   *     summary: Obtener tasks
+   *     description: Obtener datos de tasks paginados (solo para usuarios "Admin" y "Agente")
+   *     tags: [Tasks]
+   *     parameters:
+   *       - in: query
+   *         name: limit
+   *         schema:
+   *           type: integer
+   *           minimum: 1
+   *           example: 2
+   *         required: true
+   *         description: Cantidad de resultados a devolver por página.
+   *
+   *       - in: query
+   *         name: after
+   *         schema:
+   *           type: string
+   *         required: false
+   *         description: Cursor para obtener la siguiente página.
+   *
+   *       - in: query
+   *         name: before
+   *         schema:
+   *           type: string
+   *         required: false
+   *         description: Cursor para obtener la página anterior.
+   * 
+   *       - in: query
+   *         name: status
+   *         schema:
+   *           type: boolean
+   *           example: true
+   *         required: true
+   *         description: Estado de la task.
+   * 
+   *     responses:
+   *        200:
+   *         description: Tasks obtenidos
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: true
+   *                 message:
+   *                   type: string
+   *                   example: "Tasks obtenidas!"
+   *                 data:
+   *                   $ref: '#/components/schemas/PaginateTasks'
+   *        400:
+   *         description: Solicitud inválida
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/BadRequest'
+   *        401:
+   *         description: No autorizado
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Unauthorized'
+   *        403:
+   *         description: No tiene permisos
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Forbidden'
+   *        500:
+   *         description: Error interno del servidor
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/InternalServerError'
+  */
   public getTasks = async (request: Request, response: Response) => {
     try {
       const { limit, before, after, status } = request.query;
@@ -29,8 +111,86 @@ export class TaskController {
 
       return response.status(200).json({
         success: true,
-        message: "Tareas obtenidas!",
+        message: "Tasks obtenidas!",
         data: tasks
+      });
+    } catch (error: any) {
+      return response.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  };
+
+
+  /**
+   * @swagger
+   * /api/tasks:
+   *   post:
+   *     summary: Registrar una Task
+   *     description: Crea un nuevo registro de Task (solo para usuarios "Admin" y "Agente")
+   *     tags: [Tasks]
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             $ref: '#/components/schemas/CreateTaskRequest'
+   *     responses:
+   *        201:
+   *         description: Task creada exitosamente
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: true
+   *                 message:
+   *                   type: string
+   *                   example: "Task creada!"
+   *                 data:
+   *                   $ref: '#/components/schemas/FullTask'
+   *        400:
+   *         description: Solicitud inválida
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/BadRequest'
+   *        401:
+   *         description: No autorizado
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Unauthorized'
+   *        403:
+   *         description: No tiene permisos
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Forbidden'
+   *        500:
+   *         description: Error interno del servidor
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/InternalServerError'
+  */
+  public createTask = async (request: Request, response: Response) => {
+    try {
+      const { id } = request.user as User;
+      const body = request.body as CreateTaskDto;
+      body.user_id = id;
+      body.status = false;
+      const task = await this.taskService.createTask(body);
+      if (!task)
+        throw new Error("No se pudo crear el registro");
+
+      return response.status(201).json({
+        success: true,
+        message: "Task creada!",
+        data: TaskResource.toResponse(task)
       });
     } catch (error: any) {
       return response.status(500).json({

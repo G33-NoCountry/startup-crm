@@ -11,14 +11,14 @@ export const queryParamPaginateValidator = [
     ,
     query("after")
         .optional()
-        .matches(/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/).withMessage(buildValidationMessage("after", "alpha"))
+        .isString().withMessage(buildValidationMessage("after", "string"))
         .bail()
-        .isLength({ min: 4, max: 4 }).withMessage(buildValidationMessage("after", "max_length", { max: 4 }))
+        .isLength({ min: 1 }).withMessage(buildValidationMessage("after", "min_length", { min: 1 }))
     ,
     query("before")
         .optional()
-        .matches(/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/).withMessage(buildValidationMessage("before", "alpha"))
+        .isString().withMessage(buildValidationMessage("before", "string"))
         .bail()
-        .isLength({ min: 4, max: 4 }).withMessage(buildValidationMessage("before", "max_length", { max: 4 }))
+        .isLength({ min: 1 }).withMessage(buildValidationMessage("before", "min_length", { min: 1 }))
     ,
 ];
