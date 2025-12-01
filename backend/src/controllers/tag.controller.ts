@@ -237,4 +237,64 @@ export class TagController {
     }
   };
 
+  /**
+   * @swagger
+   * /api/admin/tags/{id}:
+   *   delete:
+   *     summary: Eliminar Tag
+   *     description: Eliminar registro de una Tag
+   *     tags: [Tags]
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: integer
+   *           minimum: 1
+   *         description: id de la Tag
+   *     responses:
+   *        204:
+   *         description: Tag eliminada (sin respuesta)
+   *        400:
+   *         description: Solicitud inválida
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/BadRequest'
+   *        401:
+   *         description: No autorizado
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Unauthorized'
+   *        403:
+   *         description: No tiene permisos
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Forbidden'
+   *        500:
+   *         description: Error interno del servidor
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/InternalServerError'
+  */
+  public deleteTag = async (request: Request, response: Response) => {
+    try {
+      const tagId = parseInt(request.params.id);
+      const tag = await this.tagService.getByPk(tagId);
+      if (!tag)
+        throw new Error("No se encontró");
+      await this.tagService.delete(tag);
+
+      return response.status(204).send();
+    } catch (error: any) {
+      return response.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  };
+
 }

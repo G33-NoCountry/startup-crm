@@ -33,4 +33,11 @@ router.put(
     tagController.updateTag
 );
 
+router.delete(
+    "/:id",
+    validateParam("id"),
+    recordExists(Tag),
+    tagController.deleteTag
+);
+
 export default router;
