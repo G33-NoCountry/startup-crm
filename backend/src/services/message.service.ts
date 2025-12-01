@@ -13,7 +13,7 @@ export class MessageService {
     limit: number | undefined,
     where?: any,
   ) {
-    return this.messageRepository.findAll(limit, undefined, undefined, undefined, where);
+    return this.messageRepository.findAllPaginate(limit, undefined, undefined, undefined, where);
   }
 
   public async create(data: any): Promise<Message | null> {

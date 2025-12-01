@@ -9,6 +9,7 @@ import { userExists } from "../middlewares/user-exist.middleware";
 import { sanitizeBody } from "../middlewares/sanitize.middlewares";
 import validateRequestMiddleware from "../middlewares/validate-request.middleware";
 import { acceptRoleMiddleware } from "../middlewares/check-role.middleware";
+import tagRoutes from "./tag.routes";
 
 const router = Router();
 const adminController = new AdminController;
@@ -23,5 +24,7 @@ router.patch(
     sanitizeBody,
     adminController.updateUser
 );
+
+router.use("/tags", tagRoutes);
 
 export default router;
