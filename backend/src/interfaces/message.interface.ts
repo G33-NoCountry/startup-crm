@@ -1,6 +1,6 @@
 import { Message } from "../models";
-import { ICrudBase } from "./crud-base.interface";
+import { IPaginatableRepository } from "./paginate.interface";
 
-export interface IMessageRepository extends ICrudBase<Message> {
+export interface IMessageRepository extends IPaginatableRepository<Message> {
 
 }

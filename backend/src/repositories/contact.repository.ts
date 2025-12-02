@@ -8,7 +8,7 @@ export class ContactRepository implements IContactRepository {
         return Contact.findByPk(id);
     }
 
-    async findAll(
+    async findAllPaginate(
         limit: number | undefined,
         after?: string,
         before?: string,
@@ -32,11 +32,28 @@ export class ContactRepository implements IContactRepository {
         return paginate;
     }
 
-    async createContact(data: any): Promise<Contact | null> {
+    async findAll(
+        include?: any,
+        where?: any
+    ): Promise<Contact[] | null> {
+        const result = await Contact.findAll({
+            order: [['id', 'ASC']],
+            include: include,
+            attributes: Contact.publicAttributes,
+            where,
+        });
+
+        if (!(result.length > 0))
+            return null;
+
+        return result;
+    }
+
+    async create(data: any): Promise<Contact | null> {
         return Contact.create(data);
     }
 
-    async updateContact(data: any): Promise<Contact | null> {
+    async update(data: any): Promise<Contact | null> {
         const result = await Contact.update(data, {
             where: { id: data.id }
         });
@@ -47,7 +64,7 @@ export class ContactRepository implements IContactRepository {
         return contactUpdated;
     }
 
-    async deleteContact(contact: Contact): Promise<void> {
+    async delete(contact: Contact): Promise<void> {
         return contact.destroy();
     }
 

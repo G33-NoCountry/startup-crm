@@ -7,6 +7,11 @@ class Tag extends Model {
     public color!: string;
     public readonly created_at!: Date;
     public readonly updated_at!: Date;
+
+    public static readonly publicAttributes: string[] = [
+        "id", "title", "color", "created_at", "updated_at"
+    ];
+
 }
 
 Tag.init(

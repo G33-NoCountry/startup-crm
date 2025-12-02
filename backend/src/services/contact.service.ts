@@ -39,23 +39,19 @@ export class ContactService {
     include?: any,
     where?: any
   ) {
-    return this.contactRepository.findAll(limit, after, before, include, where);
-  }
-
-  public async getContactsFilter(limit: number | undefined, after?: string, before?: string, where?: any) {
-    return this.contactRepository.findAll(limit, after, before, where);
+    return this.contactRepository.findAllPaginate(limit, after, before, include, where);
   }
 
   public async create(data: any): Promise<Contact | null> {
-    return this.contactRepository.createContact(data);
+    return this.contactRepository.create(data);
   }
 
   public async update(data: any): Promise<Contact | null> {
-    return this.contactRepository.updateContact(data);
+    return this.contactRepository.update(data);
   }
 
   public async delete(contact: Contact): Promise<void> {
-    return this.contactRepository.deleteContact(contact);
+    return this.contactRepository.delete(contact);
   }
 
   public async getConversationsByContactId(contactId: number): Promise<Conversation[] | null> {

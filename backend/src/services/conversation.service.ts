@@ -16,7 +16,7 @@ export class ConversationService {
     include?: any,
     where?: any
   ) {
-    return this.conversationRepository.findAll(limit, after, before, include, where);
+    return this.conversationRepository.findAllPaginate(limit, after, before, include, where);
   }
 
   public async create(data: any): Promise<Conversation | null> {
