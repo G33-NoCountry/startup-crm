@@ -9,6 +9,22 @@ export class ConversationRepository implements IConversationRepository {
     }
 
     async findAll(
+        include?: any,
+        where?: any
+    ): Promise<Conversation[] | null> {
+        const result = await Conversation.findAll({
+            include: include,
+            attributes: Conversation.publicAttributes,
+            where,
+        });
+
+        if (!(result.length > 0))
+            return null;
+
+        return result;
+    }
+
+    async findAllPaginate(
         limit: number | undefined,
         after?: string,
         before?: string,
@@ -30,7 +46,6 @@ export class ConversationRepository implements IConversationRepository {
         const paginate = toPaginate<Conversation>(result);
         return paginate;
     }
-
     async create(data: any): Promise<Conversation | null> {
         return Conversation.create(data);
     }

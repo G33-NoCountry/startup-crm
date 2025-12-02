@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { ContactService } from "../services/contact.service";
-import { Contact, Deal, FunnelStage } from "../models";
+import { Contact, Deal, FunnelStage, Tag } from "../models";
 import { RegisterContactDto } from "../dto/contact/register-contact.dto";
 import { ContactResource } from "../resources/contact/contact-resource.resource";
 import { UpdateContactDto } from "../dto/contact/update-contact.dto";
@@ -112,7 +112,15 @@ export class ContactController {
         parsedLimit,
         after as string ?? undefined,
         before as string ?? undefined,
-        [], contactsId.length > 0 ? { id: contactsId.map(i => i.id) } : {}
+        [
+          {
+            model: Tag,
+            as: "tags",
+            attributes: ["id", "title", "color"],
+            through: { attributes: [] }
+          }
+        ],
+        contactsId.length > 0 ? { id: contactsId.map(i => i.id) } : {}
       );
 
       return response.status(200).json({

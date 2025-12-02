@@ -16,7 +16,7 @@ export class TaskService {
     include?: any,
     where?: any
   ) {
-    return this.taskRepository.findAll(limit, after, before, include, where);
+    return this.taskRepository.findAllPaginate(limit, after, before, include, where);
   }
 
   public async createTask(data: any): Promise<Task | null> {

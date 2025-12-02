@@ -8,7 +8,7 @@ export class TaskRepository implements ITaskRepository {
         return Task.findByPk(id);
     }
 
-    async findAll(
+    async findAllPaginate(
         limit: number | undefined,
         after?: string,
         before?: string,
@@ -29,6 +29,21 @@ export class TaskRepository implements ITaskRepository {
 
         const paginate = toPaginate<Task>(result);
         return paginate;
+    }
+    async findAll(
+        include?: any,
+        where?: any
+    ): Promise<Task[] | null> {
+        const result = await Task.findAll({
+            include: include,
+            attributes: Task.publicAttributes,
+            where,
+        });
+
+        if (!(result.length > 0))
+            return null;
+
+        return result;
     }
 
     async create(data: any): Promise<Task | null> {

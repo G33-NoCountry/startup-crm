@@ -1,4 +1,4 @@
 import { Task } from "../models";
-import { ICrudBase } from "./crud-base.interface";
+import { IPaginatableRepository } from "./paginate.interface";
 
-export interface ITaskRepository extends ICrudBase<Task> { }
+export interface ITaskRepository extends IPaginatableRepository<Task> { }

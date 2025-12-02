@@ -72,7 +72,14 @@ export default {
                         "email": null,
                         "phone": "+541122222222",
                         "created_at": "2025-11-22T23:32:03.000Z",
-                        "updated_at": "2025-11-22T23:32:03.000Z"
+                        "updated_at": "2025-11-22T23:32:03.000Z",
+                        "tags": [
+                            {
+                                "id": 3,
+                                "title": "Cliente Referido",
+                                "color": "gray"
+                            }
+                        ]
                     },
                     {
                         "id": 2,
@@ -80,7 +87,14 @@ export default {
                         "email": "contact2@mail.com",
                         "phone": "+541111111111",
                         "created_at": "2025-11-22T23:32:03.000Z",
-                        "updated_at": "2025-11-22T23:32:03.000Z"
+                        "updated_at": "2025-11-22T23:32:03.000Z",
+                        "tags": [
+                            {
+                                "id": 1,
+                                "title": "Bloqueado para WA",
+                                "color": "indigo"
+                            }
+                        ]
                     }
                 ]
             },

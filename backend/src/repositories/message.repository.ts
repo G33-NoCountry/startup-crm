@@ -52,6 +52,22 @@ export class MessageRepository implements IMessageRepository {
 
 
     async findAll(
+        include?: any,
+        where?: any
+    ): Promise<any> {
+        const result = await Message.findAll({
+            attributes: Message.publicAttributes,
+            where: where,
+            order: [["created_at", "DESC"]],
+        });
+
+        if (!(result.length > 0))
+            return null;
+
+        return result;
+    }
+
+    async findAllPaginate(
         limit: number | undefined,
         after?: string,
         before?: string,
