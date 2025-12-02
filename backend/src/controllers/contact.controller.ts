@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { ContactService } from "../services/contact.service";
-import { Contact, Deal, FunnelStage, Tag } from "../models";
+import { Tag } from "../models";
 import { RegisterContactDto } from "../dto/contact/register-contact.dto";
 import { ContactResource } from "../resources/contact/contact-resource.resource";
 import { UpdateContactDto } from "../dto/contact/update-contact.dto";

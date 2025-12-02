@@ -255,5 +255,64 @@ export default {
                 }
             }
         }
+    },
+    PaginateTasks: {
+        type: "object",
+        properties: {
+            items: {
+                type: "array",
+                example: [
+                    {
+                        id: 2,
+                        user_id: 1,
+                        deal_id: null,
+                        contact_id: 3,
+                        title: "Subir documentos",
+                        due_date: "2025-11-30T04:23:04.000Z",
+                        status: true,
+                        created_at: "2025-11-30T04:23:04.000Z",
+                        updated_at: "2025-11-30T04:23:04.000Z"
+                    },
+                    {
+                        id: 7,
+                        user_id: 1,
+                        deal_id: null,
+                        contact_id: 2,
+                        title: "Reorganizar estructura de carpetas del proyecto",
+                        due_date: "2025-11-30T04:23:04.000Z",
+                        status: true,
+                        created_at: "2025-11-30T04:23:04.000Z",
+                        updated_at: "2025-11-30T04:23:04.000Z"
+                    }
+                ]
+            },
+            paginate_info: {
+                type: "object",
+                example: {
+                    has_next: false,
+                    has_previous: false,
+                    next_cursor: null,
+                    prev_cursor: null
+                },
+                properties: {
+                    has_next: {
+                        type: "boolean",
+                        example: false,
+                    },
+                    has_previous: {
+                        type: "boolean",
+                        example: false,
+                    },
+                    next_cursor: {
+                        type: "string",
+                        example: null,
+                    },
+                    prev_cursor: {
+                        type: "string",
+                        example: null,
+                    },
+                }
+            }
+        }
     }
 };

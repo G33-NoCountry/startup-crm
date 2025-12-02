@@ -14,16 +14,24 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: { model: "users" },
+        onUpdate: "CASCADE",
+        onDelete: "RESTRICT",
+
       },
       deal_id: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        allowNull: true,
         references: { model: "deals" },
+        onUpdate: "CASCADE",
+        onDelete: "RESTRICT",
+
       },
       contact_id: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        allowNull: true,
         references: { model: "contacts" },
+        onUpdate: "CASCADE",
+        onDelete: "RESTRICT",
       },
       title: {
         type: Sequelize.STRING(255),
@@ -46,6 +54,10 @@ module.exports = {
         type: Sequelize.DATE,
         allowNull: false,
         defaultValue: Sequelize.NOW,
+      },
+      deleted_at: {
+        type: Sequelize.DATE,
+        allowNull: true,
       }
     });
   },

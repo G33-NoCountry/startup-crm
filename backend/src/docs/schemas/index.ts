@@ -9,6 +9,8 @@ import contactRequestSchemas from "./request/contact.schema";
 import dealSchema from "./models/deal/deal.schema";
 import conversationSchema from "./models/conversation/conversation.schema";
 import conversationRequestSchema from "./request/conversation.schema";
+import taskRequestSchema from "./request/task.schema";
+import taskSchema from "./models/task/task.schema";
 import tagSchema from "./models/tag/tag.schema";
 import tagRequestSchema from "./request/tag.schema";
 
@@ -24,6 +26,8 @@ export default {
     ...dealSchema,
     ...conversationSchema,
     ...conversationRequestSchema,
+    ...taskSchema,
+    ...taskRequestSchema,
     ...tagSchema,
     ...tagRequestSchema
 };
