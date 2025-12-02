@@ -65,7 +65,7 @@ export class ContactRepository implements IContactRepository {
     }
 
     async delete(contact: Contact): Promise<void> {
-        return contact.destroy();
+        return (contact as any).softDelete();
     }
 
     async findConversationsByContactId(contactId: number): Promise<Conversation[] | null> {

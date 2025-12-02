@@ -291,4 +291,71 @@ export class TaskController {
     }
   };
 
+  /**
+   * @swagger
+   * /api/tasks/{id}:
+   *   delete:
+   *     summary: Eliminar una Task
+   *     description: Elimina un registro de Task
+   *     tags: [Tasks]
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: integer
+   *           minimum: 1
+   *         description: id de la Task
+   *     responses:
+   *        204:
+   *         description: Task eliminada exitosamente
+   *        400:
+   *         description: Solicitud inválida
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/BadRequest'
+   *        401:
+   *         description: No autorizado
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Unauthorized'
+   *        403:
+   *         description: No tiene permisos
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Forbidden'
+   *        404:
+   *         description: No encontrado
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/NotFound'
+   *        500:
+   *         description: Error interno del servidor
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/InternalServerError'
+  */
+  public deleteTask = async (request: Request, response: Response) => {
+    try {
+      const { id } = request.params;
+      const parsedId = parseInt(id);
+      const task = await this.taskService.getByPk(parsedId);
+      if (!task)
+        throw new Error("No se encontró");
+      await this.taskService.deleteTask(task);
+
+      return response.status(204).send();
+    } catch (error: any) {
+      return response.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  };
+
 }

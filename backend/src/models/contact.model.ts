@@ -7,12 +7,14 @@ import {
     PaginateOptions,
     PaginationConnection
 } from "sequelize-cursor-pagination";
+import Task from "./task.model";
 
 class Contact extends Model {
     public id!: number;
     public full_name!: string;
     public email!: string;
     public phone!: string;
+    public deleted_at!: Date;
     public readonly created_at!: Date;
     public readonly updated_at!: Date;
 
@@ -43,12 +45,40 @@ Contact.init(
             unique: true,
             allowNull: true,
         },
+        deleted_at: {
+            type: DataTypes.DATE(),
+            allowNull: true,
+        },
     },
     {
         sequelize,
         tableName: "contacts",
-        paranoid: true,
+        paranoid: false,
     }
 );
+
+(Contact.prototype as any).softDelete = async function () {
+    const transaction = await sequelize.transaction();
+
+    try {
+        const now = new Date;
+        await this.update(
+            { deleted_at: now },
+            { transaction: transaction }
+        );
+
+        await Task.destroy(
+            {
+                where: { contact_id: this.id },
+                transaction: transaction
+            }
+        );
+
+        await transaction.commit();
+    } catch (error) {
+        await transaction.rollback();
+        throw error;
+    }
+};
 
 export default Contact;

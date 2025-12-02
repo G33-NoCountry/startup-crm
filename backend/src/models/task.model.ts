@@ -10,6 +10,7 @@ class Task extends Model {
     public title!: string;
     public due_date!: Date;
     public status!: boolean;
+    public deleted_at!: Date;
     public readonly created_at!: Date;
     public readonly updated_at!: Date;
 
@@ -28,16 +29,22 @@ Task.init(
             type: DataTypes.INTEGER,
             allowNull: false,
             references: { model: "users" },
+            onUpdate: "CASCADE",
+            onDelete: "RESTRICT",
         },
         deal_id: {
             type: DataTypes.INTEGER,
             allowNull: true,
             references: { model: "deals" },
+            onUpdate: "CASCADE",
+            onDelete: "RESTRICT",
         },
         contact_id: {
             type: DataTypes.INTEGER,
             allowNull: true,
             references: { model: "contacts" },
+            onUpdate: "CASCADE",
+            onDelete: "RESTRICT",
         },
         title: {
             type: DataTypes.STRING(255),
@@ -55,6 +62,7 @@ Task.init(
     {
         sequelize,
         tableName: "tasks",
+        paranoid: true
     }
 );
 

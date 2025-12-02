@@ -16,6 +16,13 @@ export default {
     UpdateTaskRequest: {
         type: "object",
         properties: {
+            title: { type: "string", example: "Subir documentos" },
+            due_date: {
+                type: "string",
+                format: "date-time",
+                example: "2025-12-15T17:00:00Z",
+                description: "Fecha y hora de vencimiento de la Task",
+            },
             status: { type: "boolean", example: false, description: "Estado de la Task" },
         },
         required: ["status"],

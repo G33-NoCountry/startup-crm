@@ -31,5 +31,6 @@ router.get('/',
 
 router.post('/', createTaskValidator, validateRequestMiddleware, taskController.createTask);
 router.patch('/:id', validateParam("id"), updateTaskValidator, validateRequestMiddleware, recordExists(Task), taskController.updateTask);
+router.delete('/:id', validateParam("id"), validateRequestMiddleware, recordExists(Task), taskController.deleteTask);
 
 export default router;
