@@ -52,7 +52,7 @@ export function DeleteContactDialog({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>¿Eliminar contacto?</AlertDialogTitle>
+          <AlertDialogTitle>¿Estás seguro de eliminar contacto?</AlertDialogTitle>
           <AlertDialogDescription>
             Esta acción no se puede deshacer. Se eliminará permanentemente el contacto
             <strong className="mx-1 font-semibold">{contact.full_name}</strong>.
