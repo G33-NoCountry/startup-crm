@@ -5,7 +5,6 @@ import {
   Palette,
   User,
   ShieldCheck,
-  type Icon,
 } from "lucide-react"
 
 import {
@@ -52,10 +51,10 @@ export function NavDocuments({
               <DropdownMenuTrigger asChild>
                 <SidebarMenuAction
                   showOnHover
-                  className="data-[state=open]:bg-accent rounded-sm"
+                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground rounded-sm"
                 >
                   <Ellipsis />
-                  <span className="sr-only">More</span>
+                  <span className="sr-only">Más</span>
                 </SidebarMenuAction>
               </DropdownMenuTrigger>
               <DropdownMenuContent
@@ -65,16 +64,16 @@ export function NavDocuments({
               >
                 <DropdownMenuItem>
                   <Palette />
-                  <span>Open</span>
+                  <span>Abrir</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                   <User />
-                  <span>Share</span>
+                  <span>Compartir</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem variant="destructive">
                   <ShieldCheck />
-                  <span>Delete</span>
+                  <span>Eliminar</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
