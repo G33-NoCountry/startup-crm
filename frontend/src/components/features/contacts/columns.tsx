@@ -100,17 +100,41 @@ export const columns: ColumnDef<Contact>[] = [
       <DataTableColumnHeader column={column} title="Creado en" />
     ),
     cell: ({ row }) => {
+      // Obtener el valor de la fecha como string ISO
+      const dateString = row.getValue("created_at") as string;
+      
+      const date = new Date(dateString);
+
+      // Opciones de formato: día, mes y año numérico
+      const options: Intl.DateTimeFormatOptions = {
+        day: '2-digit',    // dd
+        month: '2-digit',  // MM
+        year: 'numeric',   // yyyy
+        hour: '2-digit',     // HH
+        minute: '2-digit',   // mm
+        second: '2-digit',   // ss
+        hour12: false,       // Usar formato de 24 horas
+      };
+
+      // Formatear la fecha a 'dd/MM/yyyy HH:mm:ss'
+      const formattedDate = new Intl.DateTimeFormat('es-ES', options).format(date);
       return (
         <div className="flex space-x-2">
           <span className="max-w-[500px] truncate font-medium">
-            {row.getValue("created_at")}
+            {formattedDate}
           </span>
         </div>
       );
     },
   },
   {
+    accessorKey: "actions",
     id: "actions",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Acciones" />
+    ),
     cell: ({ row }) => <DataTableRowActions row={row} />,
+    enableSorting: false,
+    enableHiding: false,
   },
 ];
