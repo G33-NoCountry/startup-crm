@@ -1,8 +1,7 @@
 import { create } from "zustand";
 import type { User, LoginCredentials, AuthError } from "@/types/auth.types";
-// TODO: Cambiar a authService cuando el backend implemente el endpoint
-// import { authService } from "@/lib/api/authService";
-import { authServiceMock as authService } from "@/lib/api/authService.mock";
+import { authService } from "@/lib/api/authService";
+
 import {
   saveToken,
   getToken,
@@ -55,12 +54,14 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     try {
       const response = await authService.login(credentials);
 
-      saveToken(response.data.token);
+      const accessToken = response.data.access_token;
+
+      saveToken(accessToken);
       saveUser(response.data.user);
 
       set({
         user: response.data.user,
-        token: response.data.token,
+        token: accessToken,
         isAuthenticated: true,
         isLoading: false,
         error: null,
