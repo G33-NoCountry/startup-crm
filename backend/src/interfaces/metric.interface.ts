@@ -4,4 +4,5 @@ export interface IMetricRepository {
     getTotalSentMessages(): Promise<number>;
     calculateResponseRate(): Promise<any>;
     calculateDealValues(): Promise<any>;
+    getCountFunnelById(funnelId: number): Promise<number>;
 }

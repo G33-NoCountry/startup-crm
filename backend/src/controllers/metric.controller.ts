@@ -23,10 +23,26 @@ export class MetricController {
 
       return response.status(200).json({
         success: true,
-        message: "Contactos obtenidos!",
-        data: {
-          metrics: metrics
-        }
+        message: "Metricas obtenidas!",
+        data: metrics
+      });
+    } catch (error: any) {
+      return response.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  };
+
+
+  public getFunnelProgress = async (request: Request, response: Response) => {
+    try {
+      const funnelProgress = await this.metricService.getFunnelProgress();
+
+      return response.status(200).json({
+        success: true,
+        message: "Funnel obtenidos!",
+        data: funnelProgress
       });
     } catch (error: any) {
       return response.status(500).json({

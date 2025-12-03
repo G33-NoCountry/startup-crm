@@ -43,4 +43,25 @@ export class MetricService {
     return this.metricRepository.calculateDealValues();
   }
 
+  public async getFunnelProgress(): Promise<any> {
+    const newFunnel = await this.getFunnelById(1);
+    const contacted = await this.getFunnelById(2);
+    const interested = await this.getFunnelById(3);
+    const submitted_proposal = await this.getFunnelById(4);
+    const closed_won = await this.getFunnelById(5);
+    const closed_lost = await this.getFunnelById(6);
+
+    return {
+      new: newFunnel,
+      contacted,
+      interested,
+      submitted_proposal,
+      closed_won,
+      closed_lost
+    };
+  }
+
+  private async getFunnelById(funnelId: number) {
+    return this.metricRepository.getCountFunnelById(funnelId);
+  }
 }

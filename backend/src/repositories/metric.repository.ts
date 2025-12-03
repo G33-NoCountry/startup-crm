@@ -1,6 +1,6 @@
 import { Op } from "sequelize";
 import { IMetricRepository } from "../interfaces/metric.interface";
-import { Contact, Conversation, Deal, Message } from "../models";
+import { Contact, Conversation, Deal, FunnelStage, Message } from "../models";
 
 export class MetricRepository implements IMetricRepository {
 
@@ -69,6 +69,17 @@ export class MetricRepository implements IMetricRepository {
         });
 
         return dealsValue;
+    }
+
+    public async getCountFunnelById(funnelId: number): Promise<number> {
+        const dealsByFunnelId = await Deal.count(
+            {
+                distinct: true,
+                where: { funnel_stage_id: funnelId }
+            }
+        );
+
+        return dealsByFunnelId;
     }
 
 }
