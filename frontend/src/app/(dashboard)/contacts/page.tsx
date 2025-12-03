@@ -11,11 +11,11 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 
-import { DataTable } from "@/components/features/contacts/data-table";
-import { DataTableToolbar } from "@/components/features/contacts/data-table-toolbar";
-import { columns } from "@/components/features/contacts/columns"
+import { DataTable } from "@/components/shared/data-table/data-table";
+import { DataTableToolbar } from "./components/data-table-toolbar";
+import { columns } from "./components/columns"
 import { contactDbSchema } from "@/lib/validations/contact.schema"
-import { NewContactDialog } from "@/components/features/contacts/NewContactDialog";
+import { NewContactDialog } from "./components/NewContactDialog";
 
 import { UserPlus } from "lucide-react";
 import { z } from "zod";
@@ -31,17 +31,17 @@ export default function ContactPage() {
             <Card>
               <CardHeader className="flex flex-col gap-4 px-6 py-4 md:flex-row md:items-start md:justify-between">
                 <div className="flex flex-col gap-1">
-                  <CardTitle>Administra tus contactos</CardTitle>
-                  <CardDescription>Gestiona y edita tu base de datos de contactos.</CardDescription>
+                  <CardTitle>Mis contactos</CardTitle>
+                  <CardDescription>Administra las preferencias de tu cuenta y sistema</CardDescription>
                 </div>
                 <CardAction className="w-full md:w-auto">
                   <Button variant="default" size="lg" className="w-full md:w-auto" onClick={() => setIsNewDialogOpen(true)}>
-                    <UserPlus /> Nuevo contacto
+                    <UserPlus /> Añadir contacto
                   </Button>
                 </CardAction>
               </CardHeader>
               <CardContent>
-                <DataTable data={contacts} columns={columns} toolbar={DataTableToolbar} />
+                <DataTable data={contacts} columns={columns} toolbar={DataTableToolbar} emptyMessage="No hay contactos..." />
               </CardContent>
             </Card>
 

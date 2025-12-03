@@ -5,7 +5,7 @@ import { Contact } from "@/lib/validations/contact.schema";
 import { Tag } from "@/lib/validations/tag.schema";
 import { DataTableColumnHeader } from "@/components/shared/data-table/data-table-column-header";
 import { DataTableRowActions } from "./data-table-row-actions";
-import { TagBadge } from "../../ui/tag-badge";
+import { TagBadge } from "@/components/ui/tag-badge";
 import { tagColorClasses } from "@/lib/constants/tag-colors";
 
 export const columns: ColumnDef<Contact>[] = [
