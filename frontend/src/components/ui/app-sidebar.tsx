@@ -59,8 +59,8 @@ const data = {
   ],
   documents: [
     {
-      name: "Administrar Equipos",
-      url: "/equipos",
+      name: "Administrar equipo",
+      url: "/teams",
       icon: UserCog,
     },
   ],

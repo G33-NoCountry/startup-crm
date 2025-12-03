@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/card"
 
 import { DataTable } from "@/components/features/contacts/data-table";
+import { DataTableToolbar } from "@/components/features/contacts/data-table-toolbar";
 import { columns } from "@/components/features/contacts/columns"
 import { contactDbSchema } from "@/lib/validations/contact.schema"
 import { NewContactDialog } from "@/components/features/contacts/NewContactDialog";
@@ -40,7 +41,7 @@ export default function ContactPage() {
                 </CardAction>
               </CardHeader>
               <CardContent>
-                <DataTable data={contacts} columns={columns} />
+                <DataTable data={contacts} columns={columns} toolbar={DataTableToolbar} />
               </CardContent>
             </Card>
 
