@@ -31,6 +31,7 @@ export function DataTableRowActions<TData>({
 
   return (
     <>
+    <div className="flex flex-wrap items-center gap-2 md:flex-row">
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
@@ -43,16 +44,18 @@ export function DataTableRowActions<TData>({
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[160px]">
         <DropdownMenuItem onSelect={() => setEditOpen(true)} className="cursor-pointer hover:bg-accent" >
-          <Pencil className="mr-2 h-4 w-4" />
           Editar
         </DropdownMenuItem>
         <DropdownMenuItem onSelect={() => setDeleteOpen(true)} className="cursor-pointer text-red-600 focus:text-red-600" >
-          <Trash2 className="mr-2 h-4 w-4" />
-          Eliminar
+          Eliminar contacto
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
 
+    <Button variant="ghost" size="icon" onClick={() => setEditOpen(true)}>
+        <Pencil />
+    </Button>
+    </div>
     {/* Edit Dialog */}
     <EditContactDialog
         contact={contact}
