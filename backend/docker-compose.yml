@@ -1,0 +1,47 @@
+#version: '3.8'
+
+services:
+  # Servicio de la Base de Datos MySQL
+  db:
+    image: mysql:8.0
+    container_name: startup_crm_mysql
+    restart: always
+    environment:
+      # **IMPORTANTE:** Estos valores DEBEN coincidir con tu archivo .env
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+    volumes:
+      - mysql_data:/var/lib/mysql # Persistencia de datos
+    ports:
+      - "3306:3306" # Expone el puerto por si lo necesitas localmente
+
+  # Servicio de la Aplicación Node.js
+  app:
+    build: .
+    container_name: startup_crm_app
+    restart: always
+    ports:
+      - "3000:3000" # Expone el puerto de la app
+    depends_on:
+      - db # Asegura que la DB se levante primero
+    environment:
+      # Pasa todas las variables de .env al contenedor
+      # El script de abajo se encarga de esto.
+      DB_HOST: db # ¡IMPORTANTE! El host es el nombre del servicio en docker-compose
+      DB_PORT: 3306
+      DB_USERNAME: root
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      APP_PORT: ${APP_PORT}
+
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN}
+      REFRESH_TOKEN_SECRET: ${REFRESH_TOKEN_SECRET}
+      REFRESH_TOKEN_EXPIRES_IN: ${REFRESH_TOKEN_EXPIRES_IN}
+      
+    volumes:
+      - .:/usr/src/app # Monta el código fuente
+      - /usr/src/app/node_modules # Asegura que los node_modules se manejen dentro del contenedor
+
+volumes:
+  mysql_data:
