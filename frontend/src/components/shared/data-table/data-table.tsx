@@ -26,11 +26,13 @@ import {
 } from "@/components/ui/table";
 
 import { DataTablePagination } from "./data-table-pagination";
+import { Loader2 } from "lucide-react";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   toolbar: React.ComponentType<{ table: any }>;
+  loading: boolean;
   emptyMessage?: string;
 }
 
@@ -39,6 +41,7 @@ export function DataTable<TData, TValue>({
   data,
   toolbar: Toolbar,
   emptyMessage = "No hay resultados...",
+  loading,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
@@ -95,7 +98,21 @@ export function DataTable<TData, TValue>({
               ))}
             </TableHeader>
             <TableBody>
-              {table.getRowModel().rows?.length ? (
+              {loading ? (
+                // 1. ESTADO DE CARGA (Loading)
+                <TableRow>
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-24 text-center"
+                  >
+                    <div className="flex items-center justify-center space-x-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <span>Cargando contactos...</span>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : table.getRowModel().rows?.length ? (
+                // 2. ESTADO CON RESULTADOS
                 table.getRowModel().rows.map((row) => (
                   <TableRow
                     key={row.id}
@@ -112,6 +129,7 @@ export function DataTable<TData, TValue>({
                   </TableRow>
                 ))
               ) : (
+                // 3. ESTADO SIN RESULTADOS (No hay resultados)
                 <TableRow>
                   <TableCell
                     colSpan={columns.length}
