@@ -28,11 +28,11 @@ const options = {
             },
             schemas: schemas,
         },
-        security: [
-            {
-                bearerAuth: [],
-            },
-        ],
+        // security: [
+        //     {
+        //         bearerAuth: [],
+        //     },
+        // ],
     },
     apis: ['src/controllers/**.ts'],
 };
