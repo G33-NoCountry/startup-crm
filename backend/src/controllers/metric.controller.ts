@@ -71,4 +71,24 @@ export class MetricController {
       });
     }
   };
+
+  public getRecentActivity = async (request: Request, response: Response) => {
+    try {
+      const { id } = request.user as User;
+      const recentActivity = await this.metricService.getRecentActivity(id);
+
+      return response.status(200).json({
+        success: true,
+        message: "Actividad reciente",
+        data: {
+          recent_activity: recentActivity
+        }
+      });
+    } catch (error: any) {
+      return response.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  };
 }

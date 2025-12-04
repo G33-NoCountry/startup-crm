@@ -17,5 +17,6 @@ const metricController = new MetricController(metricService);
 router.get("/metrics", metricController.getMetrics);
 router.get("/funnel-progress", metricController.getFunnelProgress);
 router.get("/pending-tasks", metricController.getPendingTasks);
+router.get("/recent-activity", metricController.getRecentActivity);
 
 export default router;

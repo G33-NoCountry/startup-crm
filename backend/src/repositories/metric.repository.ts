@@ -1,6 +1,6 @@
-import { Op } from "sequelize";
+import { Op, QueryTypes, Sequelize } from "sequelize";
 import { IMetricRepository } from "../interfaces/metric.interface";
-import { Contact, Conversation, Deal, FunnelStage, Message, Task } from "../models";
+import { Contact, Conversation, Deal, FunnelStage, Message, sequelize, Task } from "../models";
 
 export class MetricRepository implements IMetricRepository {
 
@@ -97,5 +97,77 @@ export class MetricRepository implements IMetricRepository {
         );
         return pendingTasks;
     }
+
+    public async generateRecentActivity(userId: number): Promise<any> {
+        const recentConversationWhatsapp = await this.getRecentWhatsapp(userId);
+        const recentConversationEmail = await this.getRecentEmails(userId);
+        return {
+            whatsapp: recentConversationWhatsapp,
+            email: recentConversationEmail
+        };
+    }
+
+    private async getRecentWhatsapp(userId: number): Promise<any> {
+        const lastMessageConversation = await Message.findAll({
+            attributes: ["conversation_id"],
+            where: { sender_type: "User", sender_id: userId },
+            order: [["created_at", "DESC"]],
+        });
+
+        const lastConversations: Conversation[] = await this.filterLastConversations(lastMessageConversation, "whatsapp");
+
+        return lastConversations;
+    }
+
+    private async filterLastConversations(lastMessageConversation: Message[], channel: 'whatsapp' | 'email') {
+        let lastConversationsIds: number[] = [];
+
+        for (const message of lastMessageConversation) {
+            if (lastConversationsIds.includes(message.conversation_id))
+                continue;
+            lastConversationsIds.push(message.conversation_id);
+        }
+
+        const lastConversations = await Conversation.findAndCountAll({
+            attributes: ["id", "last_interaction"],
+            where: { id: lastConversationsIds, channel: channel },
+            include: [
+                {
+                    model: Message,
+                    as: "messages",
+                    required: true,
+                    attributes: ["id", "content", "created_at"],
+                },
+                {
+                    model: Contact,
+                    as: "contact",
+                    required: true,
+                    attributes: ["id", "full_name"],
+                }
+            ],
+            distinct: true,
+            order: [["last_interaction", "DESC"]],
+        });
+
+        for (const conversation of lastConversations.rows) {
+            const messages = (conversation as any).messages;
+            const lastMessage = messages[messages.length - 1];
+            conversation.set("messages", lastMessage);
+        }
+        return lastConversations.rows.slice(0, 4);
+    }
+
+    private async getRecentEmails(userId: number): Promise<any> {
+        const lastMessageConversation = await Message.findAll({
+            attributes: ["conversation_id"],
+            where: { sender_type: "User", sender_id: userId },
+            order: [["created_at", "DESC"]],
+        });
+
+        const lastConversations: Conversation[] = await this.filterLastConversations(lastMessageConversation, "email");
+
+        return lastConversations;
+    }
+
 
 }

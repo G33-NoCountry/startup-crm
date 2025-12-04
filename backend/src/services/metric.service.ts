@@ -69,4 +69,8 @@ export class MetricService {
   public async getPendingTasks(userId: number): Promise<Task[]> {
     return this.metricRepository.getTasksByStatus(false, userId);
   }
+
+  public async getRecentActivity(userId: number): Promise<any> {
+    return this.metricRepository.generateRecentActivity(userId);
+  }
 }

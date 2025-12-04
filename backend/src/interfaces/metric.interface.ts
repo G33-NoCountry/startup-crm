@@ -8,4 +8,5 @@ export interface IMetricRepository {
     calculateDealValues(): Promise<any>;
     getCountFunnelById(funnelId: number): Promise<number>;
     getTasksByStatus(status: boolean, userId: number): Promise<Task[]>;
+    generateRecentActivity(userId: number): Promise<any>;
 }
