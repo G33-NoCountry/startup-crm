@@ -60,6 +60,8 @@ export class DealController {
      *     summary: Mover deal a otra etapa (Drag & Drop)
      *     description: Actualiza la etapa del funnel.
      *     tags: [Deals]
+     *     security:
+     *       - bearerAuth: []
      *     parameters:
      *       - in: path
      *         name: id

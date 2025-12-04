@@ -32,5 +32,17 @@ export default {
             },
         },
     },
+    TaskRelationship: {
+        type: "object",
+        example: {
+            id: 2,
+            title: "Subir documentos",
+            due_date: "2025-12-04T17:27:41.000Z",
+            contact: {
+                id: 3,
+                full_name: "Gabriela Prats"
+            }
+        },
+    }
 
 };

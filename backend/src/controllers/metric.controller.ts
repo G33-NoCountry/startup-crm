@@ -13,7 +13,50 @@ export class MetricController {
     private metricService: MetricService
   ) { }
 
-
+  /**
+   * @swagger
+   * /api/dashboard/metrics:
+   *   get:
+   *     summary: Ver métricas
+   *     description: Obtener métricas de la aplicación
+   *     tags: [KPIs]
+   *     security:
+   *       - bearerAuth: []
+   *     responses:
+   *        200:
+   *         description: Metricas obtenidas
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: true
+   *                 message:
+   *                   type: string
+   *                   example: "Metricas obtenidas!"
+   *                 data:
+   *                   $ref: '#/components/schemas/Metrics'
+   *        401:
+   *         description: No autorizado
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Unauthorized'
+   *        403:
+   *         description: No tiene permisos
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Forbidden'
+   *        500:
+   *         description: Error interno del servidor
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/InternalServerError'
+  */
   public getMetrics = async (request: Request, response: Response) => {
     try {
       const { id } = request.user as User;
@@ -24,7 +67,9 @@ export class MetricController {
       return response.status(200).json({
         success: true,
         message: "Metricas obtenidas!",
-        data: metrics
+        data: {
+          metrics
+        }
       });
     } catch (error: any) {
       return response.status(500).json({
@@ -34,7 +79,50 @@ export class MetricController {
     }
   };
 
-
+  /**
+   * @swagger
+   * /api/dashboard/funnel-progress:
+   *   get:
+   *     summary: 
+   *     description:
+   *     tags: [KPIs]
+   *     security:
+   *       - bearerAuth: []
+   *     responses:
+   *        200:
+   *         description: 
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: true
+   *                 message:
+   *                   type: string
+   *                   example: "Funnel obtenidos!"
+   *                 data:
+   *                   $ref: '#/components/schemas/FunnelProgress'
+   *        401:
+   *         description: No autorizado
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Unauthorized'
+   *        403:
+   *         description: No tiene permisos
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Forbidden'
+   *        500:
+   *         description: Error interno del servidor
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/InternalServerError'
+  */
   public getFunnelProgress = async (request: Request, response: Response) => {
     try {
       const funnelProgress = await this.metricService.getFunnelProgress();
@@ -42,7 +130,9 @@ export class MetricController {
       return response.status(200).json({
         success: true,
         message: "Funnel obtenidos!",
-        data: funnelProgress
+        data: {
+          funnel_progress: funnelProgress
+        }
       });
     } catch (error: any) {
       return response.status(500).json({
@@ -52,6 +142,50 @@ export class MetricController {
     }
   };
 
+  /**
+   * @swagger
+   * /api/dashboard/pending-tasks:
+   *   get:
+   *     summary: 
+   *     description:
+   *     tags: [KPIs]
+   *     security:
+   *       - bearerAuth: []
+   *     responses:
+   *        200:
+   *         description: 
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: true
+   *                 message:
+   *                   type: string
+   *                   example: "Tasks obtenidas!"
+   *                 data:
+   *                   $ref: '#/components/schemas/PendingTasks'
+   *        401:
+   *         description: No autorizado
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Unauthorized'
+   *        403:
+   *         description: No tiene permisos
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Forbidden'
+   *        500:
+   *         description: Error interno del servidor
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/InternalServerError'
+  */
   public getPendingTasks = async (request: Request, response: Response) => {
     try {
       const { id } = request.user as User;
@@ -72,6 +206,50 @@ export class MetricController {
     }
   };
 
+  /**
+   * @swagger
+   * /api/dashboard/recent-activity:
+   *   get:
+   *     summary: 
+   *     description:
+   *     tags: [KPIs]
+   *     security:
+   *       - bearerAuth: []
+   *     responses:
+   *        200:
+   *         description: 
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: true
+   *                 message:
+   *                   type: string
+   *                   example: "Actividad reciente"
+   *                 data:
+   *                   $ref: '#/components/schemas/RecentActivity'
+   *        401:
+   *         description: No autorizado
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Unauthorized'
+   *        403:
+   *         description: No tiene permisos
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Forbidden'
+   *        500:
+   *         description: Error interno del servidor
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/InternalServerError'
+  */
   public getRecentActivity = async (request: Request, response: Response) => {
     try {
       const { id } = request.user as User;

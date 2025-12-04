@@ -133,6 +133,8 @@ export class ConversationController {
    *     summary: Actualizar el estado de una conversación
    *     description: Actualiza la propiedad `status` en `true` = `activo` o `false` = `inactivo`
    *     tags: [Conversations]
+   *     security:
+   *       - bearerAuth: []
    *     parameters:
    *       - in: path
    *         name: id

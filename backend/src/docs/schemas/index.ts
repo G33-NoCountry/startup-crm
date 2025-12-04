@@ -13,6 +13,7 @@ import taskRequestSchema from "./request/task.schema";
 import taskSchema from "./models/task/task.schema";
 import tagSchema from "./models/tag/tag.schema";
 import tagRequestSchema from "./request/tag.schema";
+import metricschema from "./models/metrics/metrics.schema";
 
 export default {
     ...authRequestSchemas,
@@ -29,5 +30,6 @@ export default {
     ...taskSchema,
     ...taskRequestSchema,
     ...tagSchema,
-    ...tagRequestSchema
+    ...tagRequestSchema,
+    ...metricschema
 };

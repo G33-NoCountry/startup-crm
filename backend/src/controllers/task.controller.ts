@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import { Op } from "sequelize";
 import { TaskService } from "../services/task.service";
 import { User } from "../models";
 import { CreateTaskDto } from "../dto/task/create-task.dto";
@@ -24,6 +23,8 @@ export class TaskController {
    *     summary: Obtener tasks
    *     description: Obtener datos de tasks paginados
    *     tags: [Tasks]
+   *     security:
+   *       - bearerAuth: []
    *     parameters:
    *       - in: query
    *         name: limit
@@ -131,6 +132,8 @@ export class TaskController {
    *     summary: Registrar una Task
    *     description: Crea un nuevo registro de Task
    *     tags: [Tasks]
+   *     security:
+   *       - bearerAuth: []
    *     requestBody:
    *       required: true
    *       content:
@@ -208,6 +211,8 @@ export class TaskController {
    *     summary: Actualizar una Task
    *     description: Actualiza un registro de Task
    *     tags: [Tasks]
+   *     security:
+   *       - bearerAuth: []
    *     parameters:
    *       - in: path
    *         name: id
@@ -298,6 +303,8 @@ export class TaskController {
    *     summary: Eliminar una Task
    *     description: Elimina un registro de Task
    *     tags: [Tasks]
+   *     security:
+   *       - bearerAuth: []
    *     parameters:
    *       - in: path
    *         name: id
