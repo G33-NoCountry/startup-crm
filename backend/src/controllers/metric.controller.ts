@@ -51,4 +51,24 @@ export class MetricController {
       });
     }
   };
+
+  public getPendingTasks = async (request: Request, response: Response) => {
+    try {
+      const { id } = request.user as User;
+      const pendingTasks = await this.metricService.getPendingTasks(id);
+
+      return response.status(200).json({
+        success: true,
+        message: "Tasks obtenidas!",
+        data: {
+          pending_tasks: pendingTasks
+        }
+      });
+    } catch (error: any) {
+      return response.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  };
 }

@@ -16,5 +16,6 @@ const metricController = new MetricController(metricService);
 // Contactos Activos, Mensajes Enviados, Tasa de Respuesta, Pipeline
 router.get("/metrics", metricController.getMetrics);
 router.get("/funnel-progress", metricController.getFunnelProgress);
+router.get("/pending-tasks", metricController.getPendingTasks);
 
 export default router;

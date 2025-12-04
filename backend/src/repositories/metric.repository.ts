@@ -1,6 +1,6 @@
 import { Op } from "sequelize";
 import { IMetricRepository } from "../interfaces/metric.interface";
-import { Contact, Conversation, Deal, FunnelStage, Message } from "../models";
+import { Contact, Conversation, Deal, FunnelStage, Message, Task } from "../models";
 
 export class MetricRepository implements IMetricRepository {
 
@@ -80,6 +80,22 @@ export class MetricRepository implements IMetricRepository {
         );
 
         return dealsByFunnelId;
+    }
+
+    public async getTasksByStatus(status: boolean, userId: number): Promise<Task[]> {
+        const pendingTasks = await Task.findAll(
+            {
+                attributes: ["id", "title", "due_date"],
+                include: [{
+                    model: Contact,
+                    as: "contact",
+                    required: true,
+                    attributes: ["id", "full_name"]
+                }],
+                where: { user_id: userId, status: status },
+            },
+        );
+        return pendingTasks;
     }
 
 }

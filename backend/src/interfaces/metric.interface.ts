@@ -1,3 +1,5 @@
+import { Task } from "../models";
+
 export interface IMetricRepository {
     getCountActiveContacts(): Promise<number>;
     getCountSentMessagesByUser(user_id: number): Promise<number>;
@@ -5,4 +7,5 @@ export interface IMetricRepository {
     calculateResponseRate(): Promise<any>;
     calculateDealValues(): Promise<any>;
     getCountFunnelById(funnelId: number): Promise<number>;
+    getTasksByStatus(status: boolean, userId: number): Promise<Task[]>;
 }

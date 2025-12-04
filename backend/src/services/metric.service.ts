@@ -1,5 +1,6 @@
 import { GetMetricsDto } from "../dto/metrics/get-metrics.dto";
 import { IMetricRepository } from "../interfaces/metric.interface";
+import { Task } from "../models";
 
 export class MetricService {
 
@@ -61,7 +62,11 @@ export class MetricService {
     };
   }
 
-  private async getFunnelById(funnelId: number) {
+  private async getFunnelById(funnelId: number): Promise<number> {
     return this.metricRepository.getCountFunnelById(funnelId);
+  }
+
+  public async getPendingTasks(userId: number): Promise<Task[]> {
+    return this.metricRepository.getTasksByStatus(false, userId);
   }
 }
