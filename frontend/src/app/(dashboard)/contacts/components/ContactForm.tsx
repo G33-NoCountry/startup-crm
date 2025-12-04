@@ -33,11 +33,12 @@ const AVAILABLE_TAGS = [
 interface ContactFormProps {
   defaultValues?: Partial<ContactFormData & { tags: string[] }>;
   onSubmit: (data: ContactFormData & { tags?: string[] }) => Promise<void>;
+  onCancel?: () => void;
   isPending?: boolean;
   mode: "create" | "edit";
 }
 
-export function ContactForm({ defaultValues, onSubmit, isPending = false, mode }: ContactFormProps) {
+export function ContactForm({ defaultValues, onSubmit, onCancel, isPending = false, mode }: ContactFormProps) {
   const form = useForm<ContactFormData & { tags: string[] }>({
     resolver: zodResolver(contactFormSchema),
     defaultValues: {
@@ -160,6 +161,11 @@ export function ContactForm({ defaultValues, onSubmit, isPending = false, mode }
         )}
 
         <div className="flex justify-end gap-3 pt-4">
+          {onCancel && (
+            <Button type="button" variant="outline" onClick={onCancel} disabled={isPending}>
+              Cancelar
+            </Button>
+          )}
           <Button type="submit" disabled={isPending}>
             {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {mode === "create" ? "Crear contacto" : "Guardar cambios"}
