@@ -1,5 +1,5 @@
 import { IFunnelStageRepository } from "../interfaces/funnel-stage.interface";
-import { FunnelStage } from "../models";
+import { Deal, FunnelStage } from "../models";
 
 export class FunnelStageService {
 
@@ -21,8 +21,13 @@ export class FunnelStageService {
     return this.funnelStageRepository.update(data);
   }
 
-  public async delete(FunnelStage: FunnelStage): Promise<void> {
-    return this.funnelStageRepository.delete(FunnelStage);
+  public async delete(funnelStage: FunnelStage): Promise<void> {
+    const deals = await Deal.findAll({
+      where: { funnel_stage_id: funnelStage.id }
+    })
+    if (deals.length > 0)
+      throw new Error("No puede eliminar un Funnel asociado a un Deal");
+    return this.funnelStageRepository.delete(funnelStage);
   }
 
 }

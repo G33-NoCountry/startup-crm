@@ -32,5 +32,13 @@ router.put(
     sanitizeBody,
     funnelStageController.updateFunnelStage
 );
+router.delete(
+    "/:id",
+    validateParam("id"),
+    validateRequestMiddleware,
+    recordExists(FunnelStage),
+    funnelStageController.deleteFunnelStage
+);
+
 
 export default router;

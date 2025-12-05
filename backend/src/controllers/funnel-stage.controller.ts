@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { FunnelStageService } from "../services/funnel-stage.service";
 import { CreateFunnelStageDto } from "../dto/funnel-stage/create-funnel.dto";
 import { UpdateFunnelStageDto } from "../dto/funnel-stage/update-funnel.dto";
+import { FunnelStageResource } from "../resources/funnel-stage/funnel-stage-resource.resource";
 
 /**
  * @swagger
@@ -140,7 +141,7 @@ export class FunnelStageController {
       return response.status(201).json({
         success: true,
         message: "Funnel Stage creado!",
-        data: funnelStage
+        data: FunnelStageResource.toResponse(funnelStage)
       });
     } catch (error: any) {
       return response.status(500).json({
@@ -218,8 +219,70 @@ export class FunnelStageController {
       return response.status(201).json({
         success: true,
         message: "Funnel Stage creado!",
-        data: funnelStageUpdated
+        data: FunnelStageResource.toResponse(funnelStageUpdated)
       });
+    } catch (error: any) {
+      return response.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  };
+
+  /**
+   * @swagger
+   * /api/funnel-stages/{id}:
+   *   delete:
+   *     summary: Eliminar funnel 
+   *     description: Elimina un registro de funnel
+   *     tags: [Funnel Stages]
+   *     security:
+   *       - bearerAuth: []
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: integer
+   *           minimum: 1
+   *         description: id del funnel
+   *     responses:
+   *        200:
+   *         description: Funnel eliminado (sin contenido)
+   *        400:
+   *         description: Solicitud inválida
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/BadRequest'
+   *        401:
+   *         description: No autorizado
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Unauthorized'
+   *        403:
+   *         description: No tiene permisos
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Forbidden'
+   *        500:
+   *         description: Error interno del servidor
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/InternalServerError'
+  */
+  public deleteFunnelStage = async (request: Request, response: Response) => {
+    try {
+      const funnelId = parseInt(request.params.id);
+      const funnel = await this.funnelStageService.getByPk(funnelId);
+      if (!funnel)
+        throw new Error("No se encontró");
+      await this.funnelStageService.delete(funnel);
+
+      return response.status(204).send();
     } catch (error: any) {
       return response.status(500).json({
         success: false,
