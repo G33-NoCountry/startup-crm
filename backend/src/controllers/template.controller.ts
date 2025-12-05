@@ -3,6 +3,7 @@ import { TemplateService } from "../services/template.service";
 import { TemplateResource } from "../resources/template/template-resource.resource";
 import { CreateTemplateDto } from "../dto/template/create-template.dto";
 import { User } from "../models";
+import { UpdateTemplateDto } from "../dto/template/update-template.dto";
 
 /**
  * @swagger
@@ -180,4 +181,92 @@ export class TemplateController {
       });
     }
   };
+
+  /**
+   * @swagger
+   * /api/admin/templates/{id}:
+   *   put:
+   *     summary: Actualizar template  
+   *     description: Actualiza el registro de un template
+   *     tags: [Templates]
+   *     security:
+   *       - bearerAuth: []
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: integer
+   *           minimum: 1
+   *         description: id del template
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             $ref: '#/components/schemas/UpdateTemplateRequest'
+   *     responses:
+   *        200:
+   *         description: Template actualizado
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: true
+   *                 message:
+   *                   type: string
+   *                   example: "Template actualizado!"
+   *                 data:
+   *                   $ref: '#/components/schemas/FullTemplate'
+   *        400:
+   *         description: Solicitud inválida
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/BadRequest'
+   *        401:
+   *         description: No autorizado
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Unauthorized'
+   *        403:
+   *         description: No tiene permisos
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Forbidden'
+   *        500:
+   *         description: Error interno del servidor
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/InternalServerError'
+  */
+  public updateTemplate = async (request: Request, response: Response) => {
+    try {
+      const templateId = parseInt(request.params.id);
+      const body = request.body as UpdateTemplateDto;
+      body.id = templateId;
+      const templateUpdated = await this.templateService.update(body);
+      if (!templateUpdated)
+        throw new Error("No se pudo actualizar el template");
+
+      return response.status(200).json({
+        success: true,
+        message: "Template actualizado!",
+        data: TemplateResource.toResponse(templateUpdated)
+      });
+    } catch (error: any) {
+      return response.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  };
+
+
 }

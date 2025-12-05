@@ -6,6 +6,10 @@ import { queryParamPaginateValidator } from "../validators/param/query-param.val
 import validateRequestMiddleware from "../middlewares/validate-request.middleware";
 import { sanitizeBody } from "../middlewares/sanitize.middlewares";
 import createTemplateValidator from "../validators/template/create-template.validator";
+import { validateParam } from "../validators/param/param.validator";
+import updateTemplateValidator from "../validators/template/update-template.validator";
+import { recordExists } from "../middlewares/model-exist.middleware";
+import { Template } from "../models";
 
 const router = Router();
 
@@ -19,6 +23,16 @@ router.get("/",
     templateController.getTemplates
 );
 router.post("/", createTemplateValidator, validateRequestMiddleware, sanitizeBody, templateController.createTemplate);
+router.put(
+    "/:id",
+    validateParam("id"),
+    validateRequestMiddleware,
+    recordExists(Template),
+    updateTemplateValidator,
+    validateRequestMiddleware,
+    sanitizeBody,
+    templateController.updateTemplate
+);
 
 
 export default router;

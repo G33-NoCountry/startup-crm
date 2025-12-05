@@ -18,7 +18,7 @@ export class FunnelStageController {
 
   /**
    * @swagger
-   * /api/funnel-stages:
+   * /api/admin/funnel-stages:
    *   get:
    *     summary: Obtener funnel 
    *     description: Obtiene todos los funnel stage
@@ -78,7 +78,7 @@ export class FunnelStageController {
 
   /**
    * @swagger
-   * /api/funnel-stages:
+   * /api/admin/funnel-stages:
    *   post:
    *     summary: Crear funnel
    *     description: Crea un nuevo registro de funnel
@@ -154,13 +154,21 @@ export class FunnelStageController {
 
   /**
    * @swagger
-   * /api/funnel-stages/{id}:
+   * /api/admin/funnel-stages/{id}:
    *   put:
    *     summary: Actualizar funnel 
    *     description: Actualiza un registro de funnel
    *     tags: [Funnel Stages]
    *     security:
    *       - bearerAuth: []
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: integer
+   *           minimum: 1
+   *         description: id del funnel
    *     requestBody:
    *       required: true
    *       content:
@@ -225,7 +233,7 @@ export class FunnelStageController {
 
       return response.status(200).json({
         success: true,
-        message: "Funnel Stage creado!",
+        message: "Funnel Stage actualizado!",
         data: FunnelStageResource.toResponse(funnelStageUpdated)
       });
     } catch (error: any) {
@@ -238,7 +246,7 @@ export class FunnelStageController {
 
   /**
    * @swagger
-   * /api/funnel-stages/reorder:
+   * /api/admin/funnel-stages/reorder:
    *   patch:
    *     summary: Reordenar funnels  
    *     description: Actualiza el orden lógico de los funnel
@@ -312,7 +320,7 @@ export class FunnelStageController {
 
   /**
    * @swagger
-   * /api/funnel-stages/{id}:
+   * /api/admin/funnel-stages/{id}:
    *   delete:
    *     summary: Eliminar funnel 
    *     description: Elimina un registro de funnel
