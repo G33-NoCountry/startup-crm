@@ -24,6 +24,13 @@ export class FunnelStageRepository implements IFunnelStageRepository {
     }
 
     async create(data: any): Promise<FunnelStage | null> {
+        const lastFunnel = await FunnelStage.findOne({
+            order: [["id", "DESC"]],
+        });
+        if (!lastFunnel)
+            throw new Error("No se pudo obtener el funnel");
+        data.sort_order = lastFunnel?.sort_order + 1;
+
         return FunnelStage.create(data);
     }
 
