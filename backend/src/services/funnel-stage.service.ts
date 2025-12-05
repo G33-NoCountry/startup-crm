@@ -1,3 +1,4 @@
+import { ReorderFunnelStagesDto } from "../dto/funnel-stage/reorder-funnels.dto";
 import { IFunnelStageRepository } from "../interfaces/funnel-stage.interface";
 import { Deal, FunnelStage } from "../models";
 
@@ -28,6 +29,10 @@ export class FunnelStageService {
     if (deals.length > 0)
       throw new Error("No puede eliminar un Funnel asociado a un Deal");
     return this.funnelStageRepository.delete(funnelStage);
+  }
+
+  public async reorder(newOrder : ReorderFunnelStagesDto): Promise<FunnelStage[]> {
+    return this.funnelStageRepository.reorder(newOrder);
   }
 
 }

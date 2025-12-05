@@ -3,6 +3,7 @@ import { FunnelStageService } from "../services/funnel-stage.service";
 import { CreateFunnelStageDto } from "../dto/funnel-stage/create-funnel.dto";
 import { UpdateFunnelStageDto } from "../dto/funnel-stage/update-funnel.dto";
 import { FunnelStageResource } from "../resources/funnel-stage/funnel-stage-resource.resource";
+import { ReorderFunnelStagesDto } from "../dto/funnel-stage/reorder-funnels.dto";
 
 /**
  * @swagger
@@ -39,7 +40,7 @@ export class FunnelStageController {
    *                   type: string
    *                   example: "Funnel Stages obtenidos!"
    *                 data:
-   *                   $ref: '#/components/schemas/FullFunnelStage'
+   *                   $ref: '#/components/schemas/ListFunnelStage'
    *        401:
    *         description: No autorizado
    *         content:
@@ -79,7 +80,7 @@ export class FunnelStageController {
    * @swagger
    * /api/funnel-stages:
    *   post:
-   *     summary: Crear funnel 
+   *     summary: Crear funnel
    *     description: Crea un nuevo registro de funnel
    *     tags: [Funnel Stages]
    *     security:
@@ -200,6 +201,12 @@ export class FunnelStageController {
    *           application/json:
    *             schema:
    *              $ref: '#/components/schemas/Forbidden'
+   *        404:
+   *         description: No encontrado
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/NotFound'
    *        500:
    *         description: Error interno del servidor
    *         content:
@@ -216,10 +223,84 @@ export class FunnelStageController {
       if (!funnelStageUpdated)
         throw new Error("No se pudo actualizar el funnel");
 
-      return response.status(201).json({
+      return response.status(200).json({
         success: true,
         message: "Funnel Stage creado!",
         data: FunnelStageResource.toResponse(funnelStageUpdated)
+      });
+    } catch (error: any) {
+      return response.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  };
+
+  /**
+   * @swagger
+   * /api/funnel-stages/reorder:
+   *   patch:
+   *     summary: Reordenar funnels  
+   *     description: Actualiza el orden lógico de los funnel
+   *     tags: [Funnel Stages]
+   *     security:
+   *       - bearerAuth: []
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             $ref: '#/components/schemas/ReorderFunnelRequest'
+   *     responses:
+   *        200:
+   *         description: Funnels reordenados
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: true
+   *                 message:
+   *                   type: string
+   *                   example: "Funnel Stages ordenados!"
+   *                 data:
+   *                   $ref: '#/components/schemas/ListFunnelStage'
+   *        400:
+   *         description: Solicitud inválida
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/BadRequest'
+   *        401:
+   *         description: No autorizado
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Unauthorized'
+   *        403:
+   *         description: No tiene permisos
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Forbidden'
+   *        500:
+   *         description: Error interno del servidor
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/InternalServerError'
+  */
+  public reorderFunnelStages = async (request: Request, response: Response) => {
+    try {
+      const body = request.body as ReorderFunnelStagesDto;
+      const funnelStages = await this.funnelStageService.reorder(body);
+
+      return response.status(200).json({
+        success: true,
+        message: "Funnel Stage ordenados!",
+        data: funnelStages
       });
     } catch (error: any) {
       return response.status(500).json({
@@ -267,6 +348,12 @@ export class FunnelStageController {
    *           application/json:
    *             schema:
    *              $ref: '#/components/schemas/Forbidden'
+   *        404:
+   *         description: No encontrado
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/NotFound'
    *        500:
    *         description: Error interno del servidor
    *         content:

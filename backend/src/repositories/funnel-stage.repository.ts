@@ -1,5 +1,6 @@
+import { ReorderFunnelStagesDto } from "../dto/funnel-stage/reorder-funnels.dto";
 import { IFunnelStageRepository } from "../interfaces/funnel-stage.interface";
-import { FunnelStage } from "../models";
+import { FunnelStage, sequelize } from "../models";
 
 export class FunnelStageRepository implements IFunnelStageRepository {
     async findById(id: number) {
@@ -47,5 +48,28 @@ export class FunnelStageRepository implements IFunnelStageRepository {
 
     async delete(FunnelStage: FunnelStage): Promise<void> {
         return FunnelStage.destroy();
+    }
+
+    async reorder(newOrder: ReorderFunnelStagesDto): Promise<FunnelStage[]> {
+        const transaction = await sequelize.transaction();
+        try {
+            for (const funnel of newOrder.funnels) {
+                await FunnelStage.update(
+                    { sort_order: funnel.sort_order },
+                    { where: { id: funnel.id }, transaction }
+                );
+            }
+
+            await transaction.commit();
+            const funnels = await this.findAll();
+            if (!funnels)
+                throw new Error("No se pudieron obtener los registros");
+            return funnels;
+        } catch (err) {
+            await transaction.rollback();
+            throw err;
+        }
+
+        return [];
     }
 }

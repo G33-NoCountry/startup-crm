@@ -11,6 +11,7 @@ import { validateParam } from "../validators/param/param.validator";
 import { recordExists } from "../middlewares/model-exist.middleware";
 import { FunnelStage } from "../models";
 import updateFunnelValidator from "../validators/funnel-stage/update-funnel.validator";
+import reorderFunnelValidator from "../validators/funnel-stage/reorder-funnel.validator";
 
 const router = Router();
 
@@ -22,6 +23,13 @@ const funnelStageController = new FunnelStageController(funnelStageService);
 
 router.get("/", funnelStageController.getFunnelStages);
 router.post("/", createFunnelValidator, validateRequestMiddleware, sanitizeBody, funnelStageController.createFunnelStages);
+router.patch(
+    "/reorder",
+    reorderFunnelValidator,
+    validateRequestMiddleware,
+    sanitizeBody,
+    funnelStageController.reorderFunnelStages
+);
 router.put(
     "/:id",
     validateParam("id"),
