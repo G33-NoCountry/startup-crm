@@ -1,11 +1,14 @@
 import { Request, Response } from "express";
 import { TemplateService } from "../services/template.service";
+import { TemplateResource } from "../resources/template/template-resource.resource";
+import { CreateTemplateDto } from "../dto/template/create-template.dto";
+import { User } from "../models";
 
 /**
  * @swagger
  * tags:
  *   name: Templates
- *   description: Endpoints para gestionar plantillas de mensajes
+ *   description: Endpoints para gestionar plantillas de mensajes (solo acceden usuarios "Admin")
  */
 export class TemplateController {
   constructor(
@@ -100,4 +103,81 @@ export class TemplateController {
     }
   };
 
+  /**
+   * @swagger
+   * /api/admin/templates:
+   *   post:
+   *     summary: Crear template
+   *     description: Crea un nuevo registro de template
+   *     tags: [Templates]
+   *     security:
+   *       - bearerAuth: []
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             $ref: '#/components/schemas/CreateTemplateRequest'
+   *     responses:
+   *        201:
+   *         description: Template creado
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: true
+   *                 message:
+   *                   type: string
+   *                   example: "Template creado!"
+   *                 data:
+   *                   $ref: '#/components/schemas/FullTemplate'
+   *        400:
+   *         description: Solicitud inválida
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/BadRequest'
+   *        401:
+   *         description: No autorizado
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Unauthorized'
+   *        403:
+   *         description: No tiene permisos
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Forbidden'
+   *        500:
+   *         description: Error interno del servidor
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/InternalServerError'
+  */
+  public createTemplate = async (request: Request, response: Response) => {
+    try {
+      const { id } = request.user as User;
+      const body = request.body as CreateTemplateDto;
+      body.user_id = id;
+      const template = await this.templateService.create(body);
+      if (!template)
+        throw new Error("No se pudo crear el template");
+
+      return response.status(201).json({
+        success: true,
+        message: "Template creado!",
+        data: TemplateResource.toResponse(template)
+      });
+    } catch (error: any) {
+      return response.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  };
 }

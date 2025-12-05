@@ -4,6 +4,8 @@ import { TemplateService } from "../services/template.service";
 import { TemplateRepository } from "../repositories/template.repository";
 import { queryParamPaginateValidator } from "../validators/param/query-param.validator";
 import validateRequestMiddleware from "../middlewares/validate-request.middleware";
+import { sanitizeBody } from "../middlewares/sanitize.middlewares";
+import createTemplateValidator from "../validators/template/create-template.validator";
 
 const router = Router();
 
@@ -16,5 +18,7 @@ router.get("/",
     validateRequestMiddleware,
     templateController.getTemplates
 );
+router.post("/", createTemplateValidator, validateRequestMiddleware, sanitizeBody, templateController.createTemplate);
+
 
 export default router;
