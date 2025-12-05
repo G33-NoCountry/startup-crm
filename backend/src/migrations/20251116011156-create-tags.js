@@ -16,7 +16,6 @@ module.exports = {
       },
       color: {
         type: Sequelize.STRING(55),
-        unique: true,
         allowNull: false,
       },
       created_at: {
