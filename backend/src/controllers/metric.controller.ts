@@ -1,33 +1,30 @@
 import { Request, Response } from "express";
-import { TagService } from "../services/tag.service";
-import { TagResource } from "../resources/tag/tag-resource.resource";
-import { CreateTagDto } from "../dto/tag/create-tag.dto";
-import { UpdateTagDto } from "../dto/tag/update-tag.dto";
+import { MetricService } from "../services/metric.service";
+import { User } from "../models";
 
 /**
  * @swagger
  * tags:
- *   name: Tags
- *   description: Endpoints para gestionar tags (solo acceden usuarios "Admin")
+ *   name: KPIs
+ *   description: Endpoints para consultar métricas
  */
-export class TagController {
+export class MetricController {
   constructor(
-    private tagService: TagService,
+    private metricService: MetricService
   ) { }
-
 
   /**
    * @swagger
-   * /api/admin/tags:
+   * /api/dashboard/metrics:
    *   get:
-   *     summary: Obtener tags
-   *     description: Obtener datos de tags
-   *     tags: [Tags]
+   *     summary: Ver métricas
+   *     description: Obtener métricas de la aplicación
+   *     tags: [KPIs]
    *     security:
    *       - bearerAuth: []
    *     responses:
    *        200:
-   *         description: Tags obtenidas
+   *         description: Metricas obtenidas
    *         content:
    *           application/json:
    *             schema:
@@ -38,10 +35,9 @@ export class TagController {
    *                   example: true
    *                 message:
    *                   type: string
-   *                   example: "Tags obtenidas!"
+   *                   example: "Metricas obtenidas!"
    *                 data:
-   *                   $ref: '#/components/schemas/TagList'                    
-   * 
+   *                   $ref: '#/components/schemas/Metrics'
    *        401:
    *         description: No autorizado
    *         content:
@@ -61,15 +57,19 @@ export class TagController {
    *             schema:
    *               $ref: '#/components/schemas/InternalServerError'
   */
-  public getTags = async (request: Request, response: Response) => {
+  public getMetrics = async (request: Request, response: Response) => {
     try {
-
-      const tags = await this.tagService.getTags();
+      const { id } = request.user as User;
+      const metrics = await this.metricService.getMetrics({
+        user_id: id
+      });
 
       return response.status(200).json({
         success: true,
-        message: "Tags obtenidas!",
-        data: tags
+        message: "Metricas obtenidas!",
+        data: {
+          metrics
+        }
       });
     } catch (error: any) {
       return response.status(500).json({
@@ -81,22 +81,16 @@ export class TagController {
 
   /**
    * @swagger
-   * /api/admin/tags:
-   *   post:
-   *     summary: Crear Tag
-   *     description: Crea un nuevo registro de Tag
-   *     tags: [Tags]
+   * /api/dashboard/funnel-progress:
+   *   get:
+   *     summary: 
+   *     description:
+   *     tags: [KPIs]
    *     security:
    *       - bearerAuth: []
-   *     requestBody:
-   *       required: true
-   *       content:
-   *         application/json:
-   *           schema:
-   *             $ref: '#/components/schemas/CreateTagRequest'
    *     responses:
    *        200:
-   *         description: Tag creada
+   *         description: 
    *         content:
    *           application/json:
    *             schema:
@@ -107,15 +101,9 @@ export class TagController {
    *                   example: true
    *                 message:
    *                   type: string
-   *                   example: "Tag creada!"
+   *                   example: "Funnel obtenidos!"
    *                 data:
-   *                   $ref: '#/components/schemas/FullTag'
-   *        400:
-   *         description: Solicitud inválida
-   *         content:
-   *           application/json:
-   *             schema:
-   *              $ref: '#/components/schemas/BadRequest'
+   *                   $ref: '#/components/schemas/FunnelProgress'
    *        401:
    *         description: No autorizado
    *         content:
@@ -135,18 +123,16 @@ export class TagController {
    *             schema:
    *               $ref: '#/components/schemas/InternalServerError'
   */
-  public createTag = async (request: Request, response: Response) => {
+  public getFunnelProgress = async (request: Request, response: Response) => {
     try {
-      const body = request.body as CreateTagDto;
-      const tag = await this.tagService.create(body);
+      const funnelProgress = await this.metricService.getFunnelProgress();
 
-      if (!tag)
-        throw new Error("No se pudo crear el registro");
-
-      return response.status(201).json({
+      return response.status(200).json({
         success: true,
-        message: "Tag creada!",
-        data: TagResource.toResponse(tag)
+        message: "Funnel obtenidos!",
+        data: {
+          funnel_progress: funnelProgress
+        }
       });
     } catch (error: any) {
       return response.status(500).json({
@@ -158,30 +144,16 @@ export class TagController {
 
   /**
    * @swagger
-   * /api/admin/tags/{id}:
-   *   put:
-   *     summary: Actualizar Tag
-   *     description: Actualiza el registro de una Tag
-   *     tags: [Tags]
+   * /api/dashboard/pending-tasks:
+   *   get:
+   *     summary: 
+   *     description:
+   *     tags: [KPIs]
    *     security:
    *       - bearerAuth: []
-   *     parameters:
-   *       - in: path
-   *         name: id
-   *         required: true
-   *         schema:
-   *           type: integer
-   *           minimum: 1
-   *         description: id de la Tag
-   *     requestBody:
-   *       required: true
-   *       content:
-   *         application/json:
-   *           schema:
-   *             $ref: '#/components/schemas/UpdateTagRequest'
    *     responses:
    *        200:
-   *         description: Tag actualizada
+   *         description: 
    *         content:
    *           application/json:
    *             schema:
@@ -192,15 +164,9 @@ export class TagController {
    *                   example: true
    *                 message:
    *                   type: string
-   *                   example: "Tag actualizada!"
+   *                   example: "Tasks obtenidas!"
    *                 data:
-   *                   $ref: '#/components/schemas/FullTag'
-   *        400:
-   *         description: Solicitud inválida
-   *         content:
-   *           application/json:
-   *             schema:
-   *              $ref: '#/components/schemas/BadRequest'
+   *                   $ref: '#/components/schemas/PendingTasks'
    *        401:
    *         description: No autorizado
    *         content:
@@ -220,20 +186,17 @@ export class TagController {
    *             schema:
    *               $ref: '#/components/schemas/InternalServerError'
   */
-  public updateTag = async (request: Request, response: Response) => {
+  public getPendingTasks = async (request: Request, response: Response) => {
     try {
-      const tagId = parseInt(request.params.id);
-      const body = request.body as UpdateTagDto;
-      body.id = tagId;
-      const tagUpdated = await this.tagService.update(body);
+      const { id } = request.user as User;
+      const pendingTasks = await this.metricService.getPendingTasks(id);
 
-      if (!tagUpdated)
-        throw new Error("No se pudo actualizar el registro");
-
-      return response.status(201).json({
+      return response.status(200).json({
         success: true,
-        message: "Tag actualizada!",
-        data: TagResource.toResponse(tagUpdated)
+        message: "Tasks obtenidas!",
+        data: {
+          pending_tasks: pendingTasks
+        }
       });
     } catch (error: any) {
       return response.status(500).json({
@@ -245,30 +208,29 @@ export class TagController {
 
   /**
    * @swagger
-   * /api/admin/tags/{id}:
-   *   delete:
-   *     summary: Eliminar Tag
-   *     description: Eliminar registro de una Tag
-   *     tags: [Tags]
+   * /api/dashboard/recent-activity:
+   *   get:
+   *     summary: 
+   *     description:
+   *     tags: [KPIs]
    *     security:
    *       - bearerAuth: []
-   *     parameters:
-   *       - in: path
-   *         name: id
-   *         required: true
-   *         schema:
-   *           type: integer
-   *           minimum: 1
-   *         description: id de la Tag
    *     responses:
-   *        204:
-   *         description: Tag eliminada (sin respuesta)
-   *        400:
-   *         description: Solicitud inválida
+   *        200:
+   *         description: 
    *         content:
    *           application/json:
    *             schema:
-   *              $ref: '#/components/schemas/BadRequest'
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: true
+   *                 message:
+   *                   type: string
+   *                   example: "Actividad reciente"
+   *                 data:
+   *                   $ref: '#/components/schemas/RecentActivity'
    *        401:
    *         description: No autorizado
    *         content:
@@ -288,15 +250,18 @@ export class TagController {
    *             schema:
    *               $ref: '#/components/schemas/InternalServerError'
   */
-  public deleteTag = async (request: Request, response: Response) => {
+  public getRecentActivity = async (request: Request, response: Response) => {
     try {
-      const tagId = parseInt(request.params.id);
-      const tag = await this.tagService.getByPk(tagId);
-      if (!tag)
-        throw new Error("No se encontró");
-      await this.tagService.delete(tag);
+      const { id } = request.user as User;
+      const recentActivity = await this.metricService.getRecentActivity(id);
 
-      return response.status(204).send();
+      return response.status(200).json({
+        success: true,
+        message: "Actividad reciente",
+        data: {
+          recent_activity: recentActivity
+        }
+      });
     } catch (error: any) {
       return response.status(500).json({
         success: false,
@@ -304,5 +269,4 @@ export class TagController {
       });
     }
   };
-
 }

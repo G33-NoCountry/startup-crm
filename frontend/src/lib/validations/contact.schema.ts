@@ -1,6 +1,6 @@
 import { z } from "zod"
 import { emailSchema, nameSchema, phoneSchema } from "./common.schema"
-import { tagSchema } from "./tag.schema"
+import { tagDbSchema } from "./tag.schema"
 
 // Schema para el formulario (crear y editar)
 export const contactFormSchema = z.object({
@@ -18,7 +18,7 @@ export const contactDbSchema = z.object({
   full_name: nameSchema,
   email: emailSchema,
   phone: phoneSchema,
-  tags: z.array(tagSchema).default([]),
+  tags: z.array(tagDbSchema).default([]),
   created_at: z.string().or(z.date()),
 })
 

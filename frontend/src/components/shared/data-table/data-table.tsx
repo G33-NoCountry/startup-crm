@@ -107,7 +107,7 @@ export function DataTable<TData, TValue>({
                   >
                     <div className="flex items-center justify-center space-x-2">
                       <Loader2 className="h-4 w-4 animate-spin" />
-                      <span>Cargando contactos...</span>
+                      <span>Cargando datos...</span>
                     </div>
                   </TableCell>
                 </TableRow>
