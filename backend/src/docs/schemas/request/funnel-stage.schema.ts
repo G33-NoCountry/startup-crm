@@ -5,6 +5,14 @@ export default {
             title: { type: "string", example: "Contactado" },
             is_closed: { type: "boolean", example: false },
         },
+        required: ["title", "is_closed"]
+    },
+    UpdateFunnelRequest: {
+        type: "object",
+        properties: {
+            title: { type: "string", example: "Contactado" },
+            is_closed: { type: "boolean", example: false },
+        },
     },
 
 };

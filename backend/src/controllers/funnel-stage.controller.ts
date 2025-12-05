@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { FunnelStageService } from "../services/funnel-stage.service";
 import { CreateFunnelStageDto } from "../dto/funnel-stage/create-funnel.dto";
+import { UpdateFunnelStageDto } from "../dto/funnel-stage/update-funnel.dto";
 
 /**
  * @swagger
@@ -74,61 +75,61 @@ export class FunnelStageController {
   };
 
   /**
- * @swagger
- * /api/funnel-stages:
- *   post:
- *     summary: Crear funnel 
- *     description: Crea un nuevo registro de funnel
- *     tags: [Funnel Stages]
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/CreateFunnelRequest'
- *     responses:
- *        201:
- *         description: 
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 message:
- *                   type: string
- *                   example: "Funnel Stages creado!"
- *                 data:
- *                   $ref: '#/components/schemas/FullFunnelStage'
- *        400:
- *         description: Solicitud inválida
- *         content:
- *           application/json:
- *             schema:
- *              $ref: '#/components/schemas/BadRequest'
- *        401:
- *         description: No autorizado
- *         content:
- *           application/json:
- *             schema:
- *              $ref: '#/components/schemas/Unauthorized'
- *        403:
- *         description: No tiene permisos
- *         content:
- *           application/json:
- *             schema:
- *              $ref: '#/components/schemas/Forbidden'
- *        500:
- *         description: Error interno del servidor
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/InternalServerError'
-*/
+   * @swagger
+   * /api/funnel-stages:
+   *   post:
+   *     summary: Crear funnel 
+   *     description: Crea un nuevo registro de funnel
+   *     tags: [Funnel Stages]
+   *     security:
+   *       - bearerAuth: []
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             $ref: '#/components/schemas/CreateFunnelRequest'
+   *     responses:
+   *        201:
+   *         description: Funnel creado
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: true
+   *                 message:
+   *                   type: string
+   *                   example: "Funnel Stages creado!"
+   *                 data:
+   *                   $ref: '#/components/schemas/FullFunnelStage'
+   *        400:
+   *         description: Solicitud inválida
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/BadRequest'
+   *        401:
+   *         description: No autorizado
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Unauthorized'
+   *        403:
+   *         description: No tiene permisos
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Forbidden'
+   *        500:
+   *         description: Error interno del servidor
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/InternalServerError'
+  */
   public createFunnelStages = async (request: Request, response: Response) => {
     try {
       const body = request.body as CreateFunnelStageDto;
@@ -140,6 +141,84 @@ export class FunnelStageController {
         success: true,
         message: "Funnel Stage creado!",
         data: funnelStage
+      });
+    } catch (error: any) {
+      return response.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  };
+
+  /**
+   * @swagger
+   * /api/funnel-stages/{id}:
+   *   put:
+   *     summary: Actualizar funnel 
+   *     description: Actualiza un registro de funnel
+   *     tags: [Funnel Stages]
+   *     security:
+   *       - bearerAuth: []
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             $ref: '#/components/schemas/UpdateFunnelRequest'
+   *     responses:
+   *        200:
+   *         description: Funnel actualizado
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: true
+   *                 message:
+   *                   type: string
+   *                   example: "Funnel Stages actualizado!"
+   *                 data:
+   *                   $ref: '#/components/schemas/FullFunnelStage'
+   *        400:
+   *         description: Solicitud inválida
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/BadRequest'
+   *        401:
+   *         description: No autorizado
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Unauthorized'
+   *        403:
+   *         description: No tiene permisos
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Forbidden'
+   *        500:
+   *         description: Error interno del servidor
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/InternalServerError'
+  */
+  public updateFunnelStage = async (request: Request, response: Response) => {
+    try {
+      const funnelId = parseInt(request.params.id);
+      const body = request.body as UpdateFunnelStageDto;
+      body.id = funnelId;
+      const funnelStageUpdated = await this.funnelStageService.update(body);
+      if (!funnelStageUpdated)
+        throw new Error("No se pudo actualizar el funnel");
+
+      return response.status(201).json({
+        success: true,
+        message: "Funnel Stage creado!",
+        data: funnelStageUpdated
       });
     } catch (error: any) {
       return response.status(500).json({
