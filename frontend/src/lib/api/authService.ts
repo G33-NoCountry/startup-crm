@@ -1,6 +1,7 @@
 import type { LoginCredentials, LoginResponse, AuthError } from "@/types/auth.types";
+import { env } from "../config/env";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+const API_BASE_URL = env.apiUrl;
 
 /**
  * Servicio de autenticación para comunicarse con el backend
@@ -35,7 +36,7 @@ class AuthService {
         message: data.message || "Login exitoso",
         data: {
           user: data.user || data.data?.user,
-          token: data.token || data.data?.token,
+          access_token: data.access_token || data.data?.access_token,
         },
       };
     } catch (error) {
