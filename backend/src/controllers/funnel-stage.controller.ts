@@ -336,7 +336,7 @@ export class FunnelStageController {
    *           minimum: 1
    *         description: id del funnel
    *     responses:
-   *        200:
+   *        204:
    *         description: Funnel eliminado (sin contenido)
    *        400:
    *         description: Solicitud inválida

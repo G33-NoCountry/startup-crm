@@ -33,6 +33,13 @@ router.put(
     sanitizeBody,
     templateController.updateTemplate
 );
+router.delete(
+    "/:id",
+    validateParam("id"),
+    validateRequestMiddleware,
+    recordExists(Template),
+    templateController.deleteTemplate
+);
 
 
 export default router;

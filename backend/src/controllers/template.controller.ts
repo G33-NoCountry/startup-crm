@@ -268,5 +268,73 @@ export class TemplateController {
     }
   };
 
+  /**
+   * @swagger
+   * /api/admin/templates/{id}:
+   *   delete:
+   *     summary: Eliminar template 
+   *     description: Elimina un registro de template
+   *     tags: [Templates]
+   *     security:
+   *       - bearerAuth: []
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: integer
+   *           minimum: 1
+   *         description: id del template
+   *     responses:
+   *        204:
+   *         description: Template eliminado (sin contenido)
+   *        400:
+   *         description: Solicitud inválida
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/BadRequest'
+   *        401:
+   *         description: No autorizado
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Unauthorized'
+   *        403:
+   *         description: No tiene permisos
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/Forbidden'
+   *        404:
+   *         description: No encontrado
+   *         content:
+   *           application/json:
+   *             schema:
+   *              $ref: '#/components/schemas/NotFound'
+   *        500:
+   *         description: Error interno del servidor
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/InternalServerError'
+  */
+  public deleteTemplate = async (request: Request, response: Response) => {
+    try {
+      const templateId = parseInt(request.params.id);
+      const template = await this.templateService.getByPk(templateId);
+      if (!template)
+        throw new Error("No se encontró");
+      await this.templateService.delete(template);
+
+      return response.status(204).send();
+    } catch (error: any) {
+      return response.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  };
+
 
 }
