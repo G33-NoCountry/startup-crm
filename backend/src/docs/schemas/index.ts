@@ -14,6 +14,8 @@ import taskSchema from "./models/task/task.schema";
 import tagSchema from "./models/tag/tag.schema";
 import tagRequestSchema from "./request/tag.schema";
 import metricschema from "./models/metrics/metrics.schema";
+import funnelStageSchema from "./models/funnel-stage/funnel-stage.schema";
+import funnelStageRequestSchema from "./request/funnel-stage.schema";
 
 export default {
     ...authRequestSchemas,
@@ -31,5 +33,7 @@ export default {
     ...taskRequestSchema,
     ...tagSchema,
     ...tagRequestSchema,
-    ...metricschema
+    ...metricschema,
+    ...funnelStageSchema,
+    ...funnelStageRequestSchema
 };

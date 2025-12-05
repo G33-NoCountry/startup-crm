@@ -9,9 +9,9 @@ export default [
     .bail()
     .isLength({ min: 1 }).withMessage(buildValidationMessage("title", "min_length", { min: 1 }))
   ,
-  body("color")
-    .notEmpty().withMessage(buildValidationMessage("color", "required"))
+  body("is_closed")
+    .notEmpty().withMessage(buildValidationMessage("is_closed", "required"))
     .bail()
-    .isString().withMessage(buildValidationMessage("color", "string"))
+    .isBoolean().withMessage(buildValidationMessage("is_closed", "boolean"))
   ,
 ];
