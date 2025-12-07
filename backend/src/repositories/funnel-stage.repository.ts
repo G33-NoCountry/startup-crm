@@ -18,9 +18,6 @@ export class FunnelStageRepository implements IFunnelStageRepository {
             order: [['sort_order', 'ASC']],
         });
 
-        if (!(result.length > 0))
-            return null;
-
         return result;
     }
 

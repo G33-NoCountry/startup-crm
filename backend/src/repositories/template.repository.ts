@@ -19,9 +19,6 @@ export class TemplateRepository implements ITemplateRepository {
             order: [['sort_order', 'ASC']],
         });
 
-        if (!(result.length > 0))
-            return null;
-
         return result;
     }
 

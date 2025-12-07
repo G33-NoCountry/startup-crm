@@ -1,9 +1,10 @@
 import { Request, Response } from "express";
 import { TaskService } from "../services/task.service";
-import { User } from "../models";
+import { Deal, User } from "../models";
 import { CreateTaskDto } from "../dto/task/create-task.dto";
 import { TaskResource } from "../resources/task/task.resource";
 import { UpdateTaskDto } from "../dto/task/update-task.dto";
+import { Op } from "sequelize";
 
 /**
  * @swagger
@@ -21,34 +22,11 @@ export class TaskController {
    * /api/tasks:
    *   get:
    *     summary: Obtener tasks
-   *     description: Obtener datos de tasks paginados
+   *     description: Obtener datos de tasks
    *     tags: [Tasks]
    *     security:
    *       - bearerAuth: []
    *     parameters:
-   *       - in: query
-   *         name: limit
-   *         schema:
-   *           type: integer
-   *           minimum: 1
-   *           example: 2
-   *         required: true
-   *         description: Cantidad de resultados a devolver por página.
-   *
-   *       - in: query
-   *         name: after
-   *         schema:
-   *           type: string
-   *         required: false
-   *         description: Cursor para obtener la siguiente página.
-   *
-   *       - in: query
-   *         name: before
-   *         schema:
-   *           type: string
-   *         required: false
-   *         description: Cursor para obtener la página anterior.
-   * 
    *       - in: query
    *         name: status
    *         schema:
@@ -56,7 +34,20 @@ export class TaskController {
    *           example: true
    *         required: true
    *         description: Estado de la task.
-   * 
+   *       - in: query
+   *         name: date_from
+   *         schema:
+   *           type: date
+   *           example: 2025-08-01T00:00:00.000Z
+   *         required: false
+   *         description: Fecha de incio de filtrado (incluido)
+   *       - in: query
+   *         name: date_to
+   *         schema:
+   *           type: date
+   *           example: 2025-12-08T00:00:00.000Z
+   *         required: false
+   *         description: Fecha de limite de filtrado (incluido)
    *     responses:
    *        200:
    *         description: Tasks obtenidos
@@ -72,7 +63,7 @@ export class TaskController {
    *                   type: string
    *                   example: "Tasks obtenidas!"
    *                 data:
-   *                   $ref: '#/components/schemas/PaginateTasks'
+   *                   $ref: '#/components/schemas/TaskList'
    *        400:
    *         description: Solicitud inválida
    *         content:
@@ -100,15 +91,19 @@ export class TaskController {
   */
   public getTasks = async (request: Request, response: Response) => {
     try {
-      const { limit, before, after, status } = request.query;
+      const { status, date_from, date_to } = request.query;
       const user = request.user as User;
-      const parsedLimit = limit ? parseInt(limit as string, 10) : undefined;
 
       const tasks = await this.taskService.getTasks(
-        parsedLimit,
-        after as string ?? undefined,
-        before as string ?? undefined,
-        undefined, { user_id: user.id, status: status === "true" }
+        undefined,
+        {
+          user_id: user.id,
+          status: status === "true",
+          due_date: {
+            [Op.gte]: new Date(date_from as string),
+            [Op.lte]: new Date(date_to as string)
+          }
+        },
       );
 
       return response.status(200).json({

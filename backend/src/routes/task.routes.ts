@@ -6,7 +6,6 @@ import { acceptRoleMiddleware } from "../middlewares/check-role.middleware";
 import { TaskController } from "../controllers/task.controller";
 import { TaskRepository } from "../repositories/task.repository";
 import { TaskService } from "../services/task.service";
-import { queryParamPaginateValidator } from "../validators/param/query-param.validator";
 import createTaskValidator from "../validators/task/create-task.validator";
 import updateTaskValidator from "../validators/task/update-task.validator";
 import { recordExists } from "../middlewares/model-exist.middleware";
@@ -23,7 +22,6 @@ const taskController = new TaskController(taskService);
 router.use(checkJwtMiddleware, acceptRoleMiddleware('Admin', 'Agente'));
 
 router.get('/',
-    queryParamPaginateValidator,
     queryParamTaskValidator,
     validateRequestMiddleware,
     taskController.getTasks
