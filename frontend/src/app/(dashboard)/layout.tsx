@@ -5,6 +5,7 @@ import Image from "next/image"
 import { usePathname, useRouter } from "next/navigation"
 import { Bell, LogOut, User, LayoutDashboard, Users, MessageSquare, Calendar, Kanban as KanbanIcon, Settings, UsersRound } from "lucide-react"
 import { useAuthStore } from "@/store/authStore"
+import { RouteGuard } from "@/components/shared/route-guard"
 import {
     Sidebar,
     SidebarContent,
@@ -62,20 +63,21 @@ export default function DashboardLayout({
     ]
 
     return (
-        <SidebarProvider defaultOpen={true}>
-            <Sidebar collapsible="offcanvas" className="bg-foreground border-none">
-                <SidebarHeader className="border-b border-sidebar-border/20 px-4 py-6">
-                    <div className="flex items-center gap-2">
-                        <Image
-                            src="/images/logo-start.svg"
-                            alt="Logo"
-                            width={90}
-                            height={50}
-                            priority
-                        />
-                    </div>
-                    <hr className="h-1 w-16 mt-3 bg-accent rounded-lg border-none" />
-                </SidebarHeader>
+        <RouteGuard requireAuth={true}>
+            <SidebarProvider defaultOpen={true}>
+                <Sidebar collapsible="offcanvas" className="bg-foreground border-none">
+                    <SidebarHeader className="border-b border-sidebar-border/20 px-4 py-6">
+                        <div className="flex items-center gap-2">
+                            <Image
+                                src="/images/logo-start.svg"
+                                alt="Logo"
+                                width={90}
+                                height={50}
+                                priority
+                            />
+                        </div>
+                        <hr className="h-1 w-16 mt-3 bg-accent rounded-lg border-none" />
+                    </SidebarHeader>
 
                 <SidebarContent className="px-2">
                     <SidebarGroup>
@@ -169,5 +171,6 @@ export default function DashboardLayout({
                 </div>
             </SidebarInset>
         </SidebarProvider>
+        </RouteGuard>
     )
 }
