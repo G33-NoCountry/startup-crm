@@ -7,7 +7,6 @@ import dealRoutes from "./deal.routes";
 import conversationRoutes from "./conversations.routes";
 import taskRoutes from "./task.routes";
 import dashboardRoutes from "./dashboard.routes";
-import funnelStageRoutes from "./funnel-stage.routes";
 
 const router = Router();
 
@@ -19,6 +18,5 @@ router.use("/deals", dealRoutes);
 router.use("/conversations", conversationRoutes);
 router.use("/tasks", taskRoutes);
 router.use("/dashboard", dashboardRoutes);
-router.use("/funnel-stages", funnelStageRoutes);
 
 export default router;

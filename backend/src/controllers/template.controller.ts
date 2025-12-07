@@ -1,33 +1,55 @@
 import { Request, Response } from "express";
-import { FunnelStageService } from "../services/funnel-stage.service";
-import { CreateFunnelStageDto } from "../dto/funnel-stage/create-funnel.dto";
-import { UpdateFunnelStageDto } from "../dto/funnel-stage/update-funnel.dto";
-import { FunnelStageResource } from "../resources/funnel-stage/funnel-stage-resource.resource";
-import { ReorderFunnelStagesDto } from "../dto/funnel-stage/reorder-funnels.dto";
+import { TemplateService } from "../services/template.service";
+import { TemplateResource } from "../resources/template/template-resource.resource";
+import { CreateTemplateDto } from "../dto/template/create-template.dto";
+import { User } from "../models";
+import { UpdateTemplateDto } from "../dto/template/update-template.dto";
 
 /**
  * @swagger
  * tags:
- *   name: Funnel Stages
- *   description: Endpoints para gestionar las etapas de un deal (solo acceden usuarios "Admin")
+ *   name: Templates
+ *   description: Endpoints para gestionar plantillas de mensajes (solo acceden usuarios "Admin")
  */
-export class FunnelStageController {
+export class TemplateController {
   constructor(
-    private funnelStageService: FunnelStageService,
+    private templateService: TemplateService,
   ) { }
 
   /**
    * @swagger
-   * /api/admin/funnel-stages:
+   * /api/admin/templates:
    *   get:
-   *     summary: Obtener funnel 
-   *     description: Obtiene todos los funnel stage
-   *     tags: [Funnel Stages]
+   *     summary: Obtener templates
+   *     description: Obtiene todos los templates paginados
+   *     tags: [Templates]
+   *     parameters:
+   *       - in: query
+   *         name: limit
+   *         schema:
+   *           type: integer
+   *           minimum: 1
+   *         required: true
+   *         description: Cantidad de resultados a devolver por página.
+   *
+   *       - in: query
+   *         name: after
+   *         schema:
+   *           type: string
+   *         required: false
+   *         description: Cursor para obtener la siguiente página.
+   *
+   *       - in: query
+   *         name: before
+   *         schema:
+   *           type: string
+   *         required: false
+   *         description: Cursor para obtener la página anterior.
    *     security:
    *       - bearerAuth: []
    *     responses:
    *        200:
-   *         description: 
+   *         description: Templates obtenidos
    *         content:
    *           application/json:
    *             schema:
@@ -38,9 +60,9 @@ export class FunnelStageController {
    *                   example: true
    *                 message:
    *                   type: string
-   *                   example: "Funnel Stages obtenidos!"
+   *                   example: "Templates obtenidos!"
    *                 data:
-   *                   $ref: '#/components/schemas/ListFunnelStage'
+   *                   $ref: '#/components/schemas/PaginateTemplates'
    *        401:
    *         description: No autorizado
    *         content:
@@ -60,13 +82,19 @@ export class FunnelStageController {
    *             schema:
    *               $ref: '#/components/schemas/InternalServerError'
   */
-  public getFunnelStages = async (request: Request, response: Response) => {
+  public getTemplates = async (request: Request, response: Response) => {
     try {
-      const funnelStages = await this.funnelStageService.getFunnels();
+      const { limit, after, before } = request.query;
+      const parsedLimit = limit ? parseInt(limit as string, 10) : undefined;
+      const templates = await this.templateService.getTemplates(
+        parsedLimit,
+        after as string ?? undefined,
+        before as string ?? undefined,
+      );
       return response.status(200).json({
         success: true,
-        message: "Funnel Stages obtenidos!",
-        data: funnelStages
+        message: "Templates obtenidos!",
+        data: templates
       });
     } catch (error: any) {
       return response.status(500).json({
@@ -78,11 +106,11 @@ export class FunnelStageController {
 
   /**
    * @swagger
-   * /api/admin/funnel-stages:
+   * /api/admin/templates:
    *   post:
-   *     summary: Crear funnel
-   *     description: Crea un nuevo registro de funnel
-   *     tags: [Funnel Stages]
+   *     summary: Crear template
+   *     description: Crea un nuevo registro de template
+   *     tags: [Templates]
    *     security:
    *       - bearerAuth: []
    *     requestBody:
@@ -90,10 +118,10 @@ export class FunnelStageController {
    *       content:
    *         application/json:
    *           schema:
-   *             $ref: '#/components/schemas/CreateFunnelRequest'
+   *             $ref: '#/components/schemas/CreateTemplateRequest'
    *     responses:
    *        201:
-   *         description: Funnel creado
+   *         description: Template creado
    *         content:
    *           application/json:
    *             schema:
@@ -104,9 +132,9 @@ export class FunnelStageController {
    *                   example: true
    *                 message:
    *                   type: string
-   *                   example: "Funnel Stages creado!"
+   *                   example: "Template creado!"
    *                 data:
-   *                   $ref: '#/components/schemas/FullFunnelStage'
+   *                   $ref: '#/components/schemas/FullTemplate'
    *        400:
    *         description: Solicitud inválida
    *         content:
@@ -132,17 +160,19 @@ export class FunnelStageController {
    *             schema:
    *               $ref: '#/components/schemas/InternalServerError'
   */
-  public createFunnelStages = async (request: Request, response: Response) => {
+  public createTemplate = async (request: Request, response: Response) => {
     try {
-      const body = request.body as CreateFunnelStageDto;
-      const funnelStage = await this.funnelStageService.create(body);
-      if (!funnelStage)
-        throw new Error("No se pudo crear el funnel");
+      const { id } = request.user as User;
+      const body = request.body as CreateTemplateDto;
+      body.user_id = id;
+      const template = await this.templateService.create(body);
+      if (!template)
+        throw new Error("No se pudo crear el template");
 
       return response.status(201).json({
         success: true,
-        message: "Funnel Stage creado!",
-        data: FunnelStageResource.toResponse(funnelStage)
+        message: "Template creado!",
+        data: TemplateResource.toResponse(template)
       });
     } catch (error: any) {
       return response.status(500).json({
@@ -154,11 +184,11 @@ export class FunnelStageController {
 
   /**
    * @swagger
-   * /api/admin/funnel-stages/{id}:
+   * /api/admin/templates/{id}:
    *   put:
-   *     summary: Actualizar funnel 
-   *     description: Actualiza un registro de funnel
-   *     tags: [Funnel Stages]
+   *     summary: Actualizar template  
+   *     description: Actualiza el registro de un template
+   *     tags: [Templates]
    *     security:
    *       - bearerAuth: []
    *     parameters:
@@ -168,16 +198,16 @@ export class FunnelStageController {
    *         schema:
    *           type: integer
    *           minimum: 1
-   *         description: id del funnel
+   *         description: id del template
    *     requestBody:
    *       required: true
    *       content:
    *         application/json:
    *           schema:
-   *             $ref: '#/components/schemas/UpdateFunnelRequest'
+   *             $ref: '#/components/schemas/UpdateTemplateRequest'
    *     responses:
    *        200:
-   *         description: Funnel actualizado
+   *         description: Template actualizado
    *         content:
    *           application/json:
    *             schema:
@@ -188,93 +218,9 @@ export class FunnelStageController {
    *                   example: true
    *                 message:
    *                   type: string
-   *                   example: "Funnel Stages actualizado!"
+   *                   example: "Template actualizado!"
    *                 data:
-   *                   $ref: '#/components/schemas/FullFunnelStage'
-   *        400:
-   *         description: Solicitud inválida
-   *         content:
-   *           application/json:
-   *             schema:
-   *              $ref: '#/components/schemas/BadRequest'
-   *        401:
-   *         description: No autorizado
-   *         content:
-   *           application/json:
-   *             schema:
-   *              $ref: '#/components/schemas/Unauthorized'
-   *        403:
-   *         description: No tiene permisos
-   *         content:
-   *           application/json:
-   *             schema:
-   *              $ref: '#/components/schemas/Forbidden'
-   *        404:
-   *         description: No encontrado
-   *         content:
-   *           application/json:
-   *             schema:
-   *              $ref: '#/components/schemas/NotFound'
-   *        500:
-   *         description: Error interno del servidor
-   *         content:
-   *           application/json:
-   *             schema:
-   *               $ref: '#/components/schemas/InternalServerError'
-  */
-  public updateFunnelStage = async (request: Request, response: Response) => {
-    try {
-      const funnelId = parseInt(request.params.id);
-      const body = request.body as UpdateFunnelStageDto;
-      body.id = funnelId;
-      const funnelStageUpdated = await this.funnelStageService.update(body);
-      if (!funnelStageUpdated)
-        throw new Error("No se pudo actualizar el funnel");
-
-      return response.status(200).json({
-        success: true,
-        message: "Funnel Stage actualizado!",
-        data: FunnelStageResource.toResponse(funnelStageUpdated)
-      });
-    } catch (error: any) {
-      return response.status(500).json({
-        success: false,
-        message: error.message,
-      });
-    }
-  };
-
-  /**
-   * @swagger
-   * /api/admin/funnel-stages/reorder:
-   *   patch:
-   *     summary: Reordenar funnels  
-   *     description: Actualiza el orden lógico de los funnel
-   *     tags: [Funnel Stages]
-   *     security:
-   *       - bearerAuth: []
-   *     requestBody:
-   *       required: true
-   *       content:
-   *         application/json:
-   *           schema:
-   *             $ref: '#/components/schemas/ReorderFunnelRequest'
-   *     responses:
-   *        200:
-   *         description: Funnels reordenados
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 success:
-   *                   type: boolean
-   *                   example: true
-   *                 message:
-   *                   type: string
-   *                   example: "Funnel Stages ordenados!"
-   *                 data:
-   *                   $ref: '#/components/schemas/ListFunnelStage'
+   *                   $ref: '#/components/schemas/FullTemplate'
    *        400:
    *         description: Solicitud inválida
    *         content:
@@ -300,15 +246,19 @@ export class FunnelStageController {
    *             schema:
    *               $ref: '#/components/schemas/InternalServerError'
   */
-  public reorderFunnelStages = async (request: Request, response: Response) => {
+  public updateTemplate = async (request: Request, response: Response) => {
     try {
-      const body = request.body as ReorderFunnelStagesDto;
-      const funnelStages = await this.funnelStageService.reorder(body);
+      const templateId = parseInt(request.params.id);
+      const body = request.body as UpdateTemplateDto;
+      body.id = templateId;
+      const templateUpdated = await this.templateService.update(body);
+      if (!templateUpdated)
+        throw new Error("No se pudo actualizar el template");
 
       return response.status(200).json({
         success: true,
-        message: "Funnel Stage ordenados!",
-        data: funnelStages
+        message: "Template actualizado!",
+        data: TemplateResource.toResponse(templateUpdated)
       });
     } catch (error: any) {
       return response.status(500).json({
@@ -320,11 +270,11 @@ export class FunnelStageController {
 
   /**
    * @swagger
-   * /api/admin/funnel-stages/{id}:
+   * /api/admin/templates/{id}:
    *   delete:
-   *     summary: Eliminar funnel 
-   *     description: Elimina un registro de funnel
-   *     tags: [Funnel Stages]
+   *     summary: Eliminar template 
+   *     description: Elimina un registro de template
+   *     tags: [Templates]
    *     security:
    *       - bearerAuth: []
    *     parameters:
@@ -334,10 +284,10 @@ export class FunnelStageController {
    *         schema:
    *           type: integer
    *           minimum: 1
-   *         description: id del funnel
+   *         description: id del template
    *     responses:
    *        204:
-   *         description: Funnel eliminado (sin contenido)
+   *         description: Template eliminado (sin contenido)
    *        400:
    *         description: Solicitud inválida
    *         content:
@@ -369,13 +319,13 @@ export class FunnelStageController {
    *             schema:
    *               $ref: '#/components/schemas/InternalServerError'
   */
-  public deleteFunnelStage = async (request: Request, response: Response) => {
+  public deleteTemplate = async (request: Request, response: Response) => {
     try {
-      const funnelId = parseInt(request.params.id);
-      const funnel = await this.funnelStageService.getByPk(funnelId);
-      if (!funnel)
+      const templateId = parseInt(request.params.id);
+      const template = await this.templateService.getByPk(templateId);
+      if (!template)
         throw new Error("No se encontró");
-      await this.funnelStageService.delete(funnel);
+      await this.templateService.delete(template);
 
       return response.status(204).send();
     } catch (error: any) {
@@ -385,5 +335,6 @@ export class FunnelStageController {
       });
     }
   };
+
 
 }

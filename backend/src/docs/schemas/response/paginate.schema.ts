@@ -314,5 +314,63 @@ export default {
                 }
             }
         }
-    }
+    },
+    PaginateTemplates: {
+        type: "object",
+        properties: {
+            items: {
+                type: "array",
+                example: [
+                    {
+                        id: 1,
+                        title: "Confirmar propuesta",
+                        channel: "whatsapp",
+                        content: "Hola, ¿podemos avanzar con la propuesta enviada?",
+                        status: true
+                    },
+                    {
+                        id: 2,
+                        title: "Recordatorio de reunión",
+                        channel: "email",
+                        content: "Te recuerdo la reunión pautada para mañana a las 10 AM.",
+                        status: false
+                    },
+                    {
+                        id: 3,
+                        title: "Seguimiento de cotización",
+                        channel: "whatsapp",
+                        content: "¿Tuviste oportunidad de revisar la cotización que envié?",
+                        status: true
+                    }
+                ]
+            },
+            paginate_info: {
+                type: "object",
+                example: {
+                    has_next: false,
+                    has_previous: false,
+                    next_cursor: null,
+                    prev_cursor: null
+                },
+                properties: {
+                    has_next: {
+                        type: "boolean",
+                        example: false,
+                    },
+                    has_previous: {
+                        type: "boolean",
+                        example: false,
+                    },
+                    next_cursor: {
+                        type: "string",
+                        example: null,
+                    },
+                    prev_cursor: {
+                        type: "string",
+                        example: null,
+                    },
+                }
+            }
+        }
+    },
 };
