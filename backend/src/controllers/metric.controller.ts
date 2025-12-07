@@ -6,7 +6,7 @@ import { User } from "../models";
  * @swagger
  * tags:
  *   name: KPIs
- *   description: Endpoints para consultar métricas
+ *   description: Endpoints para consultar métricas (solo acceden usuarios "Admin", "Agente", "Manager")
  */
 export class MetricController {
   constructor(
