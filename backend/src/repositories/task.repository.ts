@@ -24,9 +24,6 @@ export class TaskRepository implements ITaskRepository {
             where,
         });
 
-        if (!(result.edges.length > 0))
-            return null;
-
         const paginate = toPaginate<Task>(result);
         return paginate;
     }
@@ -39,9 +36,6 @@ export class TaskRepository implements ITaskRepository {
             attributes: Task.publicAttributes,
             where,
         });
-
-        if (!(result.length > 0))
-            return null;
 
         return result;
     }

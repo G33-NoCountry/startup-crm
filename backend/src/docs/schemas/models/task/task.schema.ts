@@ -32,6 +32,35 @@ export default {
             },
         },
     },
+    TaskList: {
+        type: "array",
+        example: [
+            {
+                id: 1,
+                title: "Llamar para confirmar propuesta",
+                due_date: "2025-12-04T22:03:50.000Z",
+                status: false,
+                created_at: "2025-12-05T22:03:50.000Z",
+                updated_at: "2025-12-05T22:03:50.000Z"
+            },
+            {
+                id: 2,
+                title: "Subir documentos",
+                due_date: "2025-12-03T22:03:50.000Z",
+                status: false,
+                created_at: "2025-12-05T22:03:50.000Z",
+                updated_at: "2025-12-05T22:03:50.000Z"
+            },
+            {
+                id: 7,
+                title: "Reorganizar estructura de carpetas del proyecto",
+                due_date: "2025-09-05T22:03:50.000Z",
+                status: false,
+                created_at: "2025-12-05T22:03:50.000Z",
+                updated_at: "2025-12-05T22:03:50.000Z"
+            }
+        ],
+    },
     TaskRelationship: {
         type: "object",
         example: {
