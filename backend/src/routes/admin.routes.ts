@@ -10,6 +10,8 @@ import { sanitizeBody } from "../middlewares/sanitize.middlewares";
 import validateRequestMiddleware from "../middlewares/validate-request.middleware";
 import { acceptRoleMiddleware } from "../middlewares/check-role.middleware";
 import tagRoutes from "./tag.routes";
+import funnelStageRoutes from "./funnel-stage.routes";
+import templatesRoutes from "./template.routes";
 
 const router = Router();
 const adminController = new AdminController;
@@ -26,5 +28,7 @@ router.patch(
 );
 
 router.use("/tags", tagRoutes);
+router.use("/funnel-stages", funnelStageRoutes);
+router.use("/templates", templatesRoutes);
 
 export default router;

@@ -10,13 +10,10 @@ export class TaskService {
   }
 
   public async getTasks(
-    limit: number | undefined,
-    after?: string,
-    before?: string,
     include?: any,
-    where?: any
+    where?: any,
   ) {
-    return this.taskRepository.findAllPaginate(limit, after, before, include, where);
+    return this.taskRepository.findAll(include,where);
   }
 
   public async createTask(data: any): Promise<Task | null> {

@@ -23,6 +23,8 @@ export class TagController {
    *     summary: Obtener tags
    *     description: Obtener datos de tags
    *     tags: [Tags]
+   *     security:
+   *       - bearerAuth: []
    *     responses:
    *        200:
    *         description: Tags obtenidas
@@ -84,6 +86,8 @@ export class TagController {
    *     summary: Crear Tag
    *     description: Crea un nuevo registro de Tag
    *     tags: [Tags]
+   *     security:
+   *       - bearerAuth: []
    *     requestBody:
    *       required: true
    *       content:
@@ -159,6 +163,8 @@ export class TagController {
    *     summary: Actualizar Tag
    *     description: Actualiza el registro de una Tag
    *     tags: [Tags]
+   *     security:
+   *       - bearerAuth: []
    *     parameters:
    *       - in: path
    *         name: id
@@ -244,6 +250,8 @@ export class TagController {
    *     summary: Eliminar Tag
    *     description: Eliminar registro de una Tag
    *     tags: [Tags]
+   *     security:
+   *       - bearerAuth: []
    *     parameters:
    *       - in: path
    *         name: id

@@ -6,6 +6,7 @@ import contactRoutes from "./contact.routes";
 import dealRoutes from "./deal.routes";
 import conversationRoutes from "./conversations.routes";
 import taskRoutes from "./task.routes";
+import dashboardRoutes from "./dashboard.routes";
 
 const router = Router();
 
@@ -16,5 +17,6 @@ router.use("/contacts", contactRoutes);
 router.use("/deals", dealRoutes);
 router.use("/conversations", conversationRoutes);
 router.use("/tasks", taskRoutes);
+router.use("/dashboard", dashboardRoutes);
 
 export default router;

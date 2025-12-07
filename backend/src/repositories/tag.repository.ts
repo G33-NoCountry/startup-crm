@@ -11,13 +11,10 @@ export class TagRepository implements ITagRepository {
         where?: any
     ): Promise<Tag[] | null> {
         const result = await Tag.findAll({
-            order: [['title', 'ASC']],
+            order: [['created_at', 'DESC']],
             include: include,
             attributes: Tag.publicAttributes,
         });
-
-        if (!(result.length > 0))
-            return null;
 
         return result;
     }

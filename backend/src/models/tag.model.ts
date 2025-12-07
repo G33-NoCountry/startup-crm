@@ -22,7 +22,6 @@ Tag.init(
         },
         color: {
             type: DataTypes.STRING(55),
-            unique: true,
             allowNull: false,
         },
     },

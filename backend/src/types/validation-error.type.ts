@@ -3,6 +3,7 @@ export type ValidationErrorType =
     | "invalid_format"
     | "min_length"
     | "enum"
+    | "array"
     | "invalid"
     | "max_length"
     | "min_numeric"
