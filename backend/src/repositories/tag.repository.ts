@@ -16,9 +16,6 @@ export class TagRepository implements ITagRepository {
             attributes: Tag.publicAttributes,
         });
 
-        if (!(result.length > 0))
-            return null;
-
         return result;
     }
 

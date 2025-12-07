@@ -22,7 +22,7 @@ export class TaskController {
    * /api/tasks:
    *   get:
    *     summary: Obtener tasks
-   *     description: Obtener datos de tasks paginados
+   *     description: Obtener datos de tasks
    *     tags: [Tasks]
    *     security:
    *       - bearerAuth: []

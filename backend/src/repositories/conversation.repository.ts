@@ -18,9 +18,6 @@ export class ConversationRepository implements IConversationRepository {
             where,
         });
 
-        if (!(result.length > 0))
-            return null;
-
         return result;
     }
 
