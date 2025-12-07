@@ -21,10 +21,12 @@ import { useState } from "react";
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>;
+  onSuccess?: () => void;
 }
 
 export function DataTableRowActions<TData>({
   row,
+  onSuccess,
 }: DataTableRowActionsProps<TData>) {
   const user = row.original as User;
   const [editOpen, setEditOpen] = useState(false);
@@ -63,24 +65,22 @@ export function DataTableRowActions<TData>({
       </DropdownMenuContent>
     </DropdownMenu>
 
-    {/* Edit Dialog */}
     <EditUserDialog
         user={user}
         open={editOpen}
         onOpenChange={setEditOpen}
-        onSuccess={
-          () => toast.success("Usuario actualizado")
-        }
+        onSuccess={() => {
+          onSuccess?.();
+        }}
       />
 
-      {/* Delete Dialog */}
       <DeleteUserDialog
         user={user}
         open={deleteOpen}
         onOpenChange={setDeleteOpen}
-        onSuccess={
-          () => toast.success("Usuario eliminado")
-        }
+        onSuccess={() => {
+          onSuccess?.();
+        }}
       />
     </>
   );

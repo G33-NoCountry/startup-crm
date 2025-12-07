@@ -3,7 +3,7 @@
 import Link from "next/link"
 import Image from "next/image"
 import { usePathname, useRouter } from "next/navigation"
-import { Bell, LogOut, User, LayoutDashboard, Users, MessageSquare, Calendar, Kanban as KanbanIcon, Settings, UsersRound } from "lucide-react"
+import { Bell, LogOut, User, LayoutDashboard, Users, MessageSquare, Calendar, Kanban as KanbanIcon, Settings, UsersRound, Tag } from "lucide-react"
 import { useAuthStore } from "@/store/authStore"
 import { RouteGuard } from "@/components/shared/route-guard"
 import {
@@ -40,6 +40,7 @@ export default function DashboardLayout({
         const titles: { [key: string]: string } = {
             "/dashboard": "Dashboard",
             "/contacts": "Contactos",
+            "/tags": "Etiquetas",
             "/conversations": "Conversaciones",
             "/calendar": "Calendario",
             "/kanban": "Kanban",
@@ -52,6 +53,7 @@ export default function DashboardLayout({
     const mainMenuItems = [
         { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
         { href: "/contacts", label: "Contactos", icon: Users },
+        { href: "/tags", label: "Etiquetas", icon: Tag },
         { href: "/conversations", label: "Conversaciones", icon: MessageSquare },
         { href: "/calendar", label: "Calendario", icon: Calendar },
         { href: "/kanban", label: "Kanban", icon: KanbanIcon },

@@ -3,6 +3,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { UserForm } from "./UserForm";
 import { type UserFormData } from "@/lib/validations/user.schema";
+import { adminService } from "@/lib/api";
 import { toast } from "sonner"
 import type { User } from "@/lib/validations/user.schema";
 
@@ -16,20 +17,23 @@ interface EditUserDialogProps {
 export function EditUserDialog({ user, open, onOpenChange, onSuccess }: EditUserDialogProps) {
 
   const handleSubmit = async (data: UserFormData) => {
+    
     try {
-      const res = await fetch(`/api/admin/users/${user.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-
-      if (!res.ok) throw new Error();
+      const payload = {
+        full_name: data.full_name,
+        email: data.email,
+        role: data.role,
+        status: data.status === "Activo",
+      };
+      
+      
+      await adminService.updateUser(String(user.id), payload);
 
       toast.success("Usuario actualizado correctamente");
       onSuccess?.();
       onOpenChange(false);
-    } catch {
-      toast.error("Error al actualizar el usuario");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Error al actualizar el usuario");
     }
   };
 

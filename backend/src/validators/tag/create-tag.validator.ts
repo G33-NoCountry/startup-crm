@@ -5,13 +5,13 @@ export default [
   body("title")
     .notEmpty().withMessage(buildValidationMessage("title", "required"))
     .bail()
-    .isString().withMessage("title debe ser un string")
+    .isString().withMessage(buildValidationMessage("title", "string"))
     .bail()
     .isLength({ min: 1 }).withMessage(buildValidationMessage("title", "min_length", { min: 1 }))
   ,
   body("color")
     .notEmpty().withMessage(buildValidationMessage("color", "required"))
     .bail()
-    .isString().withMessage("color debe ser un string")
+    .isString().withMessage(buildValidationMessage("color", "string"))
   ,
 ];

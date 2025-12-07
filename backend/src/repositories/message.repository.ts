@@ -61,9 +61,6 @@ export class MessageRepository implements IMessageRepository {
             order: [["created_at", "DESC"]],
         });
 
-        if (!(result.length > 0))
-            return null;
-
         return result;
     }
 

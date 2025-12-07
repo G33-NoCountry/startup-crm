@@ -8,6 +8,10 @@ class FunnelStage extends Model {
     public is_closed!: boolean;
     public readonly created_at!: Date;
     public readonly updated_at!: Date;
+
+    public static readonly publicAttributes: string[] = [
+        "id", "title", "sort_order", "is_closed"
+    ];
 }
 
 FunnelStage.init(

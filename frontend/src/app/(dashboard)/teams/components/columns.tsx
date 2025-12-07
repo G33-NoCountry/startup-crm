@@ -6,7 +6,7 @@ import { DataTableColumnHeader } from "@/components/shared/data-table/data-table
 import { DataTableRowActions } from "./data-table-row-actions";
 import { Badge } from "@/components/ui/badge";
 
-export const columns: ColumnDef<User>[] = [
+export const getColumns = (onReload?: () => void): ColumnDef<User>[] => [
     {
         accessorKey: "id",
         header: ({ column }) => (
@@ -90,6 +90,8 @@ export const columns: ColumnDef<User>[] = [
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title="Acciones" />
         ),
-        cell: ({ row }) => <DataTableRowActions row={row} />,
+        cell: ({ row }) => <DataTableRowActions row={row} onSuccess={onReload} />,
     },
 ];
+
+export const columns = getColumns();

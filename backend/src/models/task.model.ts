@@ -15,7 +15,7 @@ class Task extends Model {
     public readonly updated_at!: Date;
 
     public static readonly publicAttributes: string[] = [
-        "id", "user_id", "deal_id", "contact_id", "title", "due_date", "status", "created_at", "updated_at"
+        "id", "title", "due_date", "status", "created_at", "updated_at"
     ];
 
     declare static paginate: (options: PaginateOptions<Task>) => Promise<PaginationConnection<Task>>;

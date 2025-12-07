@@ -43,9 +43,6 @@ export class ContactRepository implements IContactRepository {
             where,
         });
 
-        if (!(result.length > 0))
-            return null;
-
         return result;
     }
 

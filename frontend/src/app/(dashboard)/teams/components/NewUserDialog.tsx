@@ -3,6 +3,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { UserForm } from "./UserForm";
 import { type UserFormData } from "@/lib/validations/user.schema";
+import { adminService } from "@/lib/api";
 import { toast } from "sonner";
 
 interface NewUserDialogProps {
@@ -15,19 +16,24 @@ export function NewUserDialog({ open, onOpenChange, onSuccess }: NewUserDialogPr
 
   const handleSubmit = async (data: UserFormData) => {
     try {
-      const res = await fetch("/api/admin/users", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
+      if (!data.password) {
+        toast.error("La contraseña es requerida");
+        return;
+      }
 
-      if (!res.ok) throw new Error();
+      await adminService.createUser({
+        full_name: data.full_name,
+        email: data.email,
+        password: data.password,
+        role: data.role,
+      });
 
       toast.success("Usuario creado correctamente");
       onSuccess?.();
       onOpenChange(false);
-    } catch {
-      toast.error("Error al crear el usuario");
+    } catch (error) {
+      console.error("Error al crear usuario:", error);
+      toast.error(error instanceof Error ? error.message : "Error al crear el usuario");
     }
   };
 
