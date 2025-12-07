@@ -12,7 +12,19 @@ export const saveToken = (token: string): void => {
 
 export const getToken = (): string | null => {
   if (typeof window !== "undefined") {
-    return localStorage.getItem(TOKEN_KEY);
+    // Intentar obtener el token con la nueva key
+    let token = localStorage.getItem(TOKEN_KEY);
+    
+    if (!token) {
+      const oldToken = localStorage.getItem("token");
+      if (oldToken) {
+        localStorage.setItem(TOKEN_KEY, oldToken);
+        localStorage.removeItem("token");
+        token = oldToken;
+      }
+    }
+    
+    return token;
   }
   return null;
 };

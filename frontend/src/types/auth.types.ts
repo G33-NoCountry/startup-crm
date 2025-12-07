@@ -17,7 +17,18 @@ export interface LoginResponse {
   message: string;
   data: {
     user: User;
-    token: string;
+    access_token: string;
+    refresh_token: string;
+  };
+}
+
+export interface RegisterResponse {
+  success: boolean;
+  message: string;
+  data: {
+    user: User;
+    access_token: string;
+    refresh_token: string;
   };
 }
 

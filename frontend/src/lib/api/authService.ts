@@ -1,6 +1,5 @@
-import type { LoginCredentials, LoginResponse, AuthError } from "@/types/auth.types";
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+import type { LoginCredentials, LoginResponse, RegisterResponse, AuthError } from "@/types/auth.types";
+import { API_CONFIG } from "@/lib/config/api.config";
 
 /**
  * Servicio de autenticación para comunicarse con el backend
@@ -9,7 +8,7 @@ class AuthService {
 
   async login(credentials: LoginCredentials): Promise<LoginResponse> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+      const response = await fetch(`${API_CONFIG.baseURL}${API_CONFIG.endpoints.auth.login}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -18,6 +17,7 @@ class AuthService {
           email: credentials.email,
           password: credentials.password,
         }),
+        signal: AbortSignal.timeout(API_CONFIG.timeout),
       });
 
       const data = await response.json();
@@ -31,11 +31,12 @@ class AuthService {
       }
 
       return {
-        success: true,
-        message: data.message || "Login exitoso",
+        success: data.success,
+        message: data.message,
         data: {
-          user: data.user || data.data?.user,
-          token: data.token || data.data?.token,
+          user: data.data.user,
+          access_token: data.data.access_token,
+          refresh_token: data.data.refresh_token,
         },
       };
     } catch (error) {
@@ -44,7 +45,50 @@ class AuthService {
       }
 
       const authError: AuthError = {
-        message: "Error de conexión. Por favor, intenta nuevamente.",
+        message: "Error de conexión. Verifica que el backend esté corriendo.",
+        statusCode: 500,
+      };
+      throw authError;
+    }
+  }
+
+  async register(data: { name: string; email: string; password: string }): Promise<RegisterResponse> {
+    try {
+      const response = await fetch(`${API_CONFIG.baseURL}${API_CONFIG.endpoints.auth.register}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+        signal: AbortSignal.timeout(API_CONFIG.timeout),
+      });
+
+      const responseData = await response.json();
+
+      if (!response.ok) {
+        const error: AuthError = {
+          message: responseData.message || "Error al registrar usuario",
+          statusCode: response.status,
+        };
+        throw error;
+      }
+
+      return {
+        success: responseData.success,
+        message: responseData.message,
+        data: {
+          user: responseData.data.user,
+          access_token: responseData.data.access_token,
+          refresh_token: responseData.data.refresh_token,
+        },
+      };
+    } catch (error) {
+      if (error && typeof error === "object" && "statusCode" in error) {
+        throw error;
+      }
+
+      const authError: AuthError = {
+        message: "Error de conexión. Verifica que el backend esté corriendo.",
         statusCode: 500,
       };
       throw authError;
@@ -54,11 +98,12 @@ class AuthService {
 
   async logout(): Promise<void> {
     try {
-      await fetch(`${API_BASE_URL}/api/auth/logout`, {
+      await fetch(`${API_CONFIG.baseURL}${API_CONFIG.endpoints.auth.logout}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
+        signal: AbortSignal.timeout(API_CONFIG.timeout),
       });
     } catch (error) {
       console.error("Error al cerrar sesión:", error);
@@ -68,12 +113,13 @@ class AuthService {
 
   async verifyToken(token: string): Promise<boolean> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/verify`, {
+      const response = await fetch(`${API_CONFIG.baseURL}${API_CONFIG.endpoints.auth.verify}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
+        signal: AbortSignal.timeout(API_CONFIG.timeout),
       });
 
       return response.ok;
@@ -85,12 +131,13 @@ class AuthService {
 
   async getProfile(token: string) {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/profile`, {
+      const response = await fetch(`${API_CONFIG.baseURL}${API_CONFIG.endpoints.auth.profile}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
+        signal: AbortSignal.timeout(API_CONFIG.timeout),
       });
 
       if (!response.ok) {

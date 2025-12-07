@@ -1,8 +1,6 @@
 import { create } from "zustand";
 import type { User, LoginCredentials, AuthError } from "@/types/auth.types";
-// TODO: Cambiar a authService cuando el backend implemente el endpoint
-// import { authService } from "@/lib/api/authService";
-import { authServiceMock as authService } from "@/lib/api/authService.mock";
+import { authService } from "@/lib/api/authService";
 import {
   saveToken,
   getToken,
@@ -55,12 +53,12 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     try {
       const response = await authService.login(credentials);
 
-      saveToken(response.data.token);
+      saveToken(response.data.access_token);
       saveUser(response.data.user);
 
       set({
         user: response.data.user,
-        token: response.data.token,
+        token: response.data.access_token,
         isAuthenticated: true,
         isLoading: false,
         error: null,
@@ -73,10 +71,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       const authError = error as AuthError;
       const newAttempts = state.loginAttempts + 1;
 
-      // Mensaje de error genérico para seguridad
       let errorMessage = "Credenciales inválidas. Por favor, verifica tus datos.";
 
-      // Si llegó al máximo de intentos, bloquear
       if (newAttempts >= MAX_LOGIN_ATTEMPTS) {
         errorMessage = `Demasiados intentos fallidos. Tu cuenta ha sido bloqueada temporalmente por ${BLOCK_DURATION / 60000} minutos.`;
         
@@ -87,7 +83,6 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
           isBlocked: true,
         });
 
-        // Desbloquear después del tiempo establecido
         setTimeout(() => {
           set({ isBlocked: false, loginAttempts: 0 });
         }, BLOCK_DURATION);
@@ -109,9 +104,6 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     }
   },
 
-  /**
-   * Cierra la sesión del usuario
-   */
   logout: async () => {
     set({ isLoading: true });
 
@@ -134,9 +126,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     }
   },
 
-  /**
-   * Verifica si hay una sesión activa al cargar la app
-   */
+
   checkAuth: () => {
     const token = getToken();
     const user = getUser() as User | null;
@@ -148,7 +138,6 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         isAuthenticated: true,
       });
     } else {
-      // Si el token expiró, limpiar datos
       clearAuthData();
       set({
         user: null,
@@ -163,9 +152,6 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     set({ error: null });
   },
 
-  /**
-   * Resetea los intentos de login (útil para testing)
-   */
   resetLoginAttempts: () => {
     set({ loginAttempts: 0, isBlocked: false });
   },
