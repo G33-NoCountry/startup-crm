@@ -4,6 +4,7 @@ import { tagDbSchema } from "./tag.schema"
 
 // Schema para el formulario (crear y editar)
 export const contactFormSchema = z.object({
+  id: z.string().or(z.number()).optional(),
   full_name: nameSchema,
   email: emailSchema,
   phone: phoneSchema,
@@ -19,7 +20,8 @@ export const contactDbSchema = z.object({
   email: emailSchema,
   phone: phoneSchema,
   tags: z.array(tagDbSchema).default([]),
-  created_at: z.string().or(z.date()),
+  created_at: z.string().or(z.date()).optional(),
+  updated_at: z.string().or(z.date()).optional(),
 })
 
 export type Contact = z.infer<typeof contactDbSchema>
