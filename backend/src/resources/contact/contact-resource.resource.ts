@@ -7,6 +7,7 @@ export class ContactResource {
             full_name: contact.full_name,
             email: contact.email,
             phone: contact.phone,
+            tags: (contact as any).tags,
             created_at: contact.created_at,
             updated_at: contact.updated_at,
         };

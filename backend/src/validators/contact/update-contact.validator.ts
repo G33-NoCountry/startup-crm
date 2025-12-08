@@ -1,6 +1,7 @@
 import { body } from "express-validator";
 import { buildValidationMessage } from "../../utils/validation-messages";
 import { validateEmail, validatePhoneExist } from "../../utils/validators";
+import { Tag } from "../../models";
 
 const validateEqualValue = (value: string, { req, path }: any) => {
   const contact = req.contact;
@@ -11,6 +12,12 @@ const validateEqualValue = (value: string, { req, path }: any) => {
     return true;
 
   return false;
+};
+
+const validateTagExist = async (id: number) => {
+  if (!await Tag.findByPk(id))
+    throw new Error;
+  return true;
 };
 
 export const updateContactValidator = [
@@ -40,6 +47,19 @@ export const updateContactValidator = [
     .bail()
     .if(validateEqualValue)
     .custom(validatePhoneExist).withMessage(buildValidationMessage("phone", "already_exists"))
+  ,
+  body("tags_id")
+    .optional()
+    .isArray({ min: 1 }).withMessage(buildValidationMessage("tags_id", "array"))
+    .bail()
+    .notEmpty().withMessage(buildValidationMessage("tags_id", "required"))
+  ,
+  body("tags_id.*")
+    .notEmpty().withMessage(buildValidationMessage("id", "required"))
+    .bail()
+    .isInt({ min: 1 }).withMessage(buildValidationMessage("id", "numeric"))
+    .bail()
+    .custom(validateTagExist).withMessage(buildValidationMessage("id", "invalid"))
   ,
 
 ];
