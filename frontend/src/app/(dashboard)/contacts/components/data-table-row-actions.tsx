@@ -8,30 +8,34 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
 import { EditContactDialog } from "./EditContactDialog";
 import { DeleteContactDialog } from "./DeleteContactDialog";
 import type { Contact } from "@/lib/validations/contact.schema";
-import { toast } from "sonner";
 
 import { useState } from "react";
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>;
+  // Agregamos las funciones de callback del componente padre
+  onContactUpdated: (updatedContact: Contact) => void; 
+  onContactDeleted: (deletedContactId: string | number) => void;
 }
 
 export function DataTableRowActions<TData>({
   row,
+  onContactUpdated,
+  onContactDeleted,
 }: DataTableRowActionsProps<TData>) {
   const contact = row.original as Contact;
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
-
+ 
   return (
     <>
-    <div className="flex flex-wrap items-center gap-2 md:flex-row">
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
@@ -42,29 +46,26 @@ export function DataTableRowActions<TData>({
           <span className="sr-only">Abrir menú</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[160px]">
+      <DropdownMenuContent align="end" className="w-[180px]">
         <DropdownMenuItem onSelect={() => setEditOpen(true)} className="cursor-pointer hover:bg-accent" >
+          <Pencil className="mr-2 h-4 w-4" />
           Editar
         </DropdownMenuItem>
+        <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={() => setDeleteOpen(true)} className="cursor-pointer text-red-600 focus:text-red-600" >
-          Eliminar contacto
+          <Trash2 className="mr-2 h-4 w-4" />
+          Eliminar
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
 
-    <Button variant="ghost" size="icon" onClick={() => setEditOpen(true)}>
-        <Pencil />
-    </Button>
-    </div>
     {/* Edit Dialog */}
     <EditContactDialog
         contact={contact}
         open={editOpen}
         onOpenChange={setEditOpen}
-        onSuccess={
-          // Aquí puedes refrescar la tabla si usas TanStack Query, etc.
-          () => toast.success("Contacto actualizado")
-        }
+        // Pasamos la función de actualización del componente padre
+        onSuccess={onContactUpdated}
       />
 
       {/* Delete Dialog */}
@@ -72,10 +73,8 @@ export function DataTableRowActions<TData>({
         contact={contact}
         open={deleteOpen}
         onOpenChange={setDeleteOpen}
-        onSuccess={
-          // Refrescar tabla o mutar datos
-          () => toast.success("Contacto eliminado")
-        }
+        // Pasamos la función de eliminación del componente padre
+        onSuccess={onContactDeleted}
       />
     </>
   );
