@@ -12,7 +12,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Loader2, Tag } from "lucide-react";
+import { Loader2, Tag as TagIcon } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -21,32 +21,30 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { contactFormSchema, type ContactFormData } from "@/lib/validations/contact.schema";
-
-const AVAILABLE_TAGS = [
-  { value: "cliente", label: "Cliente", color: "bg-green-400" },
-  { value: "proveedor", label: "Proveedor", color: "bg-blue-400" },
-  { value: "lead", label: "Lead", color: "bg-yellow-400" },
-  { value: "vip", label: "VIP", color: "bg-purple-400" },
-  { value: "inactivo", label: "Inactivo", color: "bg-gray-400" },
-];
+import { tagColorClasses } from "@/lib/constants/tag-colors";
+import { useTags } from "../context/TagsContext";
 
 interface ContactFormProps {
-  defaultValues?: Partial<ContactFormData & { tags: string[] }>;
-  onSubmit: (data: ContactFormData & { tags?: string[] }) => Promise<void>;
+  defaultValues?: Partial<ContactFormData & { tags: number[] }>;
+  onSubmit: (data: ContactFormData & { tags?: number[] }) => Promise<void>;
   onCancel?: () => void;
   isPending?: boolean;
   mode: "create" | "edit";
 }
 
 export function ContactForm({ defaultValues, onSubmit, onCancel, isPending = false, mode }: ContactFormProps) {
-  const form = useForm<ContactFormData & { tags: string[] }>({
+  const availableTags = useTags();
+
+  const form = useForm<ContactFormData & { tags: number[] }>({
     resolver: zodResolver(contactFormSchema),
     defaultValues: {
       full_name: "",
       email: "",
       phone: "",
-      tags: [],
       ...defaultValues,
+      tags: mode === "edit"
+        ? defaultValues?.tags ?? [] // ya deberían venir como number[]
+        : [],
     },
   });
 
@@ -105,11 +103,13 @@ export function ContactForm({ defaultValues, onSubmit, onCancel, isPending = fal
                 <FormLabel>Etiquetas</FormLabel>
                 <Select
                   onValueChange={(value) => {
+                    const id = Number(value); // el value es el ID como string → lo convertimos
                     const current = field.value || [];
-                    if (current.includes(value)) {
-                      field.onChange(current.filter((t: string) => t !== value));
+
+                    if (current.includes(id)) {
+                      field.onChange(current.filter((t: number) => t !== id));
                     } else {
-                      field.onChange([...current, value]);
+                      field.onChange([...current, id]);
                     }
                   }}
                 >
@@ -119,11 +119,11 @@ export function ContactForm({ defaultValues, onSubmit, onCancel, isPending = fal
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {AVAILABLE_TAGS.map((tag) => (
-                      <SelectItem key={tag.value} value={tag.value}>
+                    {availableTags.map((tag) => (
+                      <SelectItem key={tag.id} value={String(tag.id)}>
                         <div className="flex items-center gap-2">
-                          <div className={`h-3 w-3 rounded-full ${tag.color}`} />
-                          {tag.label}
+                          <div className={`h-3 w-3 rounded-full ${tagColorClasses[tag.color]}`} />
+                          {tag.title}
                         </div>
                       </SelectItem>
                     ))}
@@ -132,26 +132,27 @@ export function ContactForm({ defaultValues, onSubmit, onCancel, isPending = fal
 
                 {/* Mostrar tags seleccionadas */}
                 <div className="flex flex-wrap gap-2 mt-2">
-                  {field.value?.map((tagValue) => {
-                    const tag = AVAILABLE_TAGS.find((t) => t.value === tagValue);
-                    return tag ? (
+                  {field.value?.map((tagId) => {
+                    const tag = availableTags.find((t) => t.id === tagId);
+                    if (!tag) return null;
+                    return (
                       <span
-                        key={tag.value}
-                        className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium text-white ${tag.color}`}
+                        key={tag.id}
+                        className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${tagColorClasses[tag.color]}`}
                       >
-                        <Tag className="h-3 w-3" />
-                        {tag.label}
+                        <TagIcon className="h-3 w-3" />
+                        {tag.title}
                         <button
                           type="button"
                           onClick={() => {
-                            field.onChange(field.value.filter((t: string) => t !== tag.value));
+                            field.onChange(field.value?.filter((t) => t !== tagId) || []);
                           }}
                           className="ml-1 hover:opacity-70"
                         >
                           ×
                         </button>
                       </span>
-                    ) : null;
+                    );
                   })}
                 </div>
                 <FormMessage />
