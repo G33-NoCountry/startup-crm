@@ -1,14 +1,19 @@
- "use client";
+"use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { Contact } from "@/lib/validations/contact.schema";
+import { Contact } from "@/lib/api/contactService";
 import { Tag } from "@/lib/validations/tag.schema";
 import { DataTableColumnHeader } from "@/components/shared/data-table/data-table-column-header";
 import { DataTableRowActions } from "./data-table-row-actions";
 import { TagBadge } from "@/components/ui/tag-badge";
 import { tagColorClasses } from "@/lib/constants/tag-colors";
 
-export const columns: ColumnDef<Contact>[] = [
+// Definimos los tipos de props que las columnas esperarán
+interface ContactColumnsProps {
+    onContactUpdated: (updatedContact: Contact) => void;
+    onContactDeleted: (deletedContactId: string | number) => void;
+}
+export const getContactColumns = ({ onContactUpdated, onContactDeleted}: ContactColumnsProps): ColumnDef<Contact>[] => [
   {
     accessorKey: "id",
     header: ({ column }) => (
@@ -132,8 +137,13 @@ export const columns: ColumnDef<Contact>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Acciones" />
     ),
-    cell: ({ row }) => <DataTableRowActions row={row} />,
-    enableSorting: false,
-    enableHiding: false,
+    // Pasamos las funciones de callback a DataTableRowActions
+    cell: ({ row }) => (
+        <DataTableRowActions 
+            row={row} 
+            onContactUpdated={onContactUpdated}
+            onContactDeleted={onContactDeleted}
+        />
+    ),
   },
 ];
