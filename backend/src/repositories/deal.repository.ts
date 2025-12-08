@@ -8,11 +8,11 @@ export class DealRepository {
         const whereCondition: WhereOptions = {};
 
         if (userId) {
-            whereCondition.user_id = userId; 
+            whereCondition.user_id = userId;
         }
 
         return await Deal.findAll({
-            where: whereCondition, 
+            where: whereCondition,
 
             attributes: ['id', 'title', 'value', 'created_at', 'updated_at'],
             include: [
@@ -66,5 +66,16 @@ export class DealRepository {
     async create(data: { title: string, value?: number, contact_id: number, user_id: number, funnel_stage_id: number }): Promise<Deal> {
         const newDeal = await Deal.create(data);
         return newDeal;
+    }
+
+    async update(data: any, dealId: number): Promise<Deal> {
+        const result = await Deal.update(data, { where: { id: dealId } });
+        if (!(result.length > 0))
+            throw new Error("No se pudo actualizar el deal");
+
+        const contactUpdated = await this.findById(dealId);
+        if (!contactUpdated)
+            throw new Error;
+        return contactUpdated;
     }
 }
