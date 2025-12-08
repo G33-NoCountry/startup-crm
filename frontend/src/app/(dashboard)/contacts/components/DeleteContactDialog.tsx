@@ -10,16 +10,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { contactsApi, type Contact } from "@/lib/api/contactService";
 import { toast } from "sonner";
 
 interface DeleteContactDialogProps {
-  contact: {
-    id: string | number;
-    full_name: string;
-  };
+  contact: Contact;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSuccess?: () => void; // opcional: para refrescar la tabla
+  onSuccess?: (deletedContactId: string | number) => void; // opcional: para refrescar la tabla
 }
 
 export function DeleteContactDialog({
@@ -30,21 +28,14 @@ export function DeleteContactDialog({
 }: DeleteContactDialogProps) {
   const handleDelete = async () => {
     try {
-      const res = await fetch(`/api/contacts/${contact.id}`, {
-        method: "DELETE",
-      });
+      await contactsApi.deleteContact(contact.id);
 
-      if (!res.ok) {
-        const error = await res.text();
-        throw new Error(error || "Error al eliminar");
-      }
-
-      toast.success(`Contacto "${contact.full_name}" eliminado`);
-      onSuccess?.();
+      toast.success(`Contacto "${contact.full_name}" eliminado correctamente`);
+      onSuccess?.(contact.id); 
       onOpenChange(false);
     } catch (err) {
+      //console.error("Error al eliminar el contacto:", err);
       toast.error("No se pudo eliminar el contacto");
-      console.error(err);
     }
   };
 
