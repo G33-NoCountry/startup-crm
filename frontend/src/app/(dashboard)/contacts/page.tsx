@@ -41,7 +41,7 @@ export default function ContactPage() {
                 </CardAction>
               </CardHeader>
               <CardContent>
-                <DataTable data={contacts} columns={columns} toolbar={DataTableToolbar} />
+                <DataTable data={contacts} columns={columns} toolbar={DataTableToolbar} loading={false} />
               </CardContent>
             </Card>
 

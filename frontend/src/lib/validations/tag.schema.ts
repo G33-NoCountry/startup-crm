@@ -25,7 +25,7 @@ export const tagDbSchema = z.object({
     const foundColor = TAG_COLORS.find((c) => val.toLowerCase().includes(c));
     return foundColor || "gray";
   }, z.enum(TAG_COLORS)),
-  created_at: z.string().or(z.date()),
+  created_at: z.string().or(z.date()).optional(),
   updated_at: z.string().or(z.date()).optional(),
 });
 
