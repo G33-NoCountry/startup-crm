@@ -10,6 +10,16 @@ export default {
                 example: "+541122334455",
                 description: "Teléfono del contacto",
             },
+            tags: {
+                type: "array",
+                example: [
+                    {
+                        id: 1,
+                        title: "Bloqueado para WA",
+                        color: "indigo"
+                    }
+                ]
+            },
             created_at: {
                 type: "string",
                 format: "date-time",

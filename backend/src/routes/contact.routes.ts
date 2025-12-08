@@ -41,7 +41,7 @@ router.get('/:id/conversations',
     contactController.getCoversationsByContactId
 );
 router.get('/:id', validateParam("id"), validateRequestMiddleware, contactExists, contactController.getContact);
-router.patch('/:id',
+router.put('/:id',
     validateParam("id"),
     validateRequestMiddleware,
     contactExists,

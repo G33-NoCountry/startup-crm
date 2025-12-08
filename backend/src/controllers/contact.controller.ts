@@ -301,7 +301,7 @@ export class ContactController {
   /**
    * @swagger
    * /api/contacts/{id}:
-   *   patch:
+   *   put:
    *     summary: Actualizar contacto
    *     description: Actualizar datos de un contacto (solo para usuarios "Agente")
    *     tags: [Contacts]

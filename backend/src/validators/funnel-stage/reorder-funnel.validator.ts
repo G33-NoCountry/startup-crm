@@ -20,7 +20,7 @@ export default [
     .isInt({ min: 1 })
     .withMessage(buildValidationMessage("id", "numeric"))
     .bail()
-    .custom(validateFunnelStageExist).withMessage("")
+    .custom(validateFunnelStageExist).withMessage(buildValidationMessage("id", "invalid"))
   ,
   body("funnels.*.sort_order")
     .notEmpty().withMessage(buildValidationMessage("sort_order", "required"))
