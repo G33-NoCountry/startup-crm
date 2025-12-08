@@ -1,5 +1,6 @@
 import { DealRepository } from "../repositories/deal.repository";
 import Deal from '../models/deal.model';
+import { AssignDealDto } from "../dto/deal/assign-deal.dto";
 
 export class DealService {
     // Definimos la propiedad
@@ -62,5 +63,11 @@ export class DealService {
         // const dealWithRelations = await this.dealRepository.findById(newDeal.id);
 
         return newDeal; // O dealWithRelations si recargas.
+    }
+
+    async assignDeal(dto: AssignDealDto): Promise<Deal> {
+        return this.dealRepository.update({
+            user_id: dto.user_id
+        }, dto.deal_id);
     }
 }
