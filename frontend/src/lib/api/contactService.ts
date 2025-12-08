@@ -1,13 +1,14 @@
 import { z } from "zod";
-import { contactDbSchema } from "@/lib/validations/contact.schema";
+import { contactDbSchema, contactFormSchema } from "@/lib/validations/contact.schema";
 import { env } from "@/lib/config/env";
 import { getToken } from "@/lib/utils/tokenUtils";
 
-// Schemas
-const apiResponseSchema = z.object({
+// Schema para respuestas que incluyen PAGINACIÓN
+const PaginatedApiResponseSchema = z.object({
   success: z.boolean(),
   message: z.string(),
   data: z.object({
+    // Utilizamos tagDbSchema para validar cada elemento de la lista
     items: z.array(contactDbSchema),
     total_count: z.number(),
     paginate_info: z.object({
@@ -19,8 +20,9 @@ const apiResponseSchema = z.object({
   }),
 });
 
-export type ApiResponse = z.infer<typeof apiResponseSchema>;
+export type PaginatedApiResponse = z.infer<typeof PaginatedApiResponseSchema>;
 export type Contact = z.infer<typeof contactDbSchema>;
+export type ContactFormData = z.infer<typeof contactFormSchema>; // Tipo para la data de creación/actualización
 
 // Tipos para parámetros de la API
 export interface ContactsQueryParams {
@@ -77,10 +79,8 @@ export class ContactsApi {
     this.baseUrl = baseUrl;
   }
 
-  /**
-   * Obtener lista de contactos
-   */
-  async getContacts(params: ContactsQueryParams = {}): Promise<ApiResponse['data']> {
+  // Obtener lista de contactos
+  async getContacts(params: ContactsQueryParams = {}): Promise<PaginatedApiResponse['data']> {// AQUI TENEMOS CAMBIOS CON TAGS
     const defaultParams: ContactsQueryParams = {
       limit: params.limit ?? env.defaultLimit,
       ...params,
@@ -105,7 +105,7 @@ export class ContactsApi {
     }
 
     const json = await response.json();
-    const result = apiResponseSchema.parse(json);
+    const result = PaginatedApiResponseSchema.parse(json);
 
     if (!result.success) {
       throw new Error(result.message || "Error al obtener contactos");
@@ -114,16 +114,14 @@ export class ContactsApi {
     return result.data;
   }
 
-  /**
-   * Obtener contacto por ID
-   */
-  async getContactById(id: number): Promise<Contact> {
+  // Obtener contacto por ID
+  async getContactById(id: number | string): Promise<Contact> {
     const url = `${this.baseUrl}/api/contacts/${id}`;
 
     const response = await fetch(url, {
       method: "GET",
       cache: "no-store",
-      headers: getAuthHeaders(), // ← Token incluido
+      headers: getAuthHeaders(),
     });
 
     if (response.status === 401) {
@@ -138,15 +136,13 @@ export class ContactsApi {
     return contactDbSchema.parse(json.data);
   }
 
-  /**
-   * Crear nuevo contacto
-   */
-  async createContact(contactData: Partial<Contact>): Promise<Contact> {
+  // Crear nuevo contacto
+  async createContact(contactData: ContactFormData): Promise<Contact> {
     const url = `${this.baseUrl}/api/contacts`;
 
     const response = await fetch(url, {
       method: "POST",
-      headers: getAuthHeaders(), // ← Token incluido
+      headers: getAuthHeaders(),
       body: JSON.stringify(contactData),
     });
 
@@ -162,15 +158,13 @@ export class ContactsApi {
     return contactDbSchema.parse(json.data);
   }
 
-  /**
-   * Actualizar contacto
-   */
-  async updateContact(id: number, contactData: Partial<Contact>): Promise<Contact> {
+  // Actualizar contacto
+  async updateContact(id: number | string, contactData: ContactFormData): Promise<Contact> {
     const url = `${this.baseUrl}/api/contacts/${id}`;
 
     const response = await fetch(url, {
       method: "PUT",
-      headers: getAuthHeaders(), // ← Token incluido
+      headers: getAuthHeaders(),
       body: JSON.stringify(contactData),
     });
 
@@ -189,12 +183,12 @@ export class ContactsApi {
   /**
    * Eliminar contacto
    */
-  async deleteContact(id: number): Promise<void> {
+  async deleteContact(id: number | string): Promise<void> {
     const url = `${this.baseUrl}/api/contacts/${id}`;
 
     const response = await fetch(url, {
       method: "DELETE",
-      headers: getAuthHeaders(), // ← Token incluido
+      headers: getAuthHeaders(),
     });
 
     if (response.status === 401) {
