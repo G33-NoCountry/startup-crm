@@ -18,6 +18,17 @@ export interface LoginResponse {
   data: {
     user: User;
     access_token: string;
+    refresh_token: string;
+  };
+}
+
+export interface RegisterResponse {
+  success: boolean;
+  message: string;
+  data: {
+    user: User;
+    access_token: string;
+    refresh_token: string;
   };
 }
 

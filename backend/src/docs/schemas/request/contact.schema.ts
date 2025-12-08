@@ -40,6 +40,11 @@ export default {
                 example: "+541122334455",
                 description: "Teléfono del contacto"
             },
+            tags_id: {
+                type: "array",
+                example: [1, 3],
+                description: "Ids de las Tag"
+            },
         },
     },
 };

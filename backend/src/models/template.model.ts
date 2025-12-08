@@ -1,5 +1,6 @@
 import { DataTypes, Model } from "sequelize";
 import { sequelize } from "../config/database.config";
+import { makePaginate, PaginateOptions, PaginationConnection } from "sequelize-cursor-pagination";
 
 class Template extends Model {
     public id!: number;
@@ -10,7 +11,16 @@ class Template extends Model {
     public status!: boolean;
     public readonly created_at!: Date;
     public readonly updated_at!: Date;
+
+    public static readonly publicAttributes: string[] = [
+        "id", "title", "channel", "content", "status"
+    ];
+
+    declare static paginate: (options: PaginateOptions<Template>) => Promise<PaginationConnection<Template>>;
 }
+
+Template.paginate = makePaginate(Template);
+
 
 Template.init(
     {

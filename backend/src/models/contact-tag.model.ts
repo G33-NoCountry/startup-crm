@@ -28,6 +28,7 @@ ContactTag.init(
     {
         sequelize,
         tableName: "contact_tag",
+        timestamps: false
     }
 );
 
