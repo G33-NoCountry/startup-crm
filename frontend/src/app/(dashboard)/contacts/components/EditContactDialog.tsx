@@ -2,33 +2,31 @@
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ContactForm } from "./ContactForm";
-import { contactFormSchema, type ContactFormData } from "@/lib/validations/contact.schema";
+import { type ContactFormData, type Contact, contactsApi } from "@/lib/api/contactService";
+
 import { toast } from "sonner"
-import type { Contact } from "@/lib/validations/contact.schema";
 
 interface EditContactDialogProps {
   contact: Contact;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSuccess?: () => void;
+  onSuccess?: (updatedContact: Contact) => void;
 }
 
 export function EditContactDialog({ contact, open, onOpenChange, onSuccess }: EditContactDialogProps) {
 
-  const handleSubmit = async (data: ContactFormData & { tags?: string[] }) => {
+  const handleSubmit = async (data: ContactFormData & { tags?: number[] }) => {
     try {
-      const res = await fetch(`/api/contacts/${contact.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
+      const updatedContact = await contactsApi.updateContact(contact.id, {
+      ...data,
+      tags: data.tags, // ← ya es number[]
+    }); 
 
-      if (!res.ok) throw new Error();
-
-      toast.success("Contacto actualizado");
-      onSuccess?.();
+      toast.success("Contacto actualizado correctamente");
+      onSuccess?.(updatedContact); 
       onOpenChange(false);
-    } catch {
+    } catch (error) {
+      //console.error("Error al actualizar el contacto:", error);
       toast.error("Error al actualizar el contacto");
     }
   };
@@ -45,10 +43,10 @@ export function EditContactDialog({ contact, open, onOpenChange, onSuccess }: Ed
                 full_name: contact.full_name,
                 email: contact.email,
                 phone: contact.phone || "",
-                tags: contact.tags.map(t => t.title),
-                // tags: contact.tags || [],
+                tags: contact.tags?.map(t => t.id) ?? [], // aquí convertimos a IDs
             }}
             onSubmit={handleSubmit}
+            onCancel={() => onOpenChange(false)}
         />
       </DialogContent>
     </Dialog>
