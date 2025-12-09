@@ -9,14 +9,14 @@ export default [
     ,
     query("date_from")
         .optional()
-        .notEmpty().withMessage(buildValidationMessage("from", "required"))
+        .notEmpty().withMessage(buildValidationMessage("date_from", "required"))
         .bail()
-        .isISO8601().withMessage(buildValidationMessage("from", "date"))
+        .isISO8601().withMessage(buildValidationMessage("date_from", "date"))
     ,
     query("date_to")
         .optional()
-        .notEmpty().withMessage(buildValidationMessage("from", "required"))
+        .notEmpty().withMessage(buildValidationMessage("date_to", "required"))
         .bail()
-        .isISO8601().withMessage(buildValidationMessage("from", "date"))
+        .isISO8601().withMessage(buildValidationMessage("date_to", "date"))
     ,
 ];

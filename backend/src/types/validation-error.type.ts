@@ -4,6 +4,7 @@ export type ValidationErrorType =
     | "min_length"
     | "enum"
     | "array"
+    | "empty"
     | "invalid"
     | "max_length"
     | "min_numeric"

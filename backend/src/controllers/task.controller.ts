@@ -93,17 +93,21 @@ export class TaskController {
     try {
       const { status, date_from, date_to } = request.query;
       const user = request.user as User;
+      let where: any = {
+        user_id: user.id,
+        status: status === "true",
+      };
+      if (date_from && date_to) {
+        where.due_date = {
+          [Op.gte]: new Date(date_from as string),
+          [Op.lte]: new Date(date_to as string)
+        }
+      }
+      console.log(where);
 
       const tasks = await this.taskService.getTasks(
         undefined,
-        {
-          user_id: user.id,
-          status: status === "true",
-          due_date: {
-            [Op.gte]: new Date(date_from as string),
-            [Op.lte]: new Date(date_to as string)
-          }
-        },
+        where
       );
 
       return response.status(200).json({
