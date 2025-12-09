@@ -263,26 +263,34 @@ export default {
                 type: "array",
                 example: [
                     {
+                        id: 1,
+                        title: "Llamar para confirmar propuesta",
+                        start_date: "2025-09-07T10:15:00.000Z",
+                        due_date: "2025-12-04T22:03:50.000Z",
+                        color: "red",
+                        status: false,
+                        created_at: "2025-12-05T22:03:50.000Z",
+                        updated_at: "2025-12-05T22:03:50.000Z"
+                    },
+                    {
                         id: 2,
-                        user_id: 1,
-                        deal_id: null,
-                        contact_id: 3,
                         title: "Subir documentos",
-                        due_date: "2025-11-30T04:23:04.000Z",
-                        status: true,
-                        created_at: "2025-11-30T04:23:04.000Z",
-                        updated_at: "2025-11-30T04:23:04.000Z"
+                        start_date: "2025-12-03T22:03:50.000Z",
+                        due_date: "2025-12-06T22:03:50.000Z",
+                        color: "indigo",
+                        status: false,
+                        created_at: "2025-12-05T22:03:50.000Z",
+                        updated_at: "2025-12-05T22:03:50.000Z"
                     },
                     {
                         id: 7,
-                        user_id: 1,
-                        deal_id: null,
-                        contact_id: 2,
                         title: "Reorganizar estructura de carpetas del proyecto",
-                        due_date: "2025-11-30T04:23:04.000Z",
-                        status: true,
-                        created_at: "2025-11-30T04:23:04.000Z",
-                        updated_at: "2025-11-30T04:23:04.000Z"
+                        start_date: "2025-09-05T22:03:50.000Z",
+                        due_date: "2025-09-07T22:03:50.000Z",
+                        color: "green",
+                        status: false,
+                        created_at: "2025-12-05T22:03:50.000Z",
+                        updated_at: "2025-12-05T22:03:50.000Z"
                     }
                 ]
             },

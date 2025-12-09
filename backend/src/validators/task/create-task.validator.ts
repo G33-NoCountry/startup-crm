@@ -48,11 +48,21 @@ export default [
     .bail()
     .isLength({ min: 3 }).withMessage(buildValidationMessage("full_name", "min_length", { min: 3 }))
   ,
+  body("start_date")
+    .notEmpty().withMessage(buildValidationMessage("start_date", "required"))
+    .bail()
+    .isISO8601().withMessage(buildValidationMessage("start_date", "date"))
+  ,
   body("due_date")
     .notEmpty().withMessage(buildValidationMessage("due_date", "required"))
     .bail()
     .isISO8601().withMessage(buildValidationMessage("due_date", "date"))
     .bail()
     .custom(validateFutureDate)
+  ,
+  body("color")
+    .notEmpty().withMessage(buildValidationMessage("color", "required"))
+    .bail()
+    .isString().withMessage(buildValidationMessage("color", "string"))
   ,
 ];
