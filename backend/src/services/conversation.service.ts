@@ -2,13 +2,15 @@ import { IConversationRepository } from "../interfaces/conversation.interface";
 import { IMessageRepository } from "../interfaces/message.interface"; 
 import { MailService } from "./mail.service";
 import { Conversation, Contact, Message } from "../models";
+import { WhatsAppApiService } from "./whatsapp-api.service";
 
 export class ConversationService {
 
   constructor(
     private conversationRepository: IConversationRepository,
     private messageRepository: IMessageRepository, 
-    private mailService: MailService              
+    private mailService: MailService,
+    private whatsAppService: WhatsAppApiService,
   ) { }
 
   public async getByPk(id: number) {
@@ -73,6 +75,7 @@ export class ConversationService {
     } else if (channel === 'whatsapp') {
       // Aquí iría la integración con Twilio/Meta.
       // Por ahora validamos que tenga teléfono.
+      this.whatsAppService.sendMessage("Texto de prueba");
       if (!contact.phone) {
         throw new Error("El contacto no tiene un teléfono registrado.");
       }

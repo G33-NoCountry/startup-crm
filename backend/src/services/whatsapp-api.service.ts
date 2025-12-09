@@ -1,6 +1,6 @@
 import { whatsappApiConfig } from '../config/whatsapp-api.config';
 
-export class WhataAppApiService {
+export class WhatsAppApiService {
 
     public async sendMessage(data: string) {
         const message = {
