@@ -3,5 +3,6 @@ export class UpdateUserDto {
     public id: number,
     public full_name?: string,
     public email?: string,
+    public avatar_color?: string,
   ) {}
 }

@@ -37,8 +37,16 @@ module.exports = {
         type: Sequelize.STRING(255),
         allowNull: false,
       },
+      start_date: {
+        type: Sequelize.DATE,
+        allowNull: false,
+      },
       due_date: {
         type: Sequelize.DATE,
+        allowNull: false,
+      },
+      color: {
+        type: Sequelize.STRING(12),
         allowNull: false,
       },
       status: {

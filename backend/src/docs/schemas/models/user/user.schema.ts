@@ -17,7 +17,7 @@ export default {
             },
             avatar_color: {
                 type: "string",
-                example: "4e9480",
+                example: "red",
                 description: "Color del avatar en formato hexadecimal",
             },
             created_at: {
