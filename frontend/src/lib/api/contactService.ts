@@ -1,149 +1,205 @@
-import type { Contact, CreateContactDto, UpdateContactDto, ContactConversation } from "@/types/contact.types";
-import type { ApiResponse, PaginatedResponse, ApiError } from "@/types/api.types";
-import { API_CONFIG } from "@/lib/config/api.config";
+import { z } from "zod";
+import { contactDbSchema, contactFormSchema } from "@/lib/validations/contact.schema";
+import { env } from "@/lib/config/env";
 import { getToken } from "@/lib/utils/tokenUtils";
 
+// Schema para respuestas que incluyen PAGINACIÓN
+const PaginatedApiResponseSchema = z.object({
+  success: z.boolean(),
+  message: z.string(),
+  data: z.object({
+    // Utilizamos tagDbSchema para validar cada elemento de la lista
+    items: z.array(contactDbSchema),
+    total_count: z.number(),
+    paginate_info: z.object({
+      has_next: z.boolean(),
+      has_previous: z.boolean(),
+      next_cursor: z.string().nullable(),
+      prev_cursor: z.string().nullable(),
+    }),
+  }),
+});
+
+export type PaginatedApiResponse = z.infer<typeof PaginatedApiResponseSchema>;
+export type Contact = z.infer<typeof contactDbSchema>;
+export type ContactFormData = z.infer<typeof contactFormSchema>; // Tipo para la data de creación/actualización
+
+// Tipos para parámetros de la API
+export interface ContactsQueryParams {
+  limit?: number;
+  after?: string;
+  before?: string;
+  funnel_stage_id?: string;
+}
+
+// Error personalizado para manejar errores de autenticación
+export class AuthenticationError extends Error {
+  constructor(message: string = "No autenticado") {
+    super(message);
+    this.name = "AuthenticationError";
+  }
+}
+
+// Construir query string desde objeto
+function buildQueryString(params: ContactsQueryParams): string {
+  const searchParams = new URLSearchParams();
+  
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== '') {
+      searchParams.append(key, String(value));
+    }
+  });
+  
+  return searchParams.toString();
+}
+
 /**
- * Servicio para gestión de contactos
- * Endpoints: /api/contacts
+ * Obtener headers con autenticación
  */
-class ContactService {
-  private getHeaders(): HeadersInit {
-    const token = getToken();
-    return {
-      "Content-Type": "application/json",
-      ...(token && { Authorization: `Bearer ${token}` }),
+function getAuthHeaders(): HeadersInit {
+  const token = getToken();
+  
+  const headers: HeadersInit = {
+    "Content-Type": "application/json",
+  };
+
+  // Solo agregar Authorization si hay token
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  return headers;
+}
+
+// Cliente API
+export class ContactsApi {
+  private baseUrl: string;
+
+  constructor(baseUrl: string = env.apiUrl) {
+    this.baseUrl = baseUrl;
+  }
+
+  // Obtener lista de contactos
+  async getContacts(params: ContactsQueryParams = {}): Promise<PaginatedApiResponse['data']> {// AQUI TENEMOS CAMBIOS CON TAGS
+    const defaultParams: ContactsQueryParams = {
+      limit: params.limit ?? env.defaultLimit,
+      ...params,
     };
-  }
 
-  async getAll(): Promise<Contact[]> {
-    try {
-      const response = await fetch(`${API_CONFIG.baseURL}${API_CONFIG.endpoints.contacts.list}?limit=100`, {
-        method: "GET",
-        headers: this.getHeaders(),
-        signal: AbortSignal.timeout(API_CONFIG.timeout),
-      });
+    const queryString = buildQueryString(defaultParams);
+    const url = `${this.baseUrl}/api/contacts${queryString ? `?${queryString}` : ''}`;
 
-      if (!response.ok) {
-        const error: ApiError = await response.json();
-        throw new Error(error.message || "Error al obtener contactos");
-      }
+    const response = await fetch(url, {
+      method: "GET",
+      cache: "no-store",
+      headers: getAuthHeaders(), // ← Aquí se incluye el token
+    });
 
-      const data = await response.json();
-      return data.data.items || [];
-    } catch (error) {
-      console.error("Error al obtener contactos:", error);
-      throw error;
+    // Manejar error 401 (No autorizado)
+    if (response.status === 401) {
+      throw new AuthenticationError("Sesión expirada. Por favor, inicia sesión nuevamente.");
     }
-  }
 
-  async getById(id: string): Promise<Contact> {
-    try {
-      const response = await fetch(`${API_CONFIG.baseURL}${API_CONFIG.endpoints.contacts.update(id)}`, {
-        method: "GET",
-        headers: this.getHeaders(),
-        signal: AbortSignal.timeout(API_CONFIG.timeout),
-      });
-
-      if (!response.ok) {
-        const error: ApiError = await response.json();
-        throw new Error(error.message || "Error al obtener contacto");
-      }
-
-      const data: ApiResponse<Contact> = await response.json();
-      return data.data;
-    } catch (error) {
-      console.error("Error al obtener contacto:", error);
-      throw error;
+    if (!response.ok) {
+      throw new Error(`Error ${response.status}: ${response.statusText}`);
     }
-  }
 
-  async create(contactData: CreateContactDto): Promise<Contact> {
-    try {
-      const response = await fetch(`${API_CONFIG.baseURL}${API_CONFIG.endpoints.contacts.create}`, {
-        method: "POST",
-        headers: this.getHeaders(),
-        body: JSON.stringify(contactData),
-        signal: AbortSignal.timeout(API_CONFIG.timeout),
-      });
+    const json = await response.json();
+    const result = PaginatedApiResponseSchema.parse(json);
 
-      if (!response.ok) {
-        const error: ApiError = await response.json();
-        throw new Error(error.message || "Error al crear contacto");
-      }
-
-      const data: ApiResponse<Contact> = await response.json();
-      return data.data;
-    } catch (error) {
-      console.error("Error al crear contacto:", error);
-      throw error;
+    if (!result.success) {
+      throw new Error(result.message || "Error al obtener contactos");
     }
+
+    return result.data;
   }
 
-  async update(id: string, contactData: UpdateContactDto): Promise<Contact> {
-    try {
-      const response = await fetch(`${API_CONFIG.baseURL}${API_CONFIG.endpoints.contacts.update(id)}`, {
-        method: "PATCH",
-        headers: this.getHeaders(),
-        body: JSON.stringify(contactData),
-        signal: AbortSignal.timeout(API_CONFIG.timeout),
-      });
+  // Obtener contacto por ID
+  async getContactById(id: number | string): Promise<Contact> {
+    const url = `${this.baseUrl}/api/contacts/${id}`;
 
-      if (!response.ok) {
-        const error: ApiError = await response.json();
-        throw new Error(error.message || "Error al actualizar contacto");
-      }
+    const response = await fetch(url, {
+      method: "GET",
+      cache: "no-store",
+      headers: getAuthHeaders(),
+    });
 
-      const data: ApiResponse<Contact> = await response.json();
-      return data.data;
-    } catch (error) {
-      console.error("Error al actualizar contacto:", error);
-      throw error;
+    if (response.status === 401) {
+      throw new AuthenticationError("Sesión expirada. Por favor, inicia sesión nuevamente.");
     }
-  }
 
-  async delete(id: string): Promise<void> {
-    try {
-      const response = await fetch(`${API_CONFIG.baseURL}${API_CONFIG.endpoints.contacts.delete(id)}`, {
-        method: "DELETE",
-        headers: this.getHeaders(),
-        signal: AbortSignal.timeout(API_CONFIG.timeout),
-      });
-
-      if (!response.ok) {
-        const error: ApiError = await response.json();
-        throw new Error(error.message || "Error al eliminar contacto");
-      }
-    } catch (error) {
-      console.error("Error al eliminar contacto:", error);
-      throw error;
+    if (!response.ok) {
+      throw new Error(`Error ${response.status}: ${response.statusText}`);
     }
+
+    const json = await response.json();
+    return contactDbSchema.parse(json.data);
   }
 
-  async getConversations(contactId: string): Promise<ContactConversation[]> {
-    try {
-      const response = await fetch(
-        `${API_CONFIG.baseURL}/api/contacts/${contactId}/conversations?limit=100`,
-        {
-          method: "GET",
-          headers: this.getHeaders(),
-          signal: AbortSignal.timeout(API_CONFIG.timeout),
-        }
-      );
+  // Crear nuevo contacto
+  async createContact(contactData: ContactFormData): Promise<Contact> {
+    const url = `${this.baseUrl}/api/contacts`;
 
-      if (!response.ok) {
-        const error: ApiError = await response.json();
-        throw new Error(error.message || "Error al obtener conversaciones");
-      }
+    const response = await fetch(url, {
+      method: "POST",
+      headers: getAuthHeaders(),
+      body: JSON.stringify(contactData),
+    });
 
-      const data = await response.json();
-      // El backend retorna data.items en un objeto de paginación
-      return data.data.items || [];
-    } catch (error) {
-      console.error("Error al obtener conversaciones del contacto:", error);
-      throw error;
+    if (response.status === 401) {
+      throw new AuthenticationError("Sesión expirada. Por favor, inicia sesión nuevamente.");
+    }
+
+    if (!response.ok) {
+      throw new Error(`Error ${response.status}: ${response.statusText}`);
+    }
+
+    const json = await response.json();
+    return contactDbSchema.parse(json.data);
+  }
+
+  // Actualizar contacto
+  async updateContact(id: number | string, contactData: ContactFormData): Promise<Contact> {
+    const url = `${this.baseUrl}/api/contacts/${id}`;
+
+    const response = await fetch(url, {
+      method: "PUT",
+      headers: getAuthHeaders(),
+      body: JSON.stringify(contactData),
+    });
+
+    if (response.status === 401) {
+      throw new AuthenticationError("Sesión expirada. Por favor, inicia sesión nuevamente.");
+    }
+
+    if (!response.ok) {
+      throw new Error(`Error ${response.status}: ${response.statusText}`);
+    }
+
+    const json = await response.json();
+    return contactDbSchema.parse(json.data);
+  }
+
+  /**
+   * Eliminar contacto
+   */
+  async deleteContact(id: number | string): Promise<void> {
+    const url = `${this.baseUrl}/api/contacts/${id}`;
+
+    const response = await fetch(url, {
+      method: "DELETE",
+      headers: getAuthHeaders(),
+    });
+
+    if (response.status === 401) {
+      throw new AuthenticationError("Sesión expirada. Por favor, inicia sesión nuevamente.");
+    }
+
+    if (!response.ok) {
+      throw new Error(`Error ${response.status}: ${response.statusText}`);
     }
   }
 }
 
-export const contactService = new ContactService();
+// Instancia singleton
+export const contactsApi = new ContactsApi();
