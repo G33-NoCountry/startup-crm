@@ -97,7 +97,7 @@ export function ContactForm({ defaultValues, onSubmit, onCancel, isPending = fal
         {mode === "edit" && (
           <FormField
             control={form.control}
-            name="tags"
+            name="tags_id"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Etiquetas</FormLabel>

@@ -15,11 +15,11 @@ interface EditContactDialogProps {
 
 export function EditContactDialog({ contact, open, onOpenChange, onSuccess }: EditContactDialogProps) {
 
-  const handleSubmit = async (data: ContactFormData & { tags?: number[] }) => {
+  const handleSubmit = async (data: ContactFormData & { tags_id?: number[] }) => {
     try {
       const updatedContact = await contactsApi.updateContact(contact.id, {
       ...data,
-      tags: data.tags, // ← ya es number[]
+      tags_id: data.tags_id, // ← ya es number[]
     }); 
 
       toast.success("Contacto actualizado correctamente");
@@ -43,7 +43,7 @@ export function EditContactDialog({ contact, open, onOpenChange, onSuccess }: Ed
                 full_name: contact.full_name,
                 email: contact.email,
                 phone: contact.phone || "",
-                tags: contact.tags?.map(t => t.id) ?? [], // aquí convertimos a IDs
+                tags_id: contact.tags?.map(t => t.id) ?? [], // aquí convertimos a IDs
             }}
             onSubmit={handleSubmit}
             onCancel={() => onOpenChange(false)}

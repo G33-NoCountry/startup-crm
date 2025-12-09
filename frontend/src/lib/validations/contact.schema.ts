@@ -8,7 +8,7 @@ export const contactFormSchema = z.object({
   full_name: nameSchema,
   email: emailSchema,
   phone: phoneSchema,
-  tags: z.array(z.number()).optional().default([]),
+  tags_id: z.array(z.number()).optional().default([]),
 })
 
 export type ContactFormData = z.infer<typeof contactFormSchema>
