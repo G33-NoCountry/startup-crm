@@ -2,10 +2,11 @@ import { IConversationRepository } from "../interfaces/conversation.interface";
 import { IPaginate } from "../interfaces/paginate.interface";
 import { Conversation } from "../models";
 import { toPaginate } from "../utils/paginate";
+import { FindOptions } from "sequelize";
 
 export class ConversationRepository implements IConversationRepository {
-    async findById(id: number) {
-        return Conversation.findByPk(id);
+    async findById(id: number, options?: FindOptions) {
+        return Conversation.findByPk(id, options);
     }
 
     async findAll(

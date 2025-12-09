@@ -11,9 +11,11 @@ export class MessageService {
 
   public async getMessagesByConversations(
     limit: number | undefined,
-    where?: any,
+    after?: string,  
+    before?: string, 
+    where?: any      
   ) {
-    return this.messageRepository.findAllPaginate(limit, undefined, undefined, undefined, where);
+    return this.messageRepository.findAllPaginate(limit, after, before, undefined, where);
   }
 
   public async create(data: any): Promise<Message | null> {

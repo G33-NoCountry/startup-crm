@@ -1,6 +1,8 @@
 import { PaginationConnection } from "sequelize-cursor-pagination";
 import { IMessageRepository } from "../interfaces/message.interface";
 import { Contact, Message, User } from "../models";
+import { IPaginate } from "../interfaces/paginate.interface";
+import { toPaginate } from "../utils/paginate";
 
 export class MessageRepository implements IMessageRepository {
     async findById(id: number) {
@@ -70,32 +72,27 @@ export class MessageRepository implements IMessageRepository {
         before?: string,
         include?: any,
         where?: any
-    ): Promise<any> {
+    ): Promise<IPaginate<Message> | null> {
         const result = await Message.paginate({
             limit,
             after,
             before,
+            include: include,
             attributes: Message.publicAttributes,
-            where: where,
-            order: [["created_at", "DESC"]],
+            where,
+            order: [['created_at', 'DESC']],
         });
-
-        const items = await this.resolveSender(result);
 
         if (!(result.edges.length > 0))
             return null;
 
-        return {
-            items: items,
-            paginate_info: {
-                has_next: result.pageInfo.hasNextPage,
-            },
-        };
+        const paginate = toPaginate<Message>(result);
+        return paginate;
     }
 
-    async create(data: any): Promise<Message | null> {
-        return Message.create(data);
-    }
+    // async create(data: any): Promise<Message | null> {
+    //     return Message.create(data);
+    // }
 
     async update(data: any): Promise<Message | null> {
         const result = await Message.update(data, {
@@ -111,4 +108,18 @@ export class MessageRepository implements IMessageRepository {
     async delete(message: Message): Promise<void> {
         return message.destroy();
     }
+
+    // Guardar un nuevo mensaje en la BD
+    async create(data: { conversation_id: number, user_id: number, content: string, channel: string }) {
+    return await Message.create(data as any);
+}
+
+    // (Opcional) Listar mensajes de una conversación
+    async findByConversation(conversationId: number) {
+    return await Message.findAll({
+        where: { conversation_id: conversationId },
+        order: [['created_at', 'ASC']]
+    });
+    }
+
 }
