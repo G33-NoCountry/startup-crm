@@ -79,7 +79,10 @@ export class ConversationController {
         : { conversation_id: conversationId };
 
       const messages = await this.messageService.getMessagesByConversations(
-        parsedLimit, where
+        parsedLimit, 
+        undefined,   
+        undefined,   
+        where
       );
 
       return response.status(200).json({
