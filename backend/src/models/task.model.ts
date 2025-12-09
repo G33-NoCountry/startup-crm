@@ -8,14 +8,16 @@ class Task extends Model {
     public deal_id!: number;
     public contact_id!: number;
     public title!: string;
+    public start_date!: Date;
     public due_date!: Date;
+    public color!: string;
     public status!: boolean;
     public deleted_at!: Date;
     public readonly created_at!: Date;
     public readonly updated_at!: Date;
 
     public static readonly publicAttributes: string[] = [
-        "id", "title", "due_date", "status", "user_id", "deal_id", "contact_id", "created_at", "updated_at"
+        "id", "title", "start_date", "due_date", "status", "color", "user_id", "deal_id", "contact_id", "created_at", "updated_at"
     ];
 
     declare static paginate: (options: PaginateOptions<Task>) => Promise<PaginationConnection<Task>>;
@@ -50,8 +52,16 @@ Task.init(
             type: DataTypes.STRING(255),
             allowNull: false,
         },
+        start_date: {
+            type: DataTypes.DATE,
+            allowNull: false,
+        },
         due_date: {
             type: DataTypes.DATE,
+            allowNull: false,
+        },
+        color: {
+            type: DataTypes.STRING(12),
             allowNull: false,
         },
         status: {
