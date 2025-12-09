@@ -19,7 +19,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors(corsConfig));
 
 app.use("/api", router);
-app.use('/api', testRouter);
+//app.use('/api', testRouter);
 
 app.use("/api/docs", swagger.serve,
     swagger.setup(swaggerConfig, {

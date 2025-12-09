@@ -1,10 +1,19 @@
 import { ITemplateRepository } from "../interfaces/template.interface";
 import { Template } from "../models";
 import { parseContent } from '../utils/placeholder.parser';
-export class TemplateService {
-  mailService: any;
+import { MailService } from './mail.service';
 
-  constructor(private templateRepository: ITemplateRepository) { }
+export class TemplateService {
+
+  private mailService: MailService;
+
+  // 2. MODIFICAR CONSTRUCTOR para aceptar e inicializar AMBAS dependencias
+  constructor(
+    private templateRepository: ITemplateRepository,
+    mailService: MailService // Acepta MailService
+  ) {
+    this.mailService = mailService; // Asigna el servicio inyectado
+  }
 
   public async getByPk(id: number) {
     return this.templateRepository.findById(id);
@@ -36,25 +45,15 @@ export class TemplateService {
     templateId: number,
     toEmail: string,
     subject: string,
-    contactData: any // Datos del contacto para el placeholder
+    contactData: any 
   ) {
-    // 1. Obtener la plantilla (asegúrate de que el método getByPk funcione)
     const template = await this.templateRepository.findById(templateId);
-
     if (!template) {
-      throw new Error(`Plantilla con ID ${templateId} no encontrada.`);
+      throw new Error(`Template with id ${templateId} not found`);
     }
 
-    // 2. Comprobación de canal (Asumo que el modelo Template tiene una propiedad 'channel')
-    if ((template as any).channel !== 'Email') {
-      throw new Error('La plantilla seleccionada no es de tipo Email.');
-    }
-
-    // 3. Parsear el contenido: [Contacto.Nombre] -> Valor real
-    // Aquí encapsulamos los datos bajo la clave 'Contacto' para que el parser funcione
     const parsedHtml = parseContent((template as any).content, { Contacto: contactData });
 
-    // 4. Enviar el correo
     return this.mailService.sendMail({
       to: toEmail,
       subject: subject,
