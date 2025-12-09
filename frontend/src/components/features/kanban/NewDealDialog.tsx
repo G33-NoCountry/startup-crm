@@ -14,10 +14,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { dealService } from "@/lib/api";
-import { contactService } from "@/lib/api";
+import { dealService, contactsApi } from "@/lib/api";
 import type { CreateDealDto, DealStage, DealPriority } from "@/types/deal.types";
-import type { Contact } from "@/types/contact.types";
+import type { Contact } from "@/lib/api/contactService";
 import { Loader2 } from "lucide-react";
 
 interface NewDealDialogProps {
@@ -65,8 +64,8 @@ export function NewDealDialog({ open, onOpenChange, onSuccess }: NewDealDialogPr
   const loadContacts = async () => {
     try {
       setLoadingContacts(true);
-      const data = await contactService.getAll();
-      setContacts(data);
+      const response = await contactsApi.getContacts();
+      setContacts(response.items);
     } catch (error) {
       console.error("Error al cargar contactos:", error);
       toast.error("Error al cargar contactos");
