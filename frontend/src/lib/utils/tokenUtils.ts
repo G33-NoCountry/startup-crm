@@ -74,7 +74,8 @@ export const decodeToken = (token: string): DecodedToken | null => {
         .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
         .join("")
     );
-    return JSON.parse(jsonPayload);
+    const decoded = JSON.parse(jsonPayload);
+    return decoded;
   } catch (error) {
     console.error("Error decodificando token:", error);
     return null;
@@ -90,7 +91,9 @@ export const isTokenExpired = (token: string): boolean => {
 
   // exp viene en segundos, Date.now() en milisegundos
   const currentTime = Date.now() / 1000;
-  return decoded.exp < currentTime;
+  const isExpired = decoded.exp < currentTime;
+  
+  return isExpired;
 };
 
 export const hasValidSession = (): boolean => {
