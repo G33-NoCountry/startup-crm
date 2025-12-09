@@ -33,7 +33,6 @@ export class ConversationController {
    *           minimum: 1
    *         description: id de la conversación
    *         example: 6
-   * 
    *       - in: query
    *         name: limit
    *         schema:
@@ -42,19 +41,17 @@ export class ConversationController {
    *         required: true
    *         description: Cantidad de resultados a devolver por página.
    *         example: 3
-   * 
    *       - in: query
    *         name: before
    *         schema:
    *           type: string
    *         required: false
-   *         description: Fecha a partir de la cual se obtendrán los mensajes anteriores. Debe estar en formato ISO 8601. Generalmente corresponde al `created_at` del mensaje más antiguo ya cargado.
+   *         description: Fecha a partir de la cual se obtendrán los mensajes anteriores.
    *         example: 2025-11-03T19:32:14.000Z
-   * 
    *     security:
    *       - bearerAuth: []
    *     responses:
-   *        200:
+   *       200:
    *         description: Mensajes obtenidos
    *         content:
    *           application/json:
@@ -69,37 +66,9 @@ export class ConversationController {
    *                   example: "Mensajes obtenidos!"
    *                 data:
    *                   $ref: '#/components/schemas/PaginateMessages'
-   *        400:
-   *         description: Solicitud inválida
-   *         content:
-   *           application/json:
-   *             schema:
-   *              $ref: '#/components/schemas/BadRequest'
-   *        401:
-   *         description: No autorizado
-   *         content:
-   *           application/json:
-   *             schema:
-   *              $ref: '#/components/schemas/Unauthorized'
-   *        403:
-   *         description: No tiene permisos
-   *         content:
-   *           application/json:
-   *             schema:
-   *              $ref: '#/components/schemas/Forbidden'
-   *        404:
-   *         description: No encontrado
-   *         content:
-   *           application/json:
-   *             schema:
-   *              $ref: '#/components/schemas/NotFound'
-   *        500:
+   *       500:
    *         description: Error interno del servidor
-   *         content:
-   *           application/json:
-   *             schema:
-   *               $ref: '#/components/schemas/InternalServerError'
-  */
+   */
   public getMessagesByConversation = async (request: Request, response: Response) => {
     try {
       const { limit, before } = request.query;
@@ -128,6 +97,101 @@ export class ConversationController {
 
   /**
    * @swagger
+   * /api/conversations/{id}/messages:
+   *   post:
+   *     summary: Enviar un mensaje (Email o WhatsApp)
+   *     description: Envía un mensaje a través del canal especificado y lo registra en la base de datos asociado a la conversación.
+   *     tags: [Conversations]
+   *     security:
+   *       - bearerAuth: []
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: integer
+   *           minimum: 1
+   *         description: ID de la conversación
+   *         example: 6
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             required:
+   *               - content
+   *               - channel
+   *             properties:
+   *               content:
+   *                 type: string
+   *                 description: Contenido del mensaje a enviar.
+   *                 example: "Hola, ¿podemos agendar una reunión?"
+   *               channel:
+   *                 type: string
+   *                 enum: [email, whatsapp]
+   *                 description: Canal de envío.
+   *                 example: "email"
+   *     responses:
+   *       201:
+   *         description: Mensaje enviado y registrado exitosamente
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: true
+   *                 message:
+   *                   type: string
+   *                   example: "Mensaje enviado y registrado."
+   *                 data:
+   *                   type: object
+   *                   description: Objeto del mensaje creado (puedes referenciar un esquema Message si lo tienes)
+   *       400:
+   *         description: Error de validación (contenido vacío o canal inválido)
+   *       404:
+   *         description: Conversación no encontrada
+   *       500:
+   *         description: Error interno del servidor
+   */
+  public sendMessage = async (request: Request, response: Response) => {
+    try {
+      const conversationId = parseInt(request.params.id);
+      const { content, channel } = request.body;
+
+      // Obtenemos el ID del usuario autenticado (Agente/Admin)
+      // Usamos 'as any' o una interfaz User si la tienes definida para acceder a .id
+      const user = (request as any).user;
+      const userId = user.id;
+
+      const message = await this.conversationService.sendMessage(
+        conversationId,
+        userId,
+        content,
+        channel
+      );
+
+      return response.status(201).json({
+        success: true,
+        message: "Mensaje enviado y registrado.",
+        data: message
+      });
+
+    } catch (error: any) {
+      // Manejo básico de errores HTTP según el mensaje del servicio
+      const statusCode = error.message.includes("no encontrada") || error.message.includes("no tiene") ? 404 : 500;
+
+      return response.status(statusCode).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  };
+
+  /**
+   * @swagger
    * /api/conversations/{id}/status:
    *   patch:
    *     summary: Actualizar el estado de una conversación
@@ -144,16 +208,14 @@ export class ConversationController {
    *           minimum: 1
    *         description: id de la conversación
    *         example: 6
-   * 
    *     requestBody:
    *       required: true
    *       content:
    *         application/json:
    *           schema:
    *             $ref: '#/components/schemas/UpdateStatusConversationRequest'
-   * 
    *     responses:
-   *        200:
+   *       200:
    *         description: Conversación actualizada
    *         content:
    *           application/json:
@@ -168,37 +230,13 @@ export class ConversationController {
    *                   example: "Conversación actualizada!"
    *                 data:
    *                   $ref: '#/components/schemas/FullConversation'
-   *        400:
+   *       400:
    *         description: Solicitud inválida
-   *         content:
-   *           application/json:
-   *             schema:
-   *              $ref: '#/components/schemas/BadRequest'
-   *        401:
-   *         description: No autorizado
-   *         content:
-   *           application/json:
-   *             schema:
-   *              $ref: '#/components/schemas/Unauthorized'
-   *        403:
-   *         description: No tiene permisos
-   *         content:
-   *           application/json:
-   *             schema:
-   *              $ref: '#/components/schemas/Forbidden'
-   *        404:
+   *       404:
    *         description: No encontrado
-   *         content:
-   *           application/json:
-   *             schema:
-   *              $ref: '#/components/schemas/NotFound'
-   *        500:
+   *       500:
    *         description: Error interno del servidor
-   *         content:
-   *           application/json:
-   *             schema:
-   *               $ref: '#/components/schemas/InternalServerError'
-  */
+   */
   public updateStatus = async (request: Request, response: Response) => {
     try {
       const body = request.body as UpdateStatusDto;

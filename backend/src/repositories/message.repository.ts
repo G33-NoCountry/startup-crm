@@ -93,9 +93,9 @@ export class MessageRepository implements IMessageRepository {
         };
     }
 
-    async create(data: any): Promise<Message | null> {
-        return Message.create(data);
-    }
+    // async create(data: any): Promise<Message | null> {
+    //     return Message.create(data);
+    // }
 
     async update(data: any): Promise<Message | null> {
         const result = await Message.update(data, {
@@ -111,4 +111,18 @@ export class MessageRepository implements IMessageRepository {
     async delete(message: Message): Promise<void> {
         return message.destroy();
     }
+
+    // Guardar un nuevo mensaje en la BD
+    async create(data: { conversation_id: number, user_id: number, content: string, channel: string }) {
+    return await Message.create(data as any);
+}
+
+    // (Opcional) Listar mensajes de una conversación
+    async findByConversation(conversationId: number) {
+    return await Message.findAll({
+        where: { conversation_id: conversationId },
+        order: [['created_at', 'ASC']]
+    });
+    }
+
 }

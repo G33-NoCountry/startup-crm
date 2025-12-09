@@ -12,14 +12,21 @@ import { acceptRoleMiddleware } from "../middlewares/check-role.middleware";
 import updateStatusConversationValidator from "../validators/conversation/update-status-conversation.validator";
 import { ConversationRepository } from "../repositories/conversation.repository";
 import { ConversationService } from "../services/conversation.service";
+import { MailService } from '../services/mail.service';
 
 const router = Router();
 
+const mailService = new MailService();
 const messageRepository = new MessageRepository;
 const conversationRepository = new ConversationRepository;
 const messageService = new MessageService(messageRepository);
-const conversationService = new ConversationService(conversationRepository);
+const conversationService = new ConversationService(
+    conversationRepository, 
+    messageRepository,      
+    mailService             
+);
 const conversationController = new ConversationController(conversationService, messageService);
+
 
 router.use(checkJwtMiddleware, acceptRoleMiddleware('Admin', 'Agente'));
 
@@ -37,6 +44,13 @@ router.patch('/:id/status',
     validateRequestMiddleware,
     recordExists(Conversation),
     conversationController.updateStatus
+);
+
+router.post(
+    '/:id/messages',
+    checkJwtMiddleware,
+    acceptRoleMiddleware('Admin', 'Agente'),
+    conversationController.sendMessage
 );
 
 export default router;
