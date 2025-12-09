@@ -29,5 +29,11 @@ export const updateUserValidator = [
     .if(validateEqualValue)
     .custom(validateEmail).withMessage(buildValidationMessage("email", "already_exists"))
   ,
+  body("avatar_color")
+    .optional()
+    .notEmpty().withMessage(buildValidationMessage("avatar_color", "required"))
+    .bail()
+    .isString().withMessage(buildValidationMessage("avatar_color", "string"))
+  ,
 
 ];
