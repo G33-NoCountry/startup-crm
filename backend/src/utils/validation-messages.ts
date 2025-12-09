@@ -10,6 +10,7 @@ export const buildValidationMessage = (
     const messages = {
         required: `El campo ${fieldLabel} es obligatorio.`,
         invalid_format: `El campo ${fieldLabel} no tiene un formato válido.`,
+        empty: `El campo ${fieldLabel} no puede estar vacío.`,
         enum: `El campo ${fieldLabel} debe ser uno de los siguientes valores: ${options?.enumValues?.join(", ")}.`,
         array: `El campo ${fieldLabel} debe ser un array.`,
         invalid: `El campo ${fieldLabel} no tiene un valor válido`,

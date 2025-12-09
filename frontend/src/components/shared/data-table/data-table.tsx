@@ -40,8 +40,8 @@ export function DataTable<TData, TValue>({
   columns,
   data,
   toolbar: Toolbar,
-  loading,
   emptyMessage = "No hay resultados...",
+  loading,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
@@ -97,7 +97,8 @@ export function DataTable<TData, TValue>({
                 </TableRow>
               ))}
             </TableHeader>
-            <TableBody>{loading ? (
+            <TableBody>
+              {loading ? (
                 // 1. ESTADO DE CARGA (Loading)
                 <TableRow>
                   <TableCell

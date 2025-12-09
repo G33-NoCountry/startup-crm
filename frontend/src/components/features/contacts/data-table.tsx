@@ -1,1 +1,0 @@
-export { DataTable } from "@/components/shared/data-table/data-table";

@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { DealService } from "../services/deal.service";
+import { AssignDealDto } from "../dto/deal/assign-deal.dto";
 
 export class DealController {
     private dealService: DealService;
@@ -167,6 +168,94 @@ export class DealController {
                 data: newDeal.toJSON()
             });
 
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    /**
+     * @swagger
+     * /api/deals/{id}/assign-agent:
+     *   patch:
+     *     summary: Asignar agente
+     *     description: Asigna un `deal` a un `usuario`
+     *     tags: [Deals]
+     *     security:
+     *       - bearerAuth: []
+     *     parameters:
+     *       - in: path
+     *         name: id
+     *         required: true
+     *         example: 2
+     *         schema:
+     *           type: integer
+     *           minimum: 1
+     *         description: id de la Deal
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             $ref: '#/components/schemas/DealAssignRequest'
+     *     responses:
+     *        201:
+     *         description: Deal asignado exitosamente
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 success:
+     *                   type: boolean
+     *                   example: true
+     *                 message:
+     *                   type: string
+     *                   example: "Deal asignado exitosamente!"
+     *                 data:
+     *                   $ref: '#/components/schemas/FullDeal'
+     *        400:
+     *         description: Solicitud inválida
+     *         content:
+     *           application/json:
+     *             schema:
+     *              $ref: '#/components/schemas/BadRequest'
+     *        401:
+     *         description: No autorizado
+     *         content:
+     *           application/json:
+     *             schema:
+     *              $ref: '#/components/schemas/Unauthorized'
+     *        403:
+     *         description: No tiene permisos
+     *         content:
+     *           application/json:
+     *             schema:
+     *              $ref: '#/components/schemas/Forbidden'
+     *        404:
+     *         description: No encontrado
+     *         content:
+     *           application/json:
+     *             schema:
+     *              $ref: '#/components/schemas/NotFound'
+     *        500:
+     *         description: Error interno del servidor
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/InternalServerError'
+     */
+    public assignToAgent = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const { id } = req.params;
+            const dto = req.body as AssignDealDto;
+            dto.deal_id = parseInt(id);
+            const dealUpdated = await this.dealService.assignDeal(dto);
+
+            return res.status(200).json({
+                success: true,
+                message: "Deal asignado exitosamente!",
+                data: dealUpdated.toJSON()
+            });
         } catch (error) {
             next(error);
         }

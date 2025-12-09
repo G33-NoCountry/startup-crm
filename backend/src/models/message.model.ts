@@ -8,11 +8,22 @@ class Message extends Model {
     public sender_type!: "User" | "Contact";
     public sender_id!: number;
     public content!: string;
+
+    // 🟢 1. AGREGAR LA PROPIEDAD DE CLASE
+    public channel!: "email" | "whatsapp";
+
     public readonly created_at!: Date;
     public readonly updated_at!: Date;
 
     public static readonly publicAttributes: string[] = [
-        "id", "conversation_id", "sender_type", "sender_id", "content", "created_at", "updated_at"
+        "id",
+        "conversation_id",
+        "sender_type",
+        "sender_id",
+        "content",
+        "channel", 
+        "created_at",
+        "updated_at"
     ];
 
     declare static paginate: (options: PaginateOptions<Message>) => Promise<PaginationConnection<Message>>;
@@ -38,6 +49,11 @@ Message.init(
         content: {
             type: DataTypes.TEXT,
             allowNull: false,
+        },
+        channel: {
+            type: DataTypes.ENUM("email", "whatsapp"),
+            allowNull: false,
+            defaultValue: "email" 
         },
     },
     {

@@ -51,7 +51,7 @@ class DealService {
       };
 
       deals.forEach((deal) => {
-        if (pipeline[deal.stage]) {
+        if (deal.stage && pipeline[deal.stage]) {
           pipeline[deal.stage].push(deal);
         }
       });
@@ -107,12 +107,12 @@ class DealService {
     }
   }
 
-  async moveStage(id: string, stageData: MoveDealStageDto): Promise<Deal> {
+  async moveStage(id: string | number, stageId: number): Promise<Deal> {
     try {
       const response = await fetch(`${API_CONFIG.baseURL}/api/deals/${id}/funnel-stage`, {
         method: "PUT",
         headers: this.getHeaders(),
-        body: JSON.stringify(stageData),
+        body: JSON.stringify({ funnel_stage_id: stageId }),
         signal: AbortSignal.timeout(API_CONFIG.timeout),
       });
 

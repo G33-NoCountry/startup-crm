@@ -65,7 +65,7 @@ export default {
             data: {
                 type: "array",
                 items: {
-                    $ref: "#/components/schemas/DealKanbanItem" 
+                    $ref: "#/components/schemas/DealKanbanItem"
                 }
             }
         }
@@ -102,5 +102,64 @@ export default {
                 $ref: "#/components/schemas/DealKanbanItem"
             }
         }
-    }
+    },
+
+    DealAssignRequest: {
+        type: "object",
+        properties: {
+            contact_id: {
+                type: "integer",
+                example: 2,
+                description: "ID del usuario existente al que se asocia este deal."
+            },
+        },
+        required: ["user_id"],
+    },
+    FullDeal: {
+        type: "object",
+        properties: {
+            id: {
+                type: "integer",
+                example: 101,
+                description: "ID único del deal"
+            },
+            title: {
+                type: "string",
+                example: "Venta Licencia Enterprise",
+                description: "Nombre de la oportunidad"
+            },
+            value: {
+                type: "number",
+                format: "float",
+                example: 1500.00,
+                description: "Valor monetario estimado"
+            },
+            contact_id: {
+                type: "integer",
+                example: 2,
+                description: "ID único del contacto asociado al deal"
+            },
+            funnel_stage_id: {
+                type: "integer",
+                example: 2,
+                description: "ID único del estado asociado al deal"
+            },
+            user_id: {
+                type: "integer",
+                example: 5,
+                description: "ID único del usuario asociado al deal"
+            },
+            created_at: {
+                type: "string",
+                format: "date-time",
+                example: "2024-11-25T14:30:00Z"
+            },
+            updated_at: {
+                type: "string",
+                format: "date-time",
+                example: "2024-11-25T14:30:00Z"
+            },
+
+        }
+    },
 };
