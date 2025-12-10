@@ -3,6 +3,7 @@ import type { User, LoginCredentials, AuthError } from "@/types/auth.types";
 import { authService } from "@/lib/api/authService";
 import {
   saveToken,
+  saveRefreshToken,
   getToken,
   saveUser,
   getUser,
@@ -54,6 +55,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       const response = await authService.login(credentials);
 
       saveToken(response.data.access_token);
+      saveRefreshToken(response.data.refresh_token);
       saveUser(response.data.user);
 
       set({
@@ -128,6 +130,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
 
   checkAuth: () => {
+    set({ isLoading: true });
+    
     const token = getToken();
     const user = getUser() as User | null;
 
@@ -136,6 +140,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         user,
         token,
         isAuthenticated: true,
+        isLoading: false,
       });
     } else {
       clearAuthData();
@@ -143,6 +148,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         user: null,
         token: null,
         isAuthenticated: false,
+        isLoading: false,
       });
     }
   },
