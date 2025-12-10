@@ -1,8 +1,14 @@
 import { useCalendarContext } from '../../calendar-context'
 import { isSameMonth } from 'date-fns'
+import { CalendarEvent } from '@/types/calendar.types'
 
-export default function CalendarHeaderDateBadge() {
-  const { events, date } = useCalendarContext()
+export default function CalendarHeaderDateBadge(
+{
+  events, // Aceptamos events como prop
+}: {
+  events: CalendarEvent[]
+}) {
+  const { date } = useCalendarContext()
   const monthEvents = events.filter((event) => isSameMonth(event.start, date))
 
   if (!monthEvents.length) return null

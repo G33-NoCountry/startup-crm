@@ -3,10 +3,17 @@ import { isSameDay } from 'date-fns'
 import { hours } from './calendar-body-margin-day-margin'
 import CalendarBodyHeader from '../calendar-body-header'
 import CalendarEvent from '../../calendar-event'
+import { CalendarEvent as CalendarEventType } from '@/types/calendar.types'
 
-export default function CalendarBodyDayContent({ date }: { date: Date }) {
-  const { events } = useCalendarContext()
+export default function CalendarBodyDayContent({
+  date,
+  events, // Aceptamos events como prop
+}: { 
+  date: Date
+  events: CalendarEventType[] // Definimos el tipo para events
+}) {
 
+  // Usamos events de la prop
   const dayEvents = events.filter((event) => isSameDay(event.start, date))
 
   return (
@@ -19,7 +26,8 @@ export default function CalendarBodyDayContent({ date }: { date: Date }) {
         ))}
 
         {dayEvents.map((event) => (
-          <CalendarEvent key={event.id} event={event} />
+          // Pasamos la lista COMPLETA de eventos a CalendarEvent (necesario para calcular solapamientos)
+          <CalendarEvent key={event.id} event={event} allEvents={events}/>
         ))}
       </div>
     </div>

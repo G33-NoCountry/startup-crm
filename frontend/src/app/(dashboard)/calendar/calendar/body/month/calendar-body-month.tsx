@@ -13,9 +13,10 @@ import {
 import { cn } from '@/lib/utils'
 import CalendarEvent from '../../calendar-event'
 import { AnimatePresence, motion } from 'framer-motion'
+import { CalendarEvent as CalendarEventType } from '@/types/calendar.types'
 
-export default function CalendarBodyMonth() {
-  const { date, events, setDate, setMode } = useCalendarContext()
+export default function CalendarBodyMonth({ events }: { events: CalendarEventType[] }) {
+  const { date, setDate, setMode } = useCalendarContext()
 
   // Get the first day of the month
   const monthStart = startOfMonth(date)
@@ -35,7 +36,9 @@ export default function CalendarBodyMonth() {
 
   const today = new Date()
 
+  //console.log("CALENDAR MONTH", events)
   // Filter events to only show those within the current month view
+  // Usamos events recibido por prop para filtrar
   const visibleEvents = events.filter(
     (event) =>
       isWithinInterval(event.start, {

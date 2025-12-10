@@ -1,9 +1,13 @@
 import { useCalendarContext } from '../../calendar-context'
 import { isSameDay } from 'date-fns'
+import { CalendarEvent as CalendarEventType } from '@/types/calendar.types'
 
-export default function CalendarBodyDayEvents() {
-  const { events, date, setManageEventDialogOpen, setSelectedEvent } =
-    useCalendarContext()
+export default function CalendarBodyDayEvents({
+  events,
+}: {
+  events: CalendarEventType[]
+}) {
+  const { date, setManageEventDialogOpen, setSelectedEvent } = useCalendarContext()
   const dayEvents = events.filter((event) => isSameDay(event.start, date))
 
   return !!dayEvents.length ? (

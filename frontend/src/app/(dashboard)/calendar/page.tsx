@@ -2,7 +2,6 @@
 
 import {
   Card,
-  CardAction,
   CardContent,
   CardDescription,
   CardHeader,
@@ -11,11 +10,9 @@ import {
 
 import { useState } from 'react'
 import Calendar from './calendar/calendar'
-import { CalendarEvent, Mode } from './calendar/calendar-types'
-import { generateMockEvents } from './calendar/mock-calendar-events'
+import { Mode } from '@/types/calendar.types'
 
 export default function CalendarPage() {
-    const [events, setEvents] = useState<CalendarEvent[]>(generateMockEvents())
     const [mode, setMode] = useState<Mode>('month')
     const [date, setDate] = useState<Date>(new Date())
 
@@ -30,8 +27,6 @@ export default function CalendarPage() {
             </CardHeader>
             <CardContent>
                 <Calendar
-                    events={events}
-                    setEvents={setEvents}
                     mode={mode}
                     setMode={setMode}
                     date={date}

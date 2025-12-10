@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import { z } from 'zod'
 import { useEffect } from 'react'
 import {
   Dialog,
@@ -35,32 +34,12 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 
-const formSchema = z
-  .object({
-    title: z.string().min(1, 'Titulo es requerido'),
-    start: z.string().refine((val) => !isNaN(Date.parse(val)), {
-      message: 'Fecha de inicio es requerida',
-    }),
-    end: z.string().refine((val) => !isNaN(Date.parse(val)), {
-      message: 'Fecha de finalización es requerida',
-    }),
-    color: z.string(),
-  })
-  .refine(
-    (data) => {
-      try {
-        const start = new Date(data.start)
-        const end = new Date(data.end)
-        return end >= start
-      } catch {
-        return false
-      }
-    },
-    {
-      message: 'La fecha final debe ser mayor a la fecha inicial',
-      path: ['end'],
-    }
-  )
+import { calendarEventFormSchema, CalendarEventFormValues } from '@/lib/validations/calendar.schema'
+import { useUpdateCalendarEvent, useDeleteCalendarEvent } from '@/hooks/use-calendar-events'
+import { toast } from 'sonner'
+
+// Usamos el esquema importado y su tipo
+const formSchema = calendarEventFormSchema
 
 export default function CalendarManageEventDialog() {
   const {
@@ -68,11 +47,13 @@ export default function CalendarManageEventDialog() {
     setManageEventDialogOpen,
     selectedEvent,
     setSelectedEvent,
-    events,
-    setEvents,
   } = useCalendarContext()
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  // Usamos los hooks de mutación
+  const updateMutation = useUpdateCalendarEvent()
+  const deleteMutation = useDeleteCalendarEvent()
+
+  const form = useForm<CalendarEventFormValues>({ // Usamos el tipo importado
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: '',
@@ -86,6 +67,7 @@ export default function CalendarManageEventDialog() {
     if (selectedEvent) {
       form.reset({
         title: selectedEvent.title,
+        // Convertimos Date a string para el formulario
         start: format(selectedEvent.start, "yyyy-MM-dd'T'HH:mm"),
         end: format(selectedEvent.end, "yyyy-MM-dd'T'HH:mm"),
         color: selectedEvent.color,
@@ -93,36 +75,49 @@ export default function CalendarManageEventDialog() {
     }
   }, [selectedEvent, form])
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    if (!selectedEvent) return
-
-    const updatedEvent = {
-      ...selectedEvent,
-      title: values.title,
-      start: new Date(values.start),
-      end: new Date(values.end),
-      color: values.color,
-    }
-
-    setEvents(
-      events.map((event) =>
-        event.id === selectedEvent.id ? updatedEvent : event
-      )
-    )
-    handleClose()
-  }
-
-  function handleDelete() {
-    if (!selectedEvent) return
-    setEvents(events.filter((event) => event.id !== selectedEvent.id))
-    handleClose()
-  }
-
   function handleClose() {
     setManageEventDialogOpen(false)
     setSelectedEvent(null)
     form.reset()
   }
+
+  function onSubmit(values: CalendarEventFormValues) {
+    if (!selectedEvent) return
+
+    // Llamada a la mutación de actualización
+    updateMutation.mutate({
+      id: selectedEvent.id,
+      data: values
+    }, {
+        onSuccess: () => {
+            toast.success('Evento actualizado con éxito')
+            handleClose()
+        },
+        onError: (error) => {
+            // console.error(error)
+            toast.error('Error al actualizar el evento')
+        }
+    })
+  }
+
+  function handleDelete() {
+    if (!selectedEvent) return
+    
+    // Llamada a la mutación de eliminación
+    deleteMutation.mutate(selectedEvent.id, {
+        onSuccess: () => {
+          toast.success('Evento eliminado con éxito')
+          handleClose()
+        },
+        onError: (error) => {
+          // console.error(error)
+          toast.error('Error al eliminar el evento')
+        }
+    })
+  }
+
+  // Deshabilita botones mientras se ejecuta una mutación
+  const isMutating = updateMutation.isPending || deleteMutation.isPending
 
   return (
     <Dialog open={manageEventDialogOpen} onOpenChange={handleClose}>
@@ -191,8 +186,8 @@ export default function CalendarManageEventDialog() {
             <DialogFooter className="flex justify-between gap-2">
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button variant="destructive" type="button">
-                    Eliminar
+                  <Button variant="destructive" type="button" disabled={isMutating}>
+                    {deleteMutation.isPending ? 'Eliminando...' : 'Eliminar'}
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
@@ -204,13 +199,15 @@ export default function CalendarManageEventDialog() {
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleDelete}>
-                      Eliminar evento
+                    <AlertDialogAction onClick={handleDelete} disabled={deleteMutation.isPending}>
+                        {deleteMutation.isPending ? 'Eliminando...' : 'Eliminar evento'}
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
-              <Button type="submit">Actualizar evento</Button>
+              <Button type="submit" disabled={isMutating}>
+                {updateMutation.isPending ? 'Actualizando...' : 'Actualizar evento'}
+              </Button>
             </DialogFooter>
           </form>
         </Form>

@@ -1,4 +1,4 @@
-import { CalendarEvent as CalendarEventType } from './calendar-types'
+import { CalendarEvent as CalendarEventType } from '@/types/calendar.types'
 import { useCalendarContext } from './calendar-context'
 import { format, isSameDay, isSameMonth } from 'date-fns'
 import { cn } from '@/lib/utils'
@@ -64,14 +64,16 @@ export default function CalendarEvent({
   event,
   month = false,
   className,
+  allEvents, // Aceptamos la lista COMPLETA de eventos como prop
 }: {
   event: CalendarEventType
   month?: boolean
   className?: string
+  allEvents?: CalendarEventType[] // Hacemos que allEvents sea opcional (solo se necesita en modo día/semana)
 }) {
-  const { events, setSelectedEvent, setManageEventDialogOpen, date } =
+  const { setSelectedEvent, setManageEventDialogOpen, date } =
     useCalendarContext()
-  const style = month ? {} : calculateEventPosition(event, events)
+    const style = month || !allEvents ? {} : calculateEventPosition(event, allEvents)
 
   // Generate a unique key that includes the current month to prevent animation conflicts
   const isEventInCurrentMonth = isSameMonth(event.start, date)

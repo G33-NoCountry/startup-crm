@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { cn } from '@/lib/utils'
-import { colorOptions } from '../calendar/calendar-tailwind-classes'
+import { colorOptions } from '@/lib/constants/calendar-colors'
 
 interface ColorPickerProps {
   field: {
@@ -24,7 +24,7 @@ export function ColorPicker({ field }: ColorPickerProps) {
           id={color.value}
           className={cn(
             'size-6 border-0 shadow-none transition-all duration-200',
-            `bg-${color.value}-500`
+            `bg-${color.value}-300`
           )}
           aria-label={color.label}
         />

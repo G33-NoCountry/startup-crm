@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import { z } from 'zod'
 import {
   Dialog,
   DialogContent,
@@ -22,30 +21,22 @@ import { format } from 'date-fns'
 import { DateTimePicker } from '../../form/date-time-picker'
 import { ColorPicker } from '../../form/color-picker'
 
-const formSchema = z
-  .object({
-    title: z.string().min(1, 'Titulo es requerido'),
-    start: z.string().datetime(),
-    end: z.string().datetime(),
-    color: z.string(),
-  })
-  .refine(
-    (data) => {
-      const start = new Date(data.start)
-      const end = new Date(data.end)
-      return end >= start
-    },
-    {
-      message: 'La fecha final debe ser mayor a la fecha inicial',
-      path: ['end'],
-    }
-  )
+
+import { calendarEventFormSchema, CalendarEventFormValues } from '@/lib/validations/calendar.schema'
+import { useCreateCalendarEvent } from '@/hooks/use-calendar-events'
+import { toast } from 'sonner'
+
+// Usamos el esquema importado y su tipo
+const formSchema = calendarEventFormSchema
 
 export default function CalendarNewEventDialog() {
-  const { newEventDialogOpen, setNewEventDialogOpen, date, events, setEvents } =
+  const { newEventDialogOpen, setNewEventDialogOpen, date } =
     useCalendarContext()
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  // Usamos el hook de mutación
+  const createMutation = useCreateCalendarEvent()
+
+  const form = useForm<CalendarEventFormValues>({ // 👈 Usamos el tipo importado
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: '',
@@ -55,18 +46,18 @@ export default function CalendarNewEventDialog() {
     },
   })
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    const newEvent = {
-      id: crypto.randomUUID(),
-      title: values.title,
-      start: new Date(values.start),
-      end: new Date(values.end),
-      color: values.color,
-    }
-
-    setEvents([...events, newEvent])
-    setNewEventDialogOpen(false)
-    form.reset()
+  function onSubmit(values: CalendarEventFormValues) {
+    createMutation.mutate(values, {
+        onSuccess: () => {
+            toast.success('Evento creado con éxito')
+            setNewEventDialogOpen(false)
+            form.reset()
+        },
+        onError: (error) => {
+            // console.error(error)
+            toast.error('Error al crear el evento')
+        }
+    })
   }
 
   return (
@@ -134,7 +125,9 @@ export default function CalendarNewEventDialog() {
             />
 
             <div className="flex justify-end">
-              <Button type="submit">Crear evento</Button>
+              <Button type="submit" disabled={createMutation.isPending}>
+                {createMutation.isPending ? 'Creando...' : 'Crear evento'}
+              </Button>
             </div>
           </form>
         </Form>
