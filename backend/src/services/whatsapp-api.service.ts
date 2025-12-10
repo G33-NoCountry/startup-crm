@@ -7,9 +7,7 @@ export class WhatsAppApiService {
             messaging_product: "whatsapp",
             to: "54111522341558",
             type: "text",
-            text: {
-                body: data
-            }
+            text: { body: data }
         };
 
         const headers = {

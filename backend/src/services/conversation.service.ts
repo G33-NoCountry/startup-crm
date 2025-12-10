@@ -1,16 +1,15 @@
 import { IConversationRepository } from "../interfaces/conversation.interface";
-import { IMessageRepository } from "../interfaces/message.interface"; 
-import { MailService } from "./mail.service";
+import { IMessageRepository } from "../interfaces/message.interface";
 import { Conversation, Contact, Message } from "../models";
-import { WhatsAppApiService } from "./whatsapp-api.service";
+import { whatsAppQueue } from "../queues/whatsapp.queue";
+import { redisConfig } from "../config/redis.config";
+import { emailQueue } from "../queues/email.queue";
 
 export class ConversationService {
 
   constructor(
     private conversationRepository: IConversationRepository,
-    private messageRepository: IMessageRepository, 
-    private mailService: MailService,
-    private whatsAppService: WhatsAppApiService,
+    private messageRepository: IMessageRepository,
   ) { }
 
   public async getByPk(id: number) {
@@ -66,26 +65,25 @@ export class ConversationService {
         throw new Error("El contacto no tiene un correo electrónico registrado.");
       }
 
-      await this.mailService.sendMail({
-        to: contact.email, 
+      await emailQueue.add({
+        to: contact.email,
         subject: `Nuevo mensaje en la conversación #${conversation.id}`,
         html: `<p>${content}</p>`
-      });
+      }, redisConfig.options);
 
     } else if (channel === 'whatsapp') {
-      // Aquí iría la integración con Twilio/Meta.
-      // Por ahora validamos que tenga teléfono.
-      this.whatsAppService.sendMessage("Texto de prueba");
       if (!contact.phone) {
         throw new Error("El contacto no tiene un teléfono registrado.");
       }
-      console.log(`[WhatsApp Mock] Enviando a ${contact.phone}: ${content}`);
+      await whatsAppQueue.add(
+        { message: content }, redisConfig.options
+      );
     }
 
     const savedMessage = await this.messageRepository.create({
       conversation_id: conversationId,
-      sender_type: 'User', 
-      sender_id: userId,   
+      sender_type: 'User',
+      sender_id: userId,
       content: content,
       channel: channel
     });

@@ -16,10 +16,10 @@ import { ConversationRepository } from "../repositories/conversation.repository"
 import { ConversationService } from "../services/conversation.service";
 import { MailService } from "../services/mail.service";
 import { MessageRepository } from "../repositories/message.repository";
+import { WhatsAppApiService } from "../services/whatsapp-api.service";
 
 const router = Router();
 
-const mailService = new MailService();
 const messageRepository = new MessageRepository();
 
 const contactRepository = new ContactRepository;
@@ -28,7 +28,6 @@ const contactService = new ContactService(contactRepository);
 const conversationService = new ConversationService(
     conversationRepository,
     messageRepository,
-    mailService
 );
 
 const contactController = new ContactController(contactService, conversationService);

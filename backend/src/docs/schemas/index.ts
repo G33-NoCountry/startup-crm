@@ -18,6 +18,7 @@ import funnelStageSchema from "./models/funnel-stage/funnel-stage.schema";
 import funnelStageRequestSchema from "./request/funnel-stage.schema";
 import templateRequestSchema from "./request/template.schema";
 import templateSchema from "./models/template/template.schema";
+import messageSchema from "./models/message/message.schema";
 
 export default {
     ...authRequestSchemas,
@@ -39,5 +40,6 @@ export default {
     ...funnelStageSchema,
     ...funnelStageRequestSchema,
     ...templateRequestSchema,
-    ...templateSchema
+    ...templateSchema,
+    ...messageSchema
 };
