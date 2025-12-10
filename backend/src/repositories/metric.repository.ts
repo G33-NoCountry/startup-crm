@@ -85,7 +85,7 @@ export class MetricRepository implements IMetricRepository {
     public async getTasksByStatus(status: boolean, userId: number): Promise<Task[]> {
         const pendingTasks = await Task.findAll(
             {
-                attributes: ["id", "title", "due_date"],
+                attributes: ["id", "title", "start_date", "due_date", "color"],
                 include: [{
                     model: Contact,
                     as: "contact",

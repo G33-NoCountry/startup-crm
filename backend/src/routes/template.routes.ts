@@ -10,11 +10,13 @@ import { validateParam } from "../validators/param/param.validator";
 import updateTemplateValidator from "../validators/template/update-template.validator";
 import { recordExists } from "../middlewares/model-exist.middleware";
 import { Template } from "../models";
+import { MailService } from '../services/mail.service';
 
 const router = Router();
 
 const templateRepository = new TemplateRepository;
-const templateService = new TemplateService(templateRepository);
+const mailService = new MailService();
+const templateService = new TemplateService(templateRepository, mailService);
 const templateController = new TemplateController(templateService);
 
 router.get("/",

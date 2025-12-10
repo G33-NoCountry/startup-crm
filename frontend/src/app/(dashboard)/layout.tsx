@@ -131,7 +131,7 @@ export default function DashboardLayout({
                 </SidebarContent>
             </Sidebar>
 
-            <SidebarInset>
+            <SidebarInset className="overflow-x-hidden">
                 <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center gap-2 border-b bg-white px-4 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
                     <div className="flex w-full items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
@@ -168,7 +168,7 @@ export default function DashboardLayout({
                     </div>
                 </header>
 
-                <div className="flex flex-1 flex-col gap-4 p-4 md:p-6">
+                <div className="flex flex-1 flex-col gap-4 p-4 md:p-6 mt-2 border-t rounded-[8px] bg-white overflow-x-hidden overflow-y-auto">
                     {children}
                 </div>
             </SidebarInset>

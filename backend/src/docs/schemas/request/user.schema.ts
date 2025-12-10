@@ -12,6 +12,11 @@ export default {
                 example: "example@mail.com",
                 format: "email",
                 description: "Email del usuario"
+            },
+            avatar_color: {
+                type: "string",
+                example: "sky",
+                description: "Color del avatar"
             }
         },
     },

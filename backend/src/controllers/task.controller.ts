@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { TaskService } from "../services/task.service";
-import { Deal, User } from "../models";
+import { User } from "../models";
 import { CreateTaskDto } from "../dto/task/create-task.dto";
 import { TaskResource } from "../resources/task/task.resource";
 import { UpdateTaskDto } from "../dto/task/update-task.dto";
@@ -93,17 +93,20 @@ export class TaskController {
     try {
       const { status, date_from, date_to } = request.query;
       const user = request.user as User;
+      let where: any = {
+        user_id: user.id,
+        status: status === "true",
+      };
+      if (date_from && date_to) {
+        where.due_date = {
+          [Op.gte]: new Date(date_from as string),
+          [Op.lte]: new Date(date_to as string)
+        }
+      }
 
       const tasks = await this.taskService.getTasks(
         undefined,
-        {
-          user_id: user.id,
-          status: status === "true",
-          due_date: {
-            [Op.gte]: new Date(date_from as string),
-            [Op.lte]: new Date(date_to as string)
-          }
-        },
+        where
       );
 
       return response.status(200).json({
@@ -224,7 +227,7 @@ export class TaskController {
    *             $ref: '#/components/schemas/UpdateTaskRequest'
    *     responses:
    *        201:
-   *         description: Task creada exitosamente
+   *         description: Task actualizada exitosamente
    *         content:
    *           application/json:
    *             schema:

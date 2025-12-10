@@ -36,4 +36,5 @@ export const phoneSchema = z
   .trim()
   .regex(/^[\d\s+()-]*$/, "Teléfono inválido (solo números, espacios, +, -, (), etc.)")
   .optional()
+  .nullable()
   .or(z.literal(""))
