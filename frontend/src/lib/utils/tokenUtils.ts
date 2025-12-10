@@ -1,6 +1,7 @@
 import type { DecodedToken } from "@/types/auth.types";
 
 const TOKEN_KEY = "auth_token";
+const REFRESH_TOKEN_KEY = "auth_refresh_token";
 const USER_KEY = "auth_user";
 
 
@@ -35,6 +36,25 @@ export const removeToken = (): void => {
   }
 };
 
+export const saveRefreshToken = (token: string): void => {
+  if (typeof window !== "undefined") {
+    localStorage.setItem(REFRESH_TOKEN_KEY, token);
+  }
+};
+
+export const getRefreshToken = (): string | null => {
+  if (typeof window !== "undefined") {
+    return localStorage.getItem(REFRESH_TOKEN_KEY);
+  }
+  return null;
+};
+
+export const removeRefreshToken = (): void => {
+  if (typeof window !== "undefined") {
+    localStorage.removeItem(REFRESH_TOKEN_KEY);
+  }
+};
+
 export const saveUser = (user: unknown): void => {
   if (typeof window !== "undefined") {
     localStorage.setItem(USER_KEY, JSON.stringify(user));
@@ -57,6 +77,7 @@ export const removeUser = (): void => {
 
 export const clearAuthData = (): void => {
   removeToken();
+  removeRefreshToken();
   removeUser();
 };
 
