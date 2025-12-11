@@ -6,8 +6,8 @@ import { Conversation } from "@/types/conversation.types";
 import { RecentChatsSection } from "@/components/features/conversations/recent-chats-section";
 import { RecentMailsSection } from "@/components/features/conversations/recent-mails-section";
 import { NewMessageModal } from "@/components/features/conversations/new-message-modal";
-import { contactsApi } from "@/lib/api/contactService";
 import { useRouter } from "next/navigation";
+import { mockConversations } from "@/lib/mocks/conversationsMock";
 
 export default function ConversationsPage() {
     const router = useRouter();
@@ -22,76 +22,22 @@ export default function ConversationsPage() {
     }, []);
 
     const loadConversations = async () => {
-        try {
-            setLoading(true);
-            setError(null);
-
-            const contactsData = await contactsApi.getContacts({ limit: 100 });
-            const allConversations: Conversation[] = [];
-
-            for (const contact of contactsData.items) {
-                try {
-                    const convData = await contactsApi.getConversations(contact.id);
-
-                    // Manejar tanto la estructura con "edges" como con "items"
-                    let conversations: any[] = [];
-
-                    if (convData?.edges && Array.isArray(convData.edges)) {
-                        // Estructura con edges (GraphQL style)
-                        conversations = convData.edges.map((edge: any) => edge.node);
-                    } else if (convData?.items && Array.isArray(convData.items)) {
-                        // Estructura con items (REST style)
-                        conversations = convData.items;
-                    }
-
-                    if (conversations.length > 0) {
-                        const convWithContact = conversations.map((conv: any) => ({
-                            ...conv,
-                            contact: {
-                                id: contact.id,
-                                full_name: contact.full_name,
-                                email: contact.email,
-                                phone: contact.phone,
-                            },
-                        }));
-                        allConversations.push(...convWithContact);
-                    }
-                } catch (error: any) {
-                    if (error?.response?.status !== 404) {
-                        console.error(`Error al cargar conversaciones del contacto ${contact.id}:`, error?.message || error);
-                    }
-                }
-            }
-
-            allConversations.sort((a, b) =>
-                new Date(b.last_interaction).getTime() - new Date(a.last_interaction).getTime()
-            );
-
-            const chats = allConversations
+        setLoading(true);
+        setError(null);
+        
+        setTimeout(() => {
+            const chats = mockConversations
                 .filter(c => c.channel === "whatsapp")
                 .slice(0, 4);
-
-            const mails = allConversations
+            
+            const mails = mockConversations
                 .filter(c => c.channel === "email")
                 .slice(0, 4);
 
-            console.log('📊 Conversaciones cargadas:', {
-                total: allConversations.length,
-                chatsCount: chats.length,
-                mailsCount: mails.length,
-                allConversations,
-                chatsData: chats,
-                mailsData: mails
-            });
-
             setRecentChats(chats);
             setRecentMails(mails);
-        } catch (error) {
-            console.error("Error al cargar conversaciones:", error);
-            setError("Error al cargar las conversaciones. Por favor, intenta de nuevo.");
-        } finally {
             setLoading(false);
-        }
+        }, 500);
     };
 
     const handleViewAllChats = () => {

@@ -38,22 +38,33 @@ export default function RegisterForm() {
         },
     });
 
-    async function onSubmit(data: RegisterFormData) {
-        console.log("🔥 onSubmit LLAMADO - Datos:", data);
-        console.log("🔥 Errores del form:", form.formState.errors);
+    async function handleRegister() {
+        const valores = form.getValues();
+        
+        if (!valores.fullName || !valores.email || !valores.password) {
+            toast.error("Por favor completa todos los campos");
+            return;
+        }
+        
+        if (valores.password !== valores.confirmPassword) {
+            toast.error("Las contraseñas no coinciden");
+            return;
+        }
+        
+        if (valores.password.length < 8) {
+            toast.error("La contraseña debe tener al menos 8 caracteres");
+            return;
+        }
         
         try {
             setIsLoading(true);
-            console.log("🔥 Llamando al API...");
             
             const response = await authService.register({
-                full_name: data.fullName,
-                email: data.email,
-                password: data.password,
-                password_confirmation: data.confirmPassword,
+                full_name: valores.fullName,
+                email: valores.email,
+                password: valores.password,
+                password_confirmation: valores.confirmPassword,
             } as any);
-
-            console.log("🔥 Respuesta del API:", response);
 
             if (response.success) {
                 saveToken(response.data.access_token);
@@ -67,18 +78,11 @@ export default function RegisterForm() {
                 }, 500);
             }
         } catch (error: any) {
-            console.error("❌ Error en registro:", error);
             toast.error(error?.message || "Error al crear la cuenta. Intenta de nuevo.");
         } finally {
             setIsLoading(false);
         }
     }
-    
-    console.log("🔍 Estado del form:", {
-        isValid: form.formState.isValid,
-        errors: form.formState.errors,
-        isDirty: form.formState.isDirty,
-    });
 
     return (
         <div className="">
@@ -94,7 +98,7 @@ export default function RegisterForm() {
                     </div>
                     <div className="space-y-4 pt-1">
                         <Form {...form}>
-                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                            <div className="space-y-4">
                                 <FormField
                                     control={form.control}
                                     name="fullName"
@@ -192,44 +196,17 @@ export default function RegisterForm() {
                                 />
 
                                 <Button 
-                                    type="submit" 
+                                    onClick={handleRegister}
                                     className="w-full font-medium" 
                                     variant="default" 
                                     size="default"
                                     disabled={isLoading}
+                                    type="button"
                                 >
                                     {isLoading ? "Creando cuenta..." : "Crear cuenta"}
                                 </Button>
-                            </form>
+                            </div>
                         </Form>
-                        
-                        <Button 
-                            onClick={async () => {
-                                console.log("🚀 PRUEBA DIRECTA - Sin validación");
-                                const valores = form.getValues();
-                                console.log("📋 Valores:", valores);
-                                
-                                if (!valores.fullName || !valores.email || !valores.password) {
-                                    toast.error("Por favor completa todos los campos");
-                                    return;
-                                }
-                                
-                                if (valores.password !== valores.confirmPassword) {
-                                    toast.error("Las contraseñas no coinciden");
-                                    return;
-                                }
-                                
-                                await onSubmit(valores as RegisterFormData);
-                            }}
-                            className="w-full font-medium bg-green-600 hover:bg-green-700" 
-                            variant="default" 
-                            size="default"
-                            disabled={isLoading}
-                            type="button"
-                        >
-                            {isLoading ? "Creando..." : "🧪 PRUEBA DIRECTA (Bypass validación)"}
-                        </Button>
-
 
                         <div className="text-center text-sm text-muted-foreground">
                             ¿Ya tienes una cuenta?{" "}
