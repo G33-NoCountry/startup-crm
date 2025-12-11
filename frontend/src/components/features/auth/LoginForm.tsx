@@ -172,15 +172,6 @@ export default function LoginForm() {
                 </Form>
 
                 <div className="space-y-4 mt-4">
-                    <Button 
-                        variant="outline" 
-                        className="w-full font-medium text-foreground bg-white hover:bg-slate-50 border-input" 
-                        type="button"
-                        disabled={isLoading}
-                    >
-                        Iniciar sesión con Google
-                    </Button>
-
                     <div className="text-center text-sm text-muted-foreground">
                         ¿Todavía no tienes una cuenta?{" "}
                         <a href="/register" className="font-medium text-primary hover:underline">

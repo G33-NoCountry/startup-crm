@@ -3,6 +3,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import {
     Form,
     FormControl,
@@ -15,13 +16,15 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { registerSchema, type RegisterFormData } from "@/lib/validations/auth.schema";
-
-
+import { authService } from "@/lib/api/authService";
+import { saveToken, saveRefreshToken, saveUser } from "@/lib/utils/tokenUtils";
+import { toast } from "sonner";
 
 export default function RegisterForm() {
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const router = useRouter();
 
     const form = useForm<RegisterFormData>({
         resolver: zodResolver(registerSchema),
@@ -35,13 +38,50 @@ export default function RegisterForm() {
         },
     });
 
-    async function onSubmit(data: RegisterFormData) {
-        setIsLoading(true);
-        console.log("Datos de registro:", data);
+    async function handleRegister() {
+        const valores = form.getValues();
+        
+        if (!valores.fullName || !valores.email || !valores.password) {
+            toast.error("Por favor completa todos los campos");
+            return;
+        }
+        
+        if (valores.password !== valores.confirmPassword) {
+            toast.error("Las contraseñas no coinciden");
+            return;
+        }
+        
+        if (valores.password.length < 8) {
+            toast.error("La contraseña debe tener al menos 8 caracteres");
+            return;
+        }
+        
+        try {
+            setIsLoading(true);
+            
+            const response = await authService.register({
+                full_name: valores.fullName,
+                email: valores.email,
+                password: valores.password,
+                password_confirmation: valores.confirmPassword,
+            } as any);
 
-        setTimeout(() => {
+            if (response.success) {
+                saveToken(response.data.access_token);
+                saveRefreshToken(response.data.refresh_token);
+                saveUser(response.data.user);
+                
+                toast.success("¡Cuenta creada exitosamente!");
+                
+                setTimeout(() => {
+                    router.push("/dashboard");
+                }, 500);
+            }
+        } catch (error: any) {
+            toast.error(error?.message || "Error al crear la cuenta. Intenta de nuevo.");
+        } finally {
             setIsLoading(false);
-        }, 1500);
+        }
     }
 
     return (
@@ -58,7 +98,7 @@ export default function RegisterForm() {
                     </div>
                     <div className="space-y-4 pt-1">
                         <Form {...form}>
-                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                            <div className="space-y-4">
                                 <FormField
                                     control={form.control}
                                     name="fullName"
@@ -156,25 +196,17 @@ export default function RegisterForm() {
                                 />
 
                                 <Button 
-                                    type="submit" 
+                                    onClick={handleRegister}
                                     className="w-full font-medium" 
                                     variant="default" 
                                     size="default"
                                     disabled={isLoading}
+                                    type="button"
                                 >
                                     {isLoading ? "Creando cuenta..." : "Crear cuenta"}
                                 </Button>
-                            </form>
+                            </div>
                         </Form>
-
-                        <Button 
-                            className="w-full font-medium text-foreground hover:bg-secondary/70 bg-white border" 
-                            size="default" 
-                            type="button"
-                            disabled={isLoading}
-                        >
-                            Continuar con Google
-                        </Button>
 
                         <div className="text-center text-sm text-muted-foreground">
                             ¿Ya tienes una cuenta?{" "}
