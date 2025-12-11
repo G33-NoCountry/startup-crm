@@ -199,6 +199,30 @@ export class ContactsApi {
       throw new Error(`Error ${response.status}: ${response.statusText}`);
     }
   }
+
+  /**
+   * Obtener conversaciones de un contacto
+   */
+  async getConversations(contactId: number | string, limit: number = 100): Promise<any> {
+    const url = `${this.baseUrl}/api/contacts/${contactId}/conversations?limit=${limit}`;
+
+    const response = await fetch(url, {
+      method: "GET",
+      cache: "no-store",
+      headers: getAuthHeaders(),
+    });
+
+    if (response.status === 401) {
+      throw new AuthenticationError("Sesión expirada. Por favor, inicia sesión nuevamente.");
+    }
+
+    if (!response.ok) {
+      throw new Error(`Error ${response.status}: ${response.statusText}`);
+    }
+
+    const json = await response.json();
+    return json.data;
+  }
 }
 
 // Instancia singleton

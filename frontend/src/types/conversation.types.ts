@@ -1,37 +1,67 @@
-export type ConversationStatus = "open" | "closed" | "pending";
-export type MessageType = "sent" | "received";
+// Tipos basados en el backend real
+export type ConversationChannel = "email" | "whatsapp";
+export type MessageSenderType = "User" | "Contact";
 
 export interface Conversation {
-  id: string;
-  contact_id: string;
-  subject: string;
-  status: ConversationStatus;
-  assigned_to?: string;
+  id: number;
+  contact_id: number;
+  status: boolean; // true = activa, false = inactiva
+  channel: ConversationChannel;
+  last_interaction: string;
   created_at: string;
   updated_at: string;
   contact?: {
-    id: string;
+    id: number;
     full_name: string;
     email: string;
-  };
-  assigned_user?: {
-    id: string;
-    full_name: string;
+    phone?: string;
   };
 }
 
 export interface Message {
-  id: string;
-  conversation_id: string;
-  type: MessageType;
+  id: number;
+  conversation_id: number;
+  sender_type: MessageSenderType;
+  sender_id: number;
   content: string;
-  sent_at: string;
-  sender?: {
-    id: string;
-    full_name: string;
+  channel: ConversationChannel;
+  created_at: string;
+  updated_at: string;
+}
+
+// DTOs para requests
+export interface UpdateConversationStatusDto {
+  status: boolean;
+}
+
+export interface SendMessageDto {
+  content: string;
+  channel: ConversationChannel;
+}
+
+// Response con paginación
+export interface PaginatedMessages {
+  edges: Array<{
+    cursor: string;
+    node: Message;
+  }>;
+  pageInfo: {
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+    startCursor: string;
+    endCursor: string;
   };
 }
 
-export interface UpdateConversationStatusDto {
-  status: ConversationStatus;
+export interface PaginatedConversations {
+  edges: Array<{
+    cursor: string;
+    node: Conversation;
+  }>;
+  pageInfo: {
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+    startCursor: string;
+    endCursor: string;
+  };
 }

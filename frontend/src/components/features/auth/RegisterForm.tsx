@@ -3,6 +3,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import {
     Form,
     FormControl,
@@ -15,13 +16,15 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { registerSchema, type RegisterFormData } from "@/lib/validations/auth.schema";
-
-
+import { authService } from "@/lib/api/authService";
+import { saveToken, saveRefreshToken, saveUser } from "@/lib/utils/tokenUtils";
+import { toast } from "sonner";
 
 export default function RegisterForm() {
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const router = useRouter();
 
     const form = useForm<RegisterFormData>({
         resolver: zodResolver(registerSchema),
@@ -36,13 +39,46 @@ export default function RegisterForm() {
     });
 
     async function onSubmit(data: RegisterFormData) {
-        setIsLoading(true);
-        console.log("Datos de registro:", data);
+        console.log("🔥 onSubmit LLAMADO - Datos:", data);
+        console.log("🔥 Errores del form:", form.formState.errors);
+        
+        try {
+            setIsLoading(true);
+            console.log("🔥 Llamando al API...");
+            
+            const response = await authService.register({
+                full_name: data.fullName,
+                email: data.email,
+                password: data.password,
+                password_confirmation: data.confirmPassword,
+            } as any);
 
-        setTimeout(() => {
+            console.log("🔥 Respuesta del API:", response);
+
+            if (response.success) {
+                saveToken(response.data.access_token);
+                saveRefreshToken(response.data.refresh_token);
+                saveUser(response.data.user);
+                
+                toast.success("¡Cuenta creada exitosamente!");
+                
+                setTimeout(() => {
+                    router.push("/dashboard");
+                }, 500);
+            }
+        } catch (error: any) {
+            console.error("❌ Error en registro:", error);
+            toast.error(error?.message || "Error al crear la cuenta. Intenta de nuevo.");
+        } finally {
             setIsLoading(false);
-        }, 1500);
+        }
     }
+    
+    console.log("🔍 Estado del form:", {
+        isValid: form.formState.isValid,
+        errors: form.formState.errors,
+        isDirty: form.formState.isDirty,
+    });
 
     return (
         <div className="">
@@ -166,15 +202,34 @@ export default function RegisterForm() {
                                 </Button>
                             </form>
                         </Form>
-
+                        
                         <Button 
-                            className="w-full font-medium text-foreground hover:bg-secondary/70 bg-white border" 
-                            size="default" 
-                            type="button"
+                            onClick={async () => {
+                                console.log("🚀 PRUEBA DIRECTA - Sin validación");
+                                const valores = form.getValues();
+                                console.log("📋 Valores:", valores);
+                                
+                                if (!valores.fullName || !valores.email || !valores.password) {
+                                    toast.error("Por favor completa todos los campos");
+                                    return;
+                                }
+                                
+                                if (valores.password !== valores.confirmPassword) {
+                                    toast.error("Las contraseñas no coinciden");
+                                    return;
+                                }
+                                
+                                await onSubmit(valores as RegisterFormData);
+                            }}
+                            className="w-full font-medium bg-green-600 hover:bg-green-700" 
+                            variant="default" 
+                            size="default"
                             disabled={isLoading}
+                            type="button"
                         >
-                            Continuar con Google
+                            {isLoading ? "Creando..." : "🧪 PRUEBA DIRECTA (Bypass validación)"}
                         </Button>
+
 
                         <div className="text-center text-sm text-muted-foreground">
                             ¿Ya tienes una cuenta?{" "}
