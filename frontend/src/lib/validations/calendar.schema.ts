@@ -8,6 +8,8 @@ export const calendarEventFormSchema = z
     start: z.string().min(1, 'Fecha de inicio es requerida'),
     end: z.string().min(1, 'Fecha de finalización es requerida'),
     color: z.string(),
+    contact_id: z.string().optional().nullable().transform(e => e === "" ? undefined : e),
+    deal_id: z.string().optional().nullable().transform(e => e === "" ? undefined : e),
   })
   .refine(
     (data) => {

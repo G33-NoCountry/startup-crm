@@ -4,6 +4,8 @@ export type CalendarEvent = {
   start: Date;
   end: Date;
   color: string; // Ejemplo: 'blue', 'red', etc.
+  contact_id?: string | number | null;
+  deal_id?: string | number | null;
 };
 
 // Tipo para la creación (las fechas vienen como string del formulario)

@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { ComboboxSelect } from '@/components/ui/combobox-select' 
 import { useCalendarContext } from '../calendar-context'
 import { format } from 'date-fns'
 import { DateTimePicker } from '../../form/date-time-picker'
@@ -36,6 +37,7 @@ import {
 
 import { calendarEventFormSchema, CalendarEventFormValues } from '@/lib/validations/calendar.schema'
 import { useUpdateCalendarEvent, useDeleteCalendarEvent } from '@/hooks/use-calendar-events'
+import { useContactsForSelect, useDealsForSelect } from '@/hooks/use-crm-data'
 import { toast } from 'sonner'
 
 // Usamos el esquema importado y su tipo
@@ -53,6 +55,10 @@ export default function CalendarManageEventDialog() {
   const updateMutation = useUpdateCalendarEvent()
   const deleteMutation = useDeleteCalendarEvent()
 
+  // Hooks para obtener datos de Combobox
+  const { data: contactOptions = [], isLoading: loadingContacts } = useContactsForSelect()
+  const { data: dealOptions = [], isLoading: loadingDeals } = useDealsForSelect()
+
   const form = useForm<CalendarEventFormValues>({ // Usamos el tipo importado
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -60,6 +66,8 @@ export default function CalendarManageEventDialog() {
       start: '',
       end: '',
       color: 'blue',
+      contact_id: undefined, 
+      deal_id: undefined,
     },
   })
 
@@ -71,6 +79,10 @@ export default function CalendarManageEventDialog() {
         start: format(selectedEvent.start, "yyyy-MM-dd'T'HH:mm"),
         end: format(selectedEvent.end, "yyyy-MM-dd'T'HH:mm"),
         color: selectedEvent.color,
+        // Si el ID es un número en selectedEvent, lo convertimos a string. 
+        // Si es null o undefined (o la propiedad no existe), debe ser undefined.
+        contact_id: selectedEvent.contact_id ? String(selectedEvent.contact_id) : undefined,
+        deal_id: selectedEvent.deal_id ? String(selectedEvent.deal_id) : undefined,
       })
     }
   }, [selectedEvent, form])
@@ -163,6 +175,52 @@ export default function CalendarManageEventDialog() {
                   <FormLabel className="font-bold">Fecha de finalización</FormLabel>
                   <FormControl>
                     <DateTimePicker field={field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Contacto Combobox */}
+            <FormField
+              control={form.control}
+              name="contact_id"
+              render={({ field }) => (
+                <FormItem className='flex flex-col gap-2 pt-2'>
+                  <FormLabel className="font-bold">Contacto (Opcional)</FormLabel>
+                  <FormControl>
+                    <ComboboxSelect
+                      options={contactOptions}
+                      // El valor debe ser string de ID o undefined para el Combobox.
+                      value={field.value || undefined} 
+                      onChange={(id) => field.onChange(id)}
+                      placeholder="Seleccionar contacto"
+                      loading={loadingContacts}
+                      disabled={isMutating}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Oportunidad (Deal) Combobox */}
+            <FormField
+              control={form.control}
+              name="deal_id"
+              render={({ field }) => (
+                <FormItem className='flex flex-col gap-2'>
+                  <FormLabel className="font-bold">Oportunidad (Opcional)</FormLabel>
+                  <FormControl>
+                    <ComboboxSelect
+                      options={dealOptions}
+                      // El valor debe ser string de ID o undefined para el Combobox.
+                      value={field.value || undefined}
+                      onChange={(id) => field.onChange(id)}
+                      placeholder="Seleccionar oportunidad"
+                      loading={loadingDeals}
+                      disabled={isMutating}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
