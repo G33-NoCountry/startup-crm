@@ -14,6 +14,8 @@ const taskApiSchema = z.object({
   due_date: z.string().datetime(), // Usaremos 'end' para el calendario
   color: z.string(), // Coincide con el tipo de color del calendario
   status: z.boolean(),
+  contact_id: z.number().int().nullable().optional(), 
+  deal_id: z.number().int().nullable().optional(),
 });
 
 // 2. Esquema de respuesta para la lista (sin paginación)
@@ -30,6 +32,17 @@ interface TasksQueryParams {
   status: boolean; // Requerido: debe ser true o false
   date_from?: string;
   date_to?: string;
+}
+
+// Tipo de dato para el payload de la API de creación/actualización de Tareas
+interface TaskApiPayload {
+  title: string;
+  start_date: string;
+  due_date: string;
+  color: string;
+  status: boolean;
+  contact_id?: number | null; // Acepta number para el ID o null para limpiar la relación
+  deal_id?: number | null; // Acepta number para el ID o null para limpiar la relación
 }
 
 // --- Funciones Auxiliares (como en contactService.ts) ---
@@ -69,6 +82,8 @@ function mapTaskToCalendarEvent(task: TaskApiData): CalendarEvent {
     start: new Date(task.start_date), // Convertir string ISO a objeto Date
     end: new Date(task.due_date), // Convertir string ISO a objeto Date
     color: task.color,
+    contact_id: task.contact_id,
+    deal_id: task.deal_id
   };
 }
 
@@ -126,14 +141,15 @@ export async function getCalendarEvents(context?: QueryContext): Promise<Calenda
     const json = await response.json();
     const result = TaskListApiResponseSchema.parse(json);
 
+    
     if (!result.success) {
       throw new Error(result.message || "Error al obtener tareas");
     }
-
+    
     return result.data.map(mapTaskToCalendarEvent); 
 
   } catch (error) {
-    console.error("Error en getCalendarEvents:", error);
+    //console.error("Error en getCalendarEvents:", error);
     throw error;
   }
 }
@@ -148,13 +164,21 @@ export async function createCalendarEvent(
   const url = API_TASK_URL;
   
   // Mapeo de CalendarEvent a Task API
-  const taskData = {
+  const taskData: TaskApiPayload = {
     title: data.title,
     start_date: new Date(data.start).toISOString(), // Usar ISO string
     due_date: new Date(data.end).toISOString(), // Usar ISO string
     color: data.color,
     status: true, // Asumimos que los nuevos eventos están activos
   };
+
+  // Agregar campos opcionales solo si están definidos
+  if (data.contact_id) {
+    taskData.contact_id = Number(data.contact_id);
+  }
+  if (data.deal_id) {
+    taskData.deal_id = Number(data.deal_id);
+  }
 
   const response = await fetch(url, {
     method: "POST",
@@ -186,13 +210,25 @@ export async function updateCalendarEvent(
   const url = `${API_TASK_URL}/${eventId}`;
   
   // Mapeo de CalendarEvent a Task API
-  const taskData = {
+  const taskData: TaskApiPayload = {
     title: data.title,
     start_date: new Date(data.start).toISOString(),
     due_date: new Date(data.end).toISOString(),
     color: data.color,
     status: true, // Mantenemos el status, o lo obtenemos de la tarea original si fuera necesario
   };
+
+  // Lógica para incluir/limpiar campos opcionales
+  
+  // Si contact_id viene definido, lo incluimos (como número o null si es string vacío para limpiar)
+  if (data.contact_id !== undefined) {
+      taskData.contact_id = data.contact_id ? Number(data.contact_id) : null;
+  }
+  
+  // Si deal_id viene definido, lo incluimos (como número o null si es string vacío para limpiar)
+  if (data.deal_id !== undefined) {
+      taskData.deal_id = data.deal_id ? Number(data.deal_id) : null;
+  }
 
   const response = await fetch(url, {
     method: "PATCH", // Usamos PATCH según tus rutas

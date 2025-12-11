@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { ComboboxSelect } from '@/components/ui/combobox-select' 
 import { useCalendarContext } from '../calendar-context'
 import { format } from 'date-fns'
 import { DateTimePicker } from '../../form/date-time-picker'
@@ -24,6 +25,7 @@ import { ColorPicker } from '../../form/color-picker'
 
 import { calendarEventFormSchema, CalendarEventFormValues } from '@/lib/validations/calendar.schema'
 import { useCreateCalendarEvent } from '@/hooks/use-calendar-events'
+import { useContactsForSelect, useDealsForSelect } from '@/hooks/use-crm-data'
 import { toast } from 'sonner'
 
 // Usamos el esquema importado y su tipo
@@ -35,6 +37,11 @@ export default function CalendarNewEventDialog() {
 
   // Usamos el hook de mutación
   const createMutation = useCreateCalendarEvent()
+  const isPending = createMutation.isPending
+
+  // Hooks para obtener datos de Combobox
+  const { data: contactOptions = [], isLoading: loadingContacts } = useContactsForSelect()
+  const { data: dealOptions = [], isLoading: loadingDeals } = useDealsForSelect()
 
   const form = useForm<CalendarEventFormValues>({ // 👈 Usamos el tipo importado
     resolver: zodResolver(formSchema),
@@ -43,6 +50,8 @@ export default function CalendarNewEventDialog() {
       start: format(date, "yyyy-MM-dd'T'HH:mm"),
       end: format(date, "yyyy-MM-dd'T'HH:mm"),
       color: 'blue',
+      contact_id: undefined, 
+      deal_id: undefined,
     },
   })
 
@@ -104,6 +113,52 @@ export default function CalendarNewEventDialog() {
                   <FormLabel className="font-bold">Fecha de finalización</FormLabel>
                   <FormControl>
                     <DateTimePicker field={field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Contacto Combobox */}
+            <FormField
+              control={form.control}
+              name="contact_id"
+              render={({ field }) => (
+                <FormItem className='flex flex-col gap-2 pt-2'> 
+                  <FormLabel className="font-bold">Contacto (Opcional)</FormLabel>
+                  <FormControl>
+                    <ComboboxSelect
+                      options={contactOptions}
+                      // El valor debe ser string de ID o undefined para el Combobox.
+                      value={field.value || undefined} 
+                      onChange={(id) => field.onChange(id)}
+                      placeholder="Seleccionar contacto"
+                      loading={loadingContacts}
+                      disabled={isPending}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Oportunidad (Deal) Combobox */}
+            <FormField
+              control={form.control}
+              name="deal_id"
+              render={({ field }) => (
+                <FormItem className='flex flex-col gap-2'>
+                  <FormLabel className="font-bold">Oportunidad (Opcional)</FormLabel>
+                  <FormControl>
+                    <ComboboxSelect
+                      options={dealOptions}
+                      // El valor debe ser string de ID o undefined para el Combobox.
+                      value={field.value || undefined}
+                      onChange={(id) => field.onChange(id)}
+                      placeholder="Seleccionar oportunidad"
+                      loading={loadingDeals}
+                      disabled={isPending}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
