@@ -49,14 +49,6 @@ export function DataTableRowActions<TData>({
           <Pencil className="mr-2 h-4 w-4" />
           Editar
         </DropdownMenuItem>
-        <DropdownMenuItem className="cursor-pointer hover:bg-accent" >
-          <UserCog className="mr-2 h-4 w-4" />
-          Modificar rol
-        </DropdownMenuItem>
-        <DropdownMenuItem className="cursor-pointer hover:bg-accent" >
-          <UserCog className="mr-2 h-4 w-4" />
-          Cambiar estado
-        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={() => setDeleteOpen(true)} className="cursor-pointer text-red-600 focus:text-red-600" >
           <Trash2 className="mr-2 h-4 w-4" />

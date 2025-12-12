@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { KanbanBoard, NewDealDialog } from "@/components/features/kanban";
 import { dealService } from "@/lib/api";
+import { funnelStageService, type FunnelStage } from "@/lib/api/funnelStageService";
 import type { Deal, DealStage } from "@/types/deal.types";
 import { toast } from "sonner";
 import { Plus, Search, Filter, Columns } from "lucide-react";
@@ -23,6 +24,7 @@ import { Badge } from "@/components/ui/badge";
 export default function KanbanPage() {
   const [deals, setDeals] = useState<Deal[]>([]);
   const [filteredDeals, setFilteredDeals] = useState<Deal[]>([]);
+  const [funnelStages, setFunnelStages] = useState<FunnelStage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isNewDialogOpen, setIsNewDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -30,13 +32,31 @@ export default function KanbanPage() {
   const [visibleColumns, setVisibleColumns] = useState<number[]>([1, 2, 3, 4, 5]);
 
   useEffect(() => {
-    loadDeals();
+    loadInitialData();
   }, []);
+
+  const loadInitialData = async () => {
+    try {
+      setIsLoading(true);
+      const [dealsData, stagesData] = await Promise.all([
+        dealService.getAll(),
+        funnelStageService.getAll()
+      ]);
+      
+      setDeals(dealsData);
+      setFilteredDeals(dealsData);
+      setFunnelStages(stagesData.sort((a, b) => a.sort_order - b.sort_order));
+    } catch (error) {
+      console.error("Error al cargar datos:", error);
+      toast.error("Error al cargar datos del kanban");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {    
     let filtered = [...deals];
     
-    // Filtro por búsqueda
     if (searchQuery.trim() !== "") {
       filtered = filtered.filter(
         (deal) =>
@@ -45,7 +65,6 @@ export default function KanbanPage() {
       );
     }
     
-    // Filtro por prioridad
     if (priorityFilter.length > 0) {
       const beforeFilter = filtered.length;
       filtered = filtered.filter(deal => {
@@ -58,52 +77,43 @@ export default function KanbanPage() {
   }, [searchQuery, deals, priorityFilter, visibleColumns]);
 
   const loadDeals = async () => {
-    try {
-      setIsLoading(true);
-      const data = await dealService.getAll();
-      
-      // Contar cuántos deals hay por prioridad
-      const priorityCount = data.reduce((acc, deal) => {
-        const priority = deal.priority || 'sin priority';
-        acc[priority] = (acc[priority] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>);
-      
-      setDeals(data);
-      setFilteredDeals(data);
-    } catch (error) {
-      console.error("Error al cargar oportunidades:", error);
-      toast.error("Error al cargar oportunidades");
-    } finally {
-      setIsLoading(false);
-    }
+    await loadInitialData();
   };
 
-  const STAGE_MAP: Record<number, { id: number; title: string; sort_order: number }> = {
-    1: { id: 1, title: "Prospección", sort_order: 1 },
-    2: { id: 2, title: "Calificación", sort_order: 2 },
-    3: { id: 3, title: "Propuesta", sort_order: 3 },
-    4: { id: 4, title: "Negociación", sort_order: 4 },
-    5: { id: 5, title: "Cierre", sort_order: 5 },
-  };
+  const stageIdByPosition = useMemo(() => {
+    const map = funnelStages.reduce((acc, stage) => {
+      if (stage.sort_order >= 1 && stage.sort_order <= 5) {
+        acc[stage.sort_order] = stage.id;
+      }
+      return acc;
+    }, {} as Record<number, number>);
+    
+    
+    return map;
+  }, [funnelStages]);
 
   const handleMoveStage = async (dealId: string | number, newStageId: number) => {
+
     const originalDeals = [...deals];
     const originalFilteredDeals = [...filteredDeals];
     
-    const newStage = STAGE_MAP[newStageId];
+    const newStage = funnelStages.find(s => s.id === newStageId);
+    if (!newStage) {
+      console.error('No se encontró la etapa con ID:', newStageId);
+      toast.error("Error: Etapa no encontrada");
+      return;
+    }
     
-    // Convertir dealId a string para comparación consistente (drag&drop siempre es string)
     const dealIdStr = String(dealId);
     
     const updatedDeals = deals.map((deal) =>
       String(deal.id) === dealIdStr
-        ? { ...deal, funnel_stage: { id: newStage.id, title: newStage.title, sort_order: newStage.sort_order, is_closed: false } }
+        ? { ...deal, funnel_stage: { id: newStage.id, title: newStage.title, sort_order: newStage.sort_order, is_closed: newStage.is_closed } }
         : deal
     );
     const updatedFilteredDeals = filteredDeals.map((deal) =>
       String(deal.id) === dealIdStr
-        ? { ...deal, funnel_stage: { id: newStage.id, title: newStage.title, sort_order: newStage.sort_order, is_closed: false } }
+        ? { ...deal, funnel_stage: { id: newStage.id, title: newStage.title, sort_order: newStage.sort_order, is_closed: newStage.is_closed } }
         : deal
     );
     
@@ -258,6 +268,7 @@ export default function KanbanPage() {
       <div className="flex-1 min-h-0 w-full">
         <KanbanBoard
           deals={filteredDeals}
+          stageIdByPosition={stageIdByPosition}
           onMoveStage={handleMoveStage}
           onDelete={handleDelete}
           visibleColumns={visibleColumns}

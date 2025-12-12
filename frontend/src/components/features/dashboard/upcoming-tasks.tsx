@@ -57,7 +57,7 @@ export function UpcomingTasks({ tasks, onManage }: UpcomingTasksProps) {
                         return (
                             <div
                                 key={task.id}
-                                className="flex items-start gap-3 rounded-lg border p-3 transition-colors hover:bg-accent"
+                                className="flex items-start gap-3 rounded-lg border p-3 transition-colors hover:bg-gray-50"
                             >
                                 <div
                                     className={cn(

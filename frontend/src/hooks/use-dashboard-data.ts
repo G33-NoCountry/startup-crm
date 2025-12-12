@@ -7,9 +7,9 @@ import type {
     Task,
     RecentConversation,
 } from "@/types/dashboard";
+import { dashboardService } from "@/lib/api/dashboardService";
+import { mockConversations } from "@/lib/mocks/conversationsMock";
 
-// Hook para simular el fetching de datos del dashboard
-// TODO: Reemplazar con React Query cuando los endpoints estén disponibles
 export function useDashboardData() {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
@@ -25,97 +25,111 @@ export function useDashboardData() {
         const fetchData = async () => {
             try {
                 setIsLoading(true);
-                await new Promise((resolve) => setTimeout(resolve, 1000));
+
+                const [metricsData, tasksData, funnelData] = await Promise.all([
+                    dashboardService.getMetrics(),
+                    dashboardService.getPendingTasks(),
+                    dashboardService.getFunnelProgress(),
+                ]);
+
+                const safeMetrics: DashboardMetrics = {
+                    activeLeads: metricsData?.activeLeads ?? 0,
+                    conversations: metricsData?.conversations ?? 0,
+                    conversationsToday: metricsData?.conversationsToday,
+                    conversionRate: metricsData?.conversionRate ?? 0,
+                    totalContacts: metricsData?.totalContacts ?? 0,
+                    activeLeadsTrend: metricsData?.activeLeadsTrend,
+                    conversationsTrend: metricsData?.conversationsTrend,
+                    conversionRateTrend: metricsData?.conversionRateTrend,
+                    totalContactsTrend: metricsData?.totalContactsTrend,
+                    pipelineValue: metricsData?.pipelineValue,
+                    monthSales: metricsData?.monthSales,
+                    dealsConversionRate: metricsData?.dealsConversionRate,
+                    avgDealValue: metricsData?.avgDealValue,
+                };
+
+                const tasksArray = Array.isArray(tasksData) ? tasksData : [];
+                
+                // Datos mock de respaldo para tareas si no hay datos del backend
+                const mockTasks: Task[] = [
+                    {
+                        id: "1",
+                        title: "Seguimiento con cliente potencial",
+                        client: "María González",
+                        dueDate: "15 dic, 14:00",
+                        priority: "high",
+                        type: "call",
+                    },
+                    {
+                        id: "2",
+                        title: "Enviar propuesta comercial",
+                        client: "Carlos Ramírez",
+                        dueDate: "16 dic, 10:30",
+                        priority: "medium",
+                        type: "call",
+                    },
+                    {
+                        id: "3",
+                        title: "Reunión de cierre",
+                        client: "Ana Martínez",
+                        dueDate: "18 dic, 16:00",
+                        priority: "high",
+                        type: "call",
+                    },
+                ];
+                
+                const mappedTasks: Task[] = tasksArray.length > 0
+                    ? tasksArray.slice(0, 3).map((task) => ({
+                        id: String(task.id),
+                        title: task.title,
+                        client: task.contact?.full_name || "Sin contacto",
+                        dueDate: new Date(task.due_date).toLocaleDateString("es-ES", {
+                            day: "numeric",
+                            month: "short",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                        }),
+                        priority: task.priority as "high" | "medium" | "low",
+                        type: "call",
+                      }))
+                    : mockTasks;
+
+                const funnelArray = Array.isArray(funnelData) ? funnelData : [];
+                
+                // Datos mock de respaldo para el gráfico si no hay datos del backend
+                const mockSalesData: SalesDataPoint[] = [
+                    { month: "Prospecto", value: 45 },
+                    { month: "Calificación", value: 32 },
+                    { month: "Propuesta", value: 18 },
+                    { month: "Negociación", value: 12 },
+                    { month: "Cerrado", value: 8 },
+                ];
+                
+                const salesData: SalesDataPoint[] = funnelArray.length > 0 
+                    ? funnelArray.map((stage) => ({
+                        month: stage.stage,
+                        value: stage.value,
+                      }))
+                    : mockSalesData;
+
+                const recentConversations: RecentConversation[] = mockConversations
+                    .slice(0, 4)
+                    .map((conv) => ({
+                        id: String(conv.id),
+                        contactName: conv.contact?.full_name || "Sin nombre",
+                        message: "Última interacción",
+                        timestamp: new Date(conv.last_interaction).toLocaleTimeString("es-ES", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                        }),
+                        channel: conv.channel as "whatsapp" | "mail",
+                    }));
 
                 setData({
-                    metrics: {
-                        activeLeads: 342,
-                        conversations: 856,
-                        conversationsToday: 17,
-                        conversionRate: 24.8,
-                        totalContacts: 1284,
-                        activeLeadsTrend: 8,
-                        conversationsTrend: 17,
-                        conversionRateTrend: -12,
-                        totalContactsTrend: 12,
-                        pipelineValue: 182000,
-                        monthSales: 50000,
-                        dealsConversionRate: 25,
-                        avgDealValue: 4500,
-                    },
-                    salesData: [
-                        { month: "Ene", value: 45000 },
-                        { month: "Feb", value: 38000 },
-                        { month: "Mar", value: 32000 },
-                        { month: "Abr", value: 42000 },
-                        { month: "May", value: 68000 },
-                        { month: "Jun", value: 52000 },
-                        { month: "Jul", value: 48000 },
-                        { month: "Ago", value: 41000 },
-                        { month: "Sep", value: 38000 },
-                        { month: "Oct", value: 51000 },
-                        { month: "Nov", value: 58000 },
-                        { month: "Dic", value: 48000 },
-                    ],
-                    tasks: [
-                        {
-                            id: "1",
-                            title: "Llamada seguimiento de propuesta",
-                            client: "Laura Torres",
-                            dueDate: "Hoy 14:00",
-                            priority: "high",
-                            type: "call",
-                        },
-                        {
-                            id: "2",
-                            title: "Enviar cotización",
-                            client: "Roberto Díaz",
-                            dueDate: "Mañana 10:00",
-                            priority: "medium",
-                            type: "email",
-                        },
-                        {
-                            id: "3",
-                            title: "Reunión de cierre",
-                            client: "Tech Solutions S.A.",
-                            dueDate: "Viernes 16:00",
-                            priority: "low",
-                            type: "meeting",
-                        },
-                    ],
-                    conversations: [
-                        {
-                            id: "1",
-                            contactName: "Carolina Díaz",
-                            message:
-                                "Me gustaría saber qué precios tienen para los produc...",
-                            timestamp: "5 min",
-                            channel: "whatsapp",
-                        },
-                        {
-                            id: "2",
-                            contactName: "Juan Cebrio",
-                            message: "Perfecto, muchas gracias",
-                            timestamp: "5 min",
-                            channel: "mail",
-                        },
-                        {
-                            id: "3",
-                            contactName: "Melanie Ceballos",
-                            message:
-                                "Necesito un poco más de servicios para mi compañía",
-                            timestamp: "5 min",
-                            channel: "whatsapp",
-                        },
-                        {
-                            id: "4",
-                            contactName: "Irene Lis",
-                            message:
-                                "Me gustaría saber qué pueden ofrecer para los produ...",
-                            timestamp: "9 min",
-                            channel: "mail",
-                        },
-                    ],
+                    metrics: safeMetrics,
+                    salesData,
+                    tasks: mappedTasks,
+                    conversations: recentConversations,
                 });
 
                 setError(null);

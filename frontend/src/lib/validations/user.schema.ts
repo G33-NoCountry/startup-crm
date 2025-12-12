@@ -13,7 +13,7 @@ export const userFormSchema = z.object({
   phone: phoneSchema.optional(),
   role: userRoleEnum,
   status: userStatusEnum,
-  password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres").optional(),
+  password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres").or(z.literal("")).optional(),
 })
 
 export type UserFormData = z.infer<typeof userFormSchema>
