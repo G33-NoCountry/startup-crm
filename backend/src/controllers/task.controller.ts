@@ -184,7 +184,7 @@ export class TaskController {
       const { id } = request.user as User;
       const body = request.body as CreateTaskDto;
       body.user_id = id;
-      body.status = false;
+      // body.status = false;
       const task = await this.taskService.createTask(body);
       if (!task)
         throw new Error("No se pudo crear el registro");

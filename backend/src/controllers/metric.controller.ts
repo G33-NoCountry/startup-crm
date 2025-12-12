@@ -68,7 +68,12 @@ export class MetricController {
         success: true,
         message: "Metricas obtenidas!",
         data: {
-          metrics
+          activeLeads: metrics.total_active_contacts || 0,
+          conversations: metrics.sent_messages?.overall || 0,
+          conversationsToday: metrics.sent_messages?.by_user || 0,
+          conversionRate: metrics.response_rate || 0,
+          totalContacts: metrics.total_active_contacts || 0,
+          pipelineValue: metrics.pipeline_value || 0,
         }
       });
     } catch (error: any) {
@@ -130,9 +135,7 @@ export class MetricController {
       return response.status(200).json({
         success: true,
         message: "Funnel obtenidos!",
-        data: {
-          funnel_progress: funnelProgress
-        }
+        data: funnelProgress
       });
     } catch (error: any) {
       return response.status(500).json({
@@ -194,9 +197,7 @@ export class MetricController {
       return response.status(200).json({
         success: true,
         message: "Tasks obtenidas!",
-        data: {
-          pending_tasks: pendingTasks
-        }
+        data: pendingTasks
       });
     } catch (error: any) {
       return response.status(500).json({
