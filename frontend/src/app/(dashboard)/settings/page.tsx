@@ -13,6 +13,14 @@ import { SecurityTab } from "./components/security-tab"
 export default function SettingsPage() {
     const [activeTab, setActiveTab] = useState("perfil")
 
+    const handleSaveChanges = () => {
+        if (activeTab === "perfil") {
+            if ((window as any).__profileFormSubmit) {
+                (window as any).__profileFormSubmit();
+            }
+        }
+    };
+
     return (
         <div className="min-h-screen bg-background">
             <div className="mx-auto max-w-6xl">
@@ -25,7 +33,10 @@ export default function SettingsPage() {
                                     Administra las preferencias de tu cuenta y sistema
                                 </CardDescription>
                             </div>
-                            <Button className="bg-[#1a1d29] hover:bg-[#1a1d29]/90">
+                            <Button 
+                                onClick={handleSaveChanges}
+                                className="bg-[#1a1d29] hover:bg-[#1a1d29]/90"
+                            >
                                 Guardar cambios
                             </Button>
                         </div>

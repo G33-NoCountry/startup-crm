@@ -1,143 +1,116 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect } from "react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { userService } from "@/lib/api/userService"
+import { profileFormSchema, type ProfileFormData } from "@/lib/validations/profile.schema"
+import { toast } from "sonner"
+import type { User } from "@/types/user.types"
 
-export function ProfileTab() {
-    const [emailError, setEmailError] = useState(false)
+interface ProfileTabProps {
+  onSave?: () => void;
+}
+
+export function ProfileTab({ onSave }: ProfileTabProps) {
+    const form = useForm<ProfileFormData>({
+        resolver: zodResolver(profileFormSchema),
+        defaultValues: {
+            full_name: "",
+            email: "",
+        },
+    });
+
+    useEffect(() => {
+        const loadProfile = async () => {
+            try {
+                const user = await userService.getProfile();
+                form.reset({
+                    full_name: user.full_name,
+                    email: user.email,
+                });
+            } catch (error) {
+                toast.error("Error al cargar perfil");
+            }
+        };
+        loadProfile();
+    }, [form]);
+
+    const handleSubmit = async (data: ProfileFormData) => {
+        try {
+            await userService.updateProfile(data);
+            toast.success("Perfil actualizado correctamente");
+            onSave?.();
+        } catch (error) {
+            toast.error(error instanceof Error ? error.message : "Error al actualizar perfil");
+        }
+    };
+
+    useEffect(() => {
+        (window as any).__profileFormSubmit = form.handleSubmit(handleSubmit);
+        return () => {
+            delete (window as any).__profileFormSubmit;
+        };
+    }, [form]);
+
+    const { full_name, email } = form.watch();
+    const initials = full_name
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2);
 
     return (
         <div>
             <h3 className="mb-4 text-lg font-semibold">Información del Perfil</h3>
 
             <div className="mb-6 flex items-center gap-4">
-                <Avatar className="size-16 bg-[#f97316] text-white">
-                    <AvatarFallback className="bg-[#f97316] text-xl font-semibold text-white">
-                        MV
+                <Avatar className="size-16 bg-primary text-white">
+                    <AvatarFallback className="bg-primary text-xl font-semibold text-white">
+                        {initials || "U"}
                     </AvatarFallback>
                 </Avatar>
                 <div>
-                    <button className="text-sm font-medium text-[#6366f1] hover:underline">
-                        Editar avatar
-                    </button>
-                    <p className="text-xs text-muted-foreground">
-                        Ajusta tu avatar según tus preferencias
+                    <p className="text-sm text-muted-foreground">
+                        Avatar generado automáticamente
                     </p>
                 </div>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-2">
+            <form onSubmit={form.handleSubmit(handleSubmit)} className="grid gap-6 md:grid-cols-2">
                 <div className="space-y-2">
-                    <Label htmlFor="nombre">Nombre completo</Label>
+                    <Label htmlFor="full_name">Nombre completo</Label>
                     <Input
-                        id="nombre"
-                        defaultValue="Marisa Villanieva"
+                        id="full_name"
+                        {...form.register("full_name")}
                         className="bg-background"
                     />
-                </div>
-
-                <div className="space-y-2">
-                    <Label htmlFor="idioma">Idioma</Label>
-                    <Select defaultValue="es">
-                        <SelectTrigger id="idioma" className="bg-background">
-                            <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="es">Español</SelectItem>
-                            <SelectItem value="en">English</SelectItem>
-                            <SelectItem value="pt">Português</SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
-
-                <div className="space-y-2">
-                    <Label htmlFor="email" className={emailError ? "text-destructive" : ""}>
-                        Correo electrónico
-                    </Label>
-                    <Input
-                        id="email"
-                        type="email"
-                        defaultValue="marisa@gmail.com"
-                        className={emailError ? "border-destructive" : "bg-background"}
-                        onChange={(e) => {
-                            setEmailError(e.target.value === "marisa@gmail.com")
-                        }}
-                    />
-                    {emailError && (
+                    {form.formState.errors.full_name && (
                         <p className="text-xs text-destructive">
-                            Ya existe una cuenta con este correo.
+                            {form.formState.errors.full_name.message}
                         </p>
                     )}
                 </div>
 
                 <div className="space-y-2">
-                    <Label htmlFor="zona">Zona horaria</Label>
-                    <Select defaultValue="gmt1">
-                        <SelectTrigger id="zona" className="bg-background">
-                            <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="gmt1">GMT+1 Madrid, España</SelectItem>
-                            <SelectItem value="gmt-3">GMT-3 Buenos Aires, Argentina</SelectItem>
-                            <SelectItem value="gmt-5">GMT-5 Ciudad de México, México</SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
-
-                <div className="space-y-2">
-                    <Label htmlFor="telefono">Teléfono</Label>
+                    <Label htmlFor="email">Correo electrónico</Label>
                     <Input
-                        id="telefono"
-                        defaultValue="+54 351 990 1132"
+                        id="email"
+                        type="email"
+                        {...form.register("email")}
                         className="bg-background"
                     />
+                    {form.formState.errors.email && (
+                        <p className="text-xs text-destructive">
+                            {form.formState.errors.email.message}
+                        </p>
+                    )}
                 </div>
-
-                <div className="space-y-2">
-                    <Label htmlFor="fecha">Formato de fecha</Label>
-                    <Select defaultValue="ddmmyyyy">
-                        <SelectTrigger id="fecha" className="bg-background">
-                            <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="ddmmyyyy">DD/MM/YYYY</SelectItem>
-                            <SelectItem value="mmddyyyy">MM/DD/YYYY</SelectItem>
-                            <SelectItem value="yyyymmdd">YYYY-MM-DD</SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
-
-                <div className="space-y-2">
-                    <Label htmlFor="cargo">Cargo del equipo</Label>
-                    <Select defaultValue="admin">
-                        <SelectTrigger id="cargo" className="bg-background">
-                            <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="admin">Administrador del sistema</SelectItem>
-                            <SelectItem value="manager">Gerente</SelectItem>
-                            <SelectItem value="user">Usuario</SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
-
-                <div className="space-y-2">
-                    <Label htmlFor="moneda">Moneda</Label>
-                    <Select defaultValue="ars">
-                        <SelectTrigger id="moneda" className="bg-background">
-                            <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="ars">PESOS ARG ($)</SelectItem>
-                            <SelectItem value="usd">USD ($)</SelectItem>
-                            <SelectItem value="eur">EUR (€)</SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
-            </div>
+            </form>
         </div>
     )
 }

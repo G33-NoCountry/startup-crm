@@ -87,7 +87,7 @@ export function RecentConversations({
                     filteredConversations.map((conversation) => (
                         <div
                             key={conversation.id}
-                            className="flex items-center gap-3 rounded-lg border p-3 transition-colors hover:bg-accent cursor-pointer group"
+                            className="flex items-center gap-3 rounded-lg border p-3 transition-colors hover:bg-gray-50 cursor-pointer group"
                         >
                             <Avatar>
                                 <AvatarFallback
