@@ -15,13 +15,14 @@ import reorderFunnelValidator from "../validators/funnel-stage/reorder-funnel.va
 
 const router = Router();
 
-router.use(checkJwtMiddleware, acceptRoleMiddleware("Admin"));
-
 const funnelStageRepository = new FunnelStageRepository;
 const funnelStageService = new FunnelStageService(funnelStageRepository);
 const funnelStageController = new FunnelStageController(funnelStageService);
 
-router.get("/", funnelStageController.getFunnelStages);
+router.get("/", checkJwtMiddleware, funnelStageController.getFunnelStages);
+
+router.use(checkJwtMiddleware, acceptRoleMiddleware("Admin"));
+
 router.post("/", createFunnelValidator, validateRequestMiddleware, sanitizeBody, funnelStageController.createFunnelStages);
 router.patch(
     "/reorder",

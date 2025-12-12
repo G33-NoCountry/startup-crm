@@ -103,10 +103,15 @@ export class ContactController {
     try {
       const { after, limit, before, funnel_stage_id } = request.query;
       const parsedLimit = limit ? parseInt(limit as string, 10) : undefined;
-      const contactsId =
-        funnel_stage_id ?
-          await this.contactService.filterContactsByFunnelStageId(parseInt(funnel_stage_id as string)) :
-          [];
+      
+      let contactsId: any[] = [];
+      if (funnel_stage_id) {
+        try {
+          contactsId = await this.contactService.filterContactsByFunnelStageId(parseInt(funnel_stage_id as string));
+        } catch (filterError) {
+          console.warn("Error al filtrar por funnel_stage_id, ignorando filtro:", filterError);
+        }
+      }
 
       const contacts = await this.contactService.getContacts(
         parsedLimit,
