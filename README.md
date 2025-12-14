@@ -334,8 +334,8 @@ npm run start
 
 | Recurso | Enlace | Estado |
 |---------|--------|--------|
-| 🎨 **Diseño UX/UI** | [Ver en Figma](#) | ✅ Completo |
-| 📋 **Gestión (Jira)** | [Ver Tablero](#) | 🔄 En uso |
+| 🎨 **Diseño UX/UI** | [Ver en Figma](https://www.figma.com/design/pwZOIFO98Q9CwZzY8cr0zW/Start?node-id=0-1&p=f) | ✅ Completo |
+| 📋 **Gestión (Jira)** | [Ver Tablero](https://innovlab.atlassian.net/jira/software/projects/SCRUM/summary) | 🔄 En uso |
 | 🚀 **Deploy Frontend** | [Ver Demo en Vercel](#) | 🚧 Pendiente |
 | ⚙️ **Deploy Backend** | [Ver API en Railway](#) | 🚧 Pendiente |
 | 📄 **Documentación API** | `http://localhost:3001/api/docs` | ✅ Disponible |
