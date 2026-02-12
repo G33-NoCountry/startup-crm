@@ -150,8 +150,7 @@ export class ConversationController {
    *                   type: string
    *                   example: "Mensaje enviado y registrado."
    *                 data:
-   *                   type: object
-   *                   description: Objeto del mensaje creado (puedes referenciar un esquema Message si lo tienes)
+   *                   $ref: '#/components/schemas/FullMessage'
    *       400:
    *         description: Error de validación (contenido vacío o canal inválido)
    *       404:

@@ -12,18 +12,15 @@ import { acceptRoleMiddleware } from "../middlewares/check-role.middleware";
 import updateStatusConversationValidator from "../validators/conversation/update-status-conversation.validator";
 import { ConversationRepository } from "../repositories/conversation.repository";
 import { ConversationService } from "../services/conversation.service";
-import { MailService } from '../services/mail.service';
 
 const router = Router();
 
-const mailService = new MailService();
 const messageRepository = new MessageRepository;
 const conversationRepository = new ConversationRepository;
 const messageService = new MessageService(messageRepository);
 const conversationService = new ConversationService(
     conversationRepository, 
     messageRepository,      
-    mailService             
 );
 const conversationController = new ConversationController(conversationService, messageService);
 

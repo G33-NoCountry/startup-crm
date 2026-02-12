@@ -15,6 +15,13 @@ services:
     ports:
       - "3306:3306" # Expone el puerto por si lo necesitas localmente
 
+  redis:
+    image: redis:7
+    container_name: startup_crm_redis
+    restart: always
+    ports:
+      - "6379:6379"
+
   # Servicio de la Aplicación Node.js
   app:
     build: .
@@ -24,6 +31,7 @@ services:
       - "3000:3000" # Expone el puerto de la app
     depends_on:
       - db # Asegura que la DB se levante primero
+      - redis
     environment:
       # Pasa todas las variables de .env al contenedor
       # El script de abajo se encarga de esto.
@@ -38,7 +46,16 @@ services:
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN}
       REFRESH_TOKEN_SECRET: ${REFRESH_TOKEN_SECRET}
       REFRESH_TOKEN_EXPIRES_IN: ${REFRESH_TOKEN_EXPIRES_IN}
-      
+
+      WHATSAPP_API_URL: ${WHATSAPP_API_URL}
+      WHATSAPP_API_ACCCESS_TOKEN: ${WHATSAPP_API_ACCCESS_TOKEN}
+
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASS: ${SMTP_PASS}
+      MAIL_FROM: ${MAIL_FROM}
+
     volumes:
       - .:/usr/src/app # Monta el código fuente
       - /usr/src/app/node_modules # Asegura que los node_modules se manejen dentro del contenedor

@@ -23,6 +23,10 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
       },
+      channel: {
+        type: Sequelize.ENUM("email", "whatsapp"),
+        allowNull: false,
+      },
       content: {
         type: Sequelize.TEXT,
         allowNull: false,
